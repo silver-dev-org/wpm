@@ -1,0 +1,16 @@
+{
+	"name": "mygame",
+	"type": "module",
+	"scripts": {
+		"build": "vite build",
+		"dev": "vite",
+		"preview": "vite preview",
+		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip www -x \"**/.DS_Store\""
+	},
+	"dependencies": {
+		"kaplay": "^3001.0.0-beta.8"
+	},
+	"devDependencies": {
+		"vite": "^5.4.10"
+	}
+}

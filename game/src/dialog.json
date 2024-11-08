@@ -1,22 +1,19 @@
 {
-    "blocks": [
+"blocks": [
         [
             "function isUnique(str) {\n",
-            "    const n = matrix.length;\n",
+            "/EMPTY/EMPTYconst n = matrix.length;\n",
             "\n",
-            "   for (let layer = 0; layer < Math.floor(n / 2); layer++) {\n",
-            "    let charSet = new Set();\n",
+            "/EMPTY/EMPTYfor (let i = 0; i < str.length; i++) {\n",
+            "if (charSet.has(str[i])) {\n",
+            "return false;\n",
+            "}\n",
+            "charSet.add(str[i]);\n",
+            "}\n",
             "\n",
-            "    for (let i = 0; i < str.length; i++) {\n",
-            "        if (charSet.has(str[i])) {\n",
-            "            return false;\n",
-            "        }\n",
-            "        charSet.add(str[i]);\n",
-            "        }\n",
-            "    }\n",
-            "    return matrix;\n",
-            "        }\n",
             "\n",
+            "}\n",
+            "/EMPTY/EMPTYreturn true;\n",
             "}\n"
         ],
         [

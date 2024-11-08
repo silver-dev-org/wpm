@@ -1,17 +1,24 @@
 import kaplay from "kaplay";
 import "kaplay/global";
-import dialogs from "./dialog.json"; 
+import dialogs from "./dialog.json";
 
 kaplay({
-    background: [255, 209, 253],
+    background: [10, 10, 27, 0],
 });
 
-const COLOR_TEXT_DEFAULT = Color.fromArray([0, 0, 255]);
-const COLOR_TEXT_RIVAL = Color.fromArray([128, 128, 255]);
-const COLOR_TEXT_CORRECT = Color.GREEN;
-const COLOR_TEXT_INCORRECT = Color.RED;
-const COLOR_TIMER = Color.fromArray([255, 215, 0]);
+loadFont("monogram", "/public/fonts/monogram.ttf");
 
+function getCSSColor(colorReturn) {
+    return getComputedStyle(document.documentElement).getPropertyValue(colorReturn).trim();
+}
+
+const COLOR_TEXT_DEFAULT = Color.fromHex(getCSSColor('--color-text-default'));
+const COLOR_TEXT_RIVAL = Color.fromHex(getCSSColor('--color-text-rival'));
+const COLOR_TEXT_CORRECT = Color.fromHex(getCSSColor('--color-text-correct'));
+const COLOR_TEXT_INCORRECT = Color.fromHex(getCSSColor('--color-text-incorrect'));
+const COLOR_TIMER = Color.fromHex(getCSSColor('--color-timer'));
+
+const goalBlocks = 2;
 let completedBlocks = 0;
 let totalCorrectChars = 0;
 let totalIncorrectChars = 0;
@@ -20,30 +27,23 @@ let accumulatedCorrectChars = 0;
 let accumulatedIncorrectChars = 0;
 let accumulatedCorrectLines = 0;
 let accumulatedMissingChars = 0;
-const goalBlocks = 2;
-let timeLeft = 60;
+let timeLeft = 160;
 const maxMistakes = 2;
 let currentMistakes = 0;
-
+let font_size = 32;
 const jsonData = dialogs;
 
 scene("game", () => {
     let currentBlockIndex = 0;
     let currentGroupIndex = 0;
-    const maxLines = 8;
+    const maxLines = 16;
     let txtCharacters = [];
     let cursorPos = 0;
-
-    const textbox = add([
-        rect(width() - 100, 640, { radius: 32 }),
-        anchor("center"),
-        pos(center().x, height() / 2),
-        outline(4),
-    ]);
 
     const timerLabel = add([
         text(`[yellow]${timeLeft}[/yellow]`, {
             size: 32,
+            font: "monogram",
             styles: {
                 "yellow": { color: COLOR_TIMER },
             },
@@ -55,7 +55,7 @@ scene("game", () => {
     const cursorPointer = add([
         text("_", { size: 32, color: COLOR_TEXT_INCORRECT }),
         pos(0, 0),
-        anchor("center"),
+        anchor("left"),
     ]);
 
     function selectCurrentBlock() {
@@ -90,10 +90,9 @@ scene("game", () => {
             currentGroupIndex = 0;
             completedBlocks++;
 
-            const expectedChars = selectCurrentBlock().join('').length; 
+            const expectedChars = selectCurrentBlock().join('').length;
             const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
             accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-            console.log(`Miss characters: ${accumulatedMissingChars}`);
 
             if (completedBlocks >= goalBlocks) {
                 go("endgame");
@@ -112,23 +111,31 @@ scene("game", () => {
         txtCharacters.length = 0;
         cursorPos = 0;
         currentMistakes = 0;
-
         const lineHeight = 30;
         const charSpacing = 17;
+        let intialposX = 250;
         let verticalOffset = height() / 2 - (lineHeight * currentGroup.length) / 2;
 
         for (let line of currentGroup) {
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i] === "\n" ? " " : line[i];
+            let i = 0;
+            while (i < line.length) {
+
+                if (line.startsWith("/EMPTY", i)) {
+                    i += 6;
+                    continue;
+                }
+
+                const char = line[i];
                 const charText = add([
-                    text(char, { size: 32 }),
-                    pos(center().x - (line.length * charSpacing) / 2 + (i * charSpacing), verticalOffset),
-                    anchor("center"),
+                    text(char === "\n" ? " " : char, { size: font_size, font: "monogram" }),
+                    pos(intialposX + (i * charSpacing), verticalOffset),
+                    anchor("left"),
                     color(COLOR_TEXT_DEFAULT),
-                    { originalChar: line[i], originalColor: COLOR_TEXT_DEFAULT, isModified: false },
+                    { originalChar: char, originalColor: COLOR_TEXT_DEFAULT, isModified: false },
                 ]);
 
                 txtCharacters.push(charText);
+                i++;
             }
             verticalOffset += lineHeight;
         }
@@ -136,6 +143,7 @@ scene("game", () => {
         updateCursorPosition();
         applyRivalColor();
     }
+
 
     function updateCursorPosition() {
         if (cursorPos < txtCharacters.length) {
@@ -151,13 +159,11 @@ scene("game", () => {
 
             if (timeLeft <= 0) {
                 timerLabel.text = "[yellow]0[/yellow]";
-                
-                const expectedChars = selectCurrentBlock().join('').length; 
+
+                const expectedChars = selectCurrentBlock().join('').length;
                 const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
                 accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-                
-                console.log(`Missin Characters: ${accumulatedMissingChars}`);
-                
+
                 go("endgame");
             }
         });
@@ -165,10 +171,11 @@ scene("game", () => {
 
     window.addEventListener("keydown", (event) => {
         const key = event.key;
+
         if (key === "Backspace" && cursorPos > 0) {
             const currentChar = txtCharacters[cursorPos - 1];
             const nextChar = cursorPos < txtCharacters.length ? txtCharacters[cursorPos] : null;
-        
+
             if (currentChar.originalChar === "\n") {
                 totalCorrectLines--;
             }
@@ -178,11 +185,11 @@ scene("game", () => {
             } else if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 totalIncorrectChars--;
             }
-        
+
             if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 currentMistakes--;
             }
-        
+
             if (nextChar && nextChar.color.eq(COLOR_TEXT_RIVAL)) {
                 currentChar.color = COLOR_TEXT_RIVAL;
             } else {
@@ -193,11 +200,10 @@ scene("game", () => {
             accumulatedCorrectChars = totalCorrectChars;
             accumulatedIncorrectChars = totalIncorrectChars;
             accumulatedCorrectLines = totalCorrectLines;
-            debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
             updateCursorPosition();
             return;
         }
-        
+
         if (currentMistakes >= maxMistakes) {
             return;
         }
@@ -214,8 +220,15 @@ scene("game", () => {
                     accumulatedCorrectChars = totalCorrectChars;
                     accumulatedIncorrectChars = totalIncorrectChars;
                     accumulatedCorrectLines = totalCorrectLines;
-                    debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
                     updateCursorPosition();
+
+                    if (cursorPos >= txtCharacters.length) {
+                        const allCorrect = txtCharacters.every(char => char.color.eq(COLOR_TEXT_CORRECT));
+                        if (allCorrect) {
+                            currentGroupIndex++;
+                            updateDialog();
+                        }
+                    }
                 }
                 return;
             }
@@ -234,10 +247,10 @@ scene("game", () => {
                 accumulatedCorrectChars = totalCorrectChars;
                 accumulatedIncorrectChars = totalIncorrectChars;
                 accumulatedCorrectLines = totalCorrectLines;
-                debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
                 cursorPos++;
                 updateCursorPosition();
             }
+
 
             if (cursorPos >= txtCharacters.length) {
                 const allCorrect = txtCharacters.every(char => char.color.eq(COLOR_TEXT_CORRECT));
@@ -248,6 +261,7 @@ scene("game", () => {
             }
         }
     });
+
 
     startTimer();
     updateDialog();
@@ -265,9 +279,9 @@ scene("endgame", () => {
 
     const timeElapsed = 60 - timeLeft;
     const wpm = (accumulatedCorrectChars / 5) / (timeElapsed / 60);
-    const loc = (accumulatedCorrectLines / timeElapsed) * 60; 
+    const loc = (accumulatedCorrectLines / timeElapsed) * 60;
 
-    const statsLabel = add([ 
+    const statsLabel = add([
         text(`Accuracy: ${accuracy.toFixed(2)}%`, { size: 32 }),
         pos(center().x, center().y),
         anchor("center"),
@@ -293,3 +307,4 @@ scene("endgame", () => {
 });
 
 go("game");
+

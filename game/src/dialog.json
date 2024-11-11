@@ -1,19 +1,17 @@
 {
 "blocks": [
         [
-            "function isUnique(str) {\n",
-            "/EMPTY/EMPTYconst n = matrix.length;\n",
+            "Function isUnique(str) {\n",
+            "/EMPTYlet charSet = new Set();\n",
             "\n",
-            "/EMPTY/EMPTYfor (let i = 0; i < str.length; i++) {\n",
-            "if (charSet.has(str[i])) {\n",
-            "return false;\n",
-            "}\n",
-            "charSet.add(str[i]);\n",
-            "}\n",
+            "/EMPTYfor (let i = 0; i < str.length; i++) {\n",
+            "/EMPTY/EMPTYif (charSet.has(str[i])) {\n",
+            "/EMPTY/EMPTY/EMPTYreturn false;\n",
+            "/EMPTY/EMPTY}\n",
+            "/EMPTY/EMPTYcharSet.add(str[i]);\n",
+            "/EMPTY}\n",
             "\n",
-            "\n",
-            "}\n",
-            "/EMPTY/EMPTYreturn true;\n",
+            "/EMPTYreturn true;\n",
             "}\n"
         ],
         [

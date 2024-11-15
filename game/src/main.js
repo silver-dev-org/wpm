@@ -6,21 +6,19 @@ kaplay({
     background: [10, 10, 27, 0],
 });
 
-loadFont("monogram", "/public/fonts/monogram.ttf");
+loadFont("monogram", "/fonts/monogram.ttf");
 
 function getCSSColor(colorReturn) {
-    return getComputedStyle(document.documentElement).getPropertyValue(colorReturn).trim();
+    const color = getComputedStyle(document.documentElement).getPropertyValue(colorReturn);
+    return color ? color.trim() : "#FFFFFF";
 }
 const goalBlocks = 4;
 
-let COLOR_TEXT_DEFAULT = Color.fromHex(getCSSColor('--color-text-default'));
-let COLOR_TEXT_RIVAL = Color.fromHex(getCSSColor('--color-text-rival'));
-let COLOR_TEXT_CORRECT = Color.fromHex(getCSSColor('--color-text-correct'));
-let COLOR_TEXT_INCORRECT = Color.fromHex(getCSSColor('--color-text-incorrect'));
-let COLOR_TIMER = Color.fromHex(getCSSColor('--color-timer'));
-
-let OmitedtagsLengths = { "/EMPTY": 5, };
-
+let COLOR_TEXT_DEFAULT = Color.fromHex("#99959c");
+let COLOR_TEXT_RIVAL = Color.fromHex("#faedaa");
+let COLOR_TEXT_CORRECT = Color.GREEN;
+let COLOR_TEXT_INCORRECT = Color.RED;
+let OmitedtagsLengths = { "▯": 0, };
 let completedBlocks = 0;
 let totalCorrectChars = 0;
 let totalIncorrectChars = 0;
@@ -43,13 +41,20 @@ scene("game", () => {
     let txtCharacters = [];
     let cursorPos = 0;
 
+    const textbox = add([
+        rect(width() * 0.9, height() * 0.8, { radius: 4 }),
+        anchor("center"),
+        pos(center().x, height() - height() * 0.5),
+        outline(4, CYAN),
+        color(10, 10, 27),
+        opacity(0.7),
+        area(),
+    ]);
+
     const timerLabel = add([
-        text(`[yellow]${timeLeft}[/yellow]`, {
+        text({ timeLeft }, {
             size: 48,
             font: "monogram",
-            styles: {
-                "yellow": { color: COLOR_TIMER },
-            },
         }),
         pos(width() * 0.80, height() * 0.1),
         anchor("topright"),
@@ -62,19 +67,28 @@ scene("game", () => {
     ]);
 
     function selectCurrentBlock() {
-        return jsonData.blocks[currentBlockIndex];
+        if (jsonData.blocks && jsonData.blocks[currentBlockIndex]) {
+            return jsonData.blocks[currentBlockIndex];
+        } else {
+            console.error("jsonData.blocks is undefined or out of range");
+            return [];
+        }
     }
 
     function getCurrentGroup() {
+       // debug.log(currentBlockIndex);
         const currentBlock = selectCurrentBlock();
-        const startIndex = currentGroupIndex * maxLines;
-        return currentBlock.slice(startIndex, startIndex + maxLines);
+        const lineHeight = 28; 
+        const visibleLines = Math.floor(textbox.height / lineHeight);
+    
+        return currentBlock.slice(0, visibleLines);
     }
 
     function applyRivalColor() {
         let rivalIndex = 0;
+        const currentBlockId = currentBlockIndex; 
         loop(0.3, () => {
-            if (rivalIndex < txtCharacters.length) {
+            if (rivalIndex < txtCharacters.length && currentBlockIndex === currentBlockId) {
                 const char = txtCharacters[rivalIndex];
                 if (char.color.eq(COLOR_TEXT_DEFAULT)) {
                     char.color = COLOR_TEXT_RIVAL;
@@ -94,40 +108,39 @@ scene("game", () => {
             accumulatedCorrectLines = totalCorrectLines;
             currentGroupIndex = 0;
             completedBlocks++;
-            timeLeft= maxtime;
+            timeLeft = maxtime;
             const expectedChars = selectCurrentBlock().join('').length;
             const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
             accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-
+    
             if (completedBlocks >= goalBlocks) {
                 go("endgame");
                 return;
             }
-
-            currentBlockIndex++;
+    
             if (currentBlockIndex >= jsonData.blocks.length) {
                 currentBlockIndex = 0;
             }
             updateDialog();
             return;
         }
-
+    
         txtCharacters.forEach(character => character.destroy());
         txtCharacters.length = 0;
         cursorPos = 0;
         currentMistakes = 0;
 
-        const lineHeight = 30;
+        const lineHeight = 28;
         const charSpacing = 17;
-        const font_size = 48;
+        const font_size = 32;
 
         let totalTextWidth = currentGroup.reduce((width, line) => {
             return width + line.length * charSpacing;
         }, 0);
-
-        let intialposX = Math.max(0, (width() - totalTextWidth) / 2) + (width() * 0.10);
-        let verticalOffset = height() / 2 - (lineHeight * currentGroup.length) / 2;
-
+    
+        let initialPosX = Math.max(0, (textbox.width - totalTextWidth) / 2) + textbox.pos.x - (textbox.width / 2.2);
+        let verticalOffset = textbox.pos.y - (lineHeight * currentGroup.length) / 2;
+    
         for (let line of currentGroup) {
             let i = 0;
             while (i < line.length) {
@@ -142,23 +155,20 @@ scene("game", () => {
                     }
                 }
                 if (!tagFound) {
-                    const charText = add([
+                    const charText = add([ 
                         text(char, { size: font_size, font: "monogram" }),
-                        pos(intialposX + (i * charSpacing), verticalOffset),
+                        pos(initialPosX + (i * charSpacing), verticalOffset),
                         anchor("left"),
                         color(COLOR_TEXT_DEFAULT),
                         { originalChar: char, originalColor: COLOR_TEXT_DEFAULT, isModified: false },
                     ]);
-
                     txtCharacters.push(charText);
                 }
-
                 i++;
             }
-
             verticalOffset += lineHeight;
         }
-
+    
         updateCursorPosition();
         applyRivalColor();
     }
@@ -168,9 +178,9 @@ scene("game", () => {
         if (cursorPos < txtCharacters.length) {
             const currentChar = txtCharacters[cursorPos];
             cursorPointer.pos = vec2(currentChar.pos.x, currentChar.pos.y);
+           // debug.log(`Cursor pos: ${cursorPos}, Char: '${currentChar.text}'`);
         }
     }
-
 
     function startTimer() {
         loop(1, () => {
@@ -180,7 +190,8 @@ scene("game", () => {
             if (timeLeft <= 0) {
                 timerLabel.text = "[yellow]0[/yellow]";
 
-                const expectedChars = selectCurrentBlock().join('').length;
+                const currentBlock = selectCurrentBlock();
+                const expectedChars = currentBlock ? currentBlock.join('').length : 0;
                 const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
                 accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
 
@@ -188,6 +199,8 @@ scene("game", () => {
             }
         });
     }
+
+    let spacePositions = [];
 
     window.addEventListener("keydown", (event) => {
         const key = event.key;
@@ -200,12 +213,16 @@ scene("game", () => {
                 updateCursorPosition();
                 return;
             }
+            if (spacePositions.includes(cursorPos - 1)) {        
+                currentChar.text = " "; 
+                spacePositions = spacePositions.filter(pos => pos !== cursorPos - 1);
+            }
 
             if (currentChar.originalChar === "\n") {
                 totalCorrectLines--;
             }
 
-            if (currentChar.color.eq(COLOR_TEXT_CORRECT)) {
+            if (currentChar.color.eq(!COLOR_TEXT_CORRECT && !COLOR_TEXT_DEFAULT)) {
                 totalCorrectChars--;
             } else if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 totalIncorrectChars--;
@@ -247,7 +264,6 @@ scene("game", () => {
                 updateCursorPosition();
                 return;
             }
-
             if (currentChar.originalChar === "\n") {
                 if (key === "Enter") {
                     currentChar.color = COLOR_TEXT_CORRECT;
@@ -286,6 +302,7 @@ scene("game", () => {
                 return;
             }
 
+            const isValidCharacter = /^[a-zA-Z0-9 ]$/.test(key);
             if (key.length === 1 || key === " ") {
                 const isCorrect = currentChar.text === key;
 
@@ -296,6 +313,12 @@ scene("game", () => {
                     currentChar.color = COLOR_TEXT_INCORRECT;
                     totalIncorrectChars++;
                     currentMistakes++;
+
+                    if (currentChar.originalChar === " ") {
+                        currentChar.text = key;
+                        spacePositions.push(cursorPos);
+                       // debug.log("Insert");
+                    }
                 }
                 accumulatedCorrectChars = totalCorrectChars;
                 accumulatedIncorrectChars = totalIncorrectChars;
@@ -303,27 +326,51 @@ scene("game", () => {
                 cursorPos++;
                 updateCursorPosition();
             }
+
         }
     });
 
     function applyTagColor() {
-        for (const [tag, positions] of Object.entries(colorTags)) {
-            if (positions.includes(cursorPos)) {
-                switch (tag) {
-                    case "/C1":
-                        COLOR_TEXT_CORRECT = WHITE;
+        if (colorTags && currentBlockIndex !== undefined) {
+           // debug.log(` ${cursorPos}`);
+            const currentBlock = colorTags[currentBlockIndex];
+            if (currentBlock) {
+                for (const [tag, positions] of Object.entries(currentBlock)) {
+                    //debug.log(`Checking tag ${tag} with positions ${positions}`);
+
+                    if (positions.includes(cursorPos)) {
+                        switch (tag) {
+                            case "/C1":
+                                COLOR_TEXT_CORRECT = Color.CYAN;
+                              //  debug.log("/C1");
+                                break;
+                            case "/C2":
+                                COLOR_TEXT_CORRECT = Color.MAGENTA;
+                             //    debug.log(" /C2");
+                                break;
+                            case "/C3":
+                                COLOR_TEXT_CORRECT = Color.WHITE;
+                              //   debug.log("/C3");
+                                break;
+                            case "/C4":
+                                COLOR_TEXT_CORRECT =Color.fromHex("#a35b0f");
+                               //  debug.log("/C4");
+                                break;
+                            case "/C5":
+                                COLOR_TEXT_CORRECT =Color.fromHex("#600fa3");
+                              //   debug.log("/C5");
+                                break;
+                            default:
+                                console.warn(`warn: ${tag}`);
+                                break;
+                        }
                         break;
-                    case "/C2":
-                        COLOR_TEXT_CORRECT = GREEN;
-                        break;
-                    case "/C3":
-                        COLOR_TEXT_CORRECT = BLUE;
-                        break;
+                    } 
                 }
-                break;
             }
         }
     }
+
 
     function isTag(character) {
         return tagPositions.hasOwnProperty(character);
@@ -331,7 +378,6 @@ scene("game", () => {
 
     startTimer();
     updateDialog();
-
 });
 
 scene("endgame", () => {

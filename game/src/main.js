@@ -12,7 +12,11 @@ function getCSSColor(colorReturn) {
     const color = getComputedStyle(document.documentElement).getPropertyValue(colorReturn);
     return color ? color.trim() : "#FFFFFF";
 }
-const goalBlocks = 4;
+const goalBlocks = 2;
+const maxtime = 500;
+const maxMistakes = 2;
+const lineHeight = 28;
+const charSpacing = 14;
 
 let COLOR_TEXT_DEFAULT = Color.fromHex("#99959c");
 let COLOR_TEXT_RIVAL = Color.fromHex("#faedaa");
@@ -27,11 +31,9 @@ let accumulatedCorrectChars = 0;
 let accumulatedIncorrectChars = 0;
 let accumulatedCorrectLines = 0;
 let accumulatedMissingChars = 0;
-const maxtime = 160;
 let timeLeft = maxtime;
-const maxMistakes = 2;
 let currentMistakes = 0;
-let font_size = 32;
+let font_size = 24;
 const jsonData = dialogs;
 
 scene("game", () => {
@@ -76,7 +78,7 @@ scene("game", () => {
     }
 
     function getCurrentGroup() {
-       // debug.log(currentBlockIndex);
+        debug.log(currentBlockIndex);
         const currentBlock = selectCurrentBlock();
         const lineHeight = 28; 
         const visibleLines = Math.floor(textbox.height / lineHeight);
@@ -102,37 +104,23 @@ scene("game", () => {
 
     function updateDialog() {
         const currentGroup = getCurrentGroup();
-        if (currentGroup.length === 0) {
-            accumulatedCorrectChars = totalCorrectChars;
-            accumulatedIncorrectChars = totalIncorrectChars;
-            accumulatedCorrectLines = totalCorrectLines;
-            currentGroupIndex = 0;
-            completedBlocks++;
-            timeLeft = maxtime;
-            const expectedChars = selectCurrentBlock().join('').length;
-            const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
-            accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-    
-            if (completedBlocks >= goalBlocks) {
-                go("endgame");
-                return;
-            }
-    
-            if (currentBlockIndex >= jsonData.blocks.length) {
-                currentBlockIndex = 0;
-            }
-            updateDialog();
-            return;
-        }
-    
+        accumulatedCorrectChars = totalCorrectChars;
+        accumulatedIncorrectChars = totalIncorrectChars;
+        accumulatedCorrectLines = totalCorrectLines;
+        currentGroupIndex = 0;
+        completedBlocks++;
+        debug.log("completedBlocks")
+  
+        timeLeft = maxtime;
+        //let expectedChars = selectCurrentBlock().join('').length;
+       // let totalCharsTyped = totalCorrectChars + totalIncorrectChars;
+       // accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
+
         txtCharacters.forEach(character => character.destroy());
         txtCharacters.length = 0;
         cursorPos = 0;
         currentMistakes = 0;
 
-        const lineHeight = 28;
-        const charSpacing = 17;
-        const font_size = 32;
 
         let totalTextWidth = currentGroup.reduce((width, line) => {
             return width + line.length * charSpacing;
@@ -186,14 +174,10 @@ scene("game", () => {
         loop(1, () => {
             timeLeft--;
             timerLabel.text = `[yellow]${timeLeft}[/yellow]`;
-
+            debug.log(totalCorrectChars);
+            debug.log(totalIncorrectChars);
             if (timeLeft <= 0) {
                 timerLabel.text = "[yellow]0[/yellow]";
-
-                const currentBlock = selectCurrentBlock();
-                const expectedChars = currentBlock ? currentBlock.join('').length : 0;
-                const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
-                accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
 
                 go("endgame");
             }
@@ -222,12 +206,6 @@ scene("game", () => {
                 totalCorrectLines--;
             }
 
-            if (currentChar.color.eq(!COLOR_TEXT_CORRECT && !COLOR_TEXT_DEFAULT)) {
-                totalCorrectChars--;
-            } else if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
-                totalIncorrectChars--;
-            }
-
             if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 currentMistakes--;
             }
@@ -239,9 +217,6 @@ scene("game", () => {
             }
             currentChar.isModified = false;
             cursorPos--;
-            accumulatedCorrectChars = totalCorrectChars;
-            accumulatedIncorrectChars = totalIncorrectChars;
-            accumulatedCorrectLines = totalCorrectLines;
             updateCursorPosition();
             applyTagColor();
             return;
@@ -270,9 +245,6 @@ scene("game", () => {
                     totalCorrectChars++;
                     totalCorrectLines++;
                     cursorPos++;
-                    accumulatedCorrectChars = totalCorrectChars;
-                    accumulatedIncorrectChars = totalIncorrectChars;
-                    accumulatedCorrectLines = totalCorrectLines;
                     updateCursorPosition();
 
                     if (cursorPos >= txtCharacters.length) {

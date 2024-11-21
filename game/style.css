@@ -9,24 +9,14 @@ canvas {
 
 :root {
     --bg: #0a0a1b;
-    --accent1: #ff2a6d;
-    --accent2: #05d9e8;
-    --accent3: #7700a6;
-    --neon2: #00fff9;
-    --color-text-default: #555557;
-    --color-text-rival: #8080ff;
-    --color-text-correct: #ffffff;
-    --color-text-correct2: #00ffb3;
-    --color-text-incorrect: #ff0000;
-    --color-timer: #ffd700;
 }
 
 body {
     margin: 0;
     background: var(--bg);
     background-image:
-        linear-gradient(90deg, rgba(255, 0, 60, 0.1) 1px, transparent 1px),
-        linear-gradient(0deg, rgba(0, 255, 249, 0.1) 1px, transparent 1px);
+        linear-gradient(90deg, rgba(35, 9, 30, 0.8) 2px, transparent 1px),
+        linear-gradient(0deg, rgba(9, 35, 50, 0.8) 2px, transparent 1px);
     background-size: 30px 30px;
     display: flex;
     justify-content: center;

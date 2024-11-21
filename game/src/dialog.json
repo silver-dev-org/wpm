@@ -1,7 +1,7 @@
 {
 "blocks": [
         [
-            "Function isUnique(str) {\n",
+            "function isUnique(str) {\n",
             "▯▯▯▯let charSet = new Set();\n",
             "\n",
             "▯▯▯▯for (let i = 0; i < str.length; i++) {\n",
@@ -12,6 +12,7 @@
             "▯▯▯▯}\n",
             "▯▯▯▯return true;\n",
             "}\n"
+            
         ],
         [
             "function rotateMatrix(matrix) {\n",
@@ -29,11 +30,14 @@
             "▯▯▯▯▯▯▯▯▯▯▯▯matrix[last - offset][first] = matrix[last][last - offset];\n",
             "▯▯▯▯▯▯▯▯▯▯▯▯matrix[last][last - offset] = matrix[i][last];\n",
             "▯▯▯▯▯▯▯▯▯▯▯▯matrix[i][last] = top;\n",
+            "▯▯▯▯▯▯▯▯▯▯▯▯matrix[first][i] = matrix[last - offset][first];\n",
+            "▯▯▯▯▯▯▯▯▯▯▯▯matrix[last - offset][first] = matrix[last][last - offset];\n",
+            "▯▯▯▯▯▯▯▯▯▯▯▯matrix[last][last - offset] = matrix[i][last];\n",
+            "▯▯▯▯▯▯▯▯▯▯▯▯matrix[i][last] = top;\n",
             "▯▯▯▯▯▯▯▯}\n",
             "▯▯▯▯}\n",
             "▯▯▯▯}\n",
-            "}\n",
-            "\n"
+            "}\n"
         ],
         [
             "class Node {\n",

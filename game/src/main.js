@@ -1,134 +1,197 @@
 import kaplay from "kaplay";
 import "kaplay/global";
-import dialogs from "./dialog.json"; 
+import dialogs from "./dialog.json";
+import colorTags from "./colorTags.json";
 
 kaplay({
-    background: [255, 209, 253],
+    background: [10, 10, 27, 0],
 });
 
-const COLOR_TEXT_DEFAULT = Color.fromArray([0, 0, 255]);
-const COLOR_TEXT_RIVAL = Color.fromArray([128, 128, 255]);
-const COLOR_TEXT_CORRECT = Color.GREEN;
-const COLOR_TEXT_INCORRECT = Color.RED;
-const COLOR_TIMER = Color.fromArray([255, 215, 0]);
+loadFont("monogram", "/fonts/monogram.ttf", {
+    outline: 4,
+    filter: "linear",
+});
 
+const goalBlocks = 2;
+const maxtime = 500;
+const maxMistakes = 2;
+const lineHeight = 24;
+const charSpacing = 12;
+const startmoveline = 5;
+const marginvisiblebox = -40
+let COLOR_TEXT_DEFAULT = Color.fromHex("#553d4d");
+let COLOR_TEXT_RIVAL = Color.fromHex("#fbf236");
+let COLOR_TEXT_CORRECT = Color.WHITE;
+let COLOR_TEXT_INCORRECT = Color.RED;
+let OmitedtagsLengths = { "▯": 0, };
 let completedBlocks = 0;
 let totalCorrectChars = 0;
 let totalIncorrectChars = 0;
 let totalCorrectLines = 0;
-let accumulatedCorrectChars = 0;
-let accumulatedIncorrectChars = 0;
-let accumulatedCorrectLines = 0;
-let accumulatedMissingChars = 0;
-const goalBlocks = 2;
-let timeLeft = 60;
-const maxMistakes = 2;
+let timeLeft = maxtime;
 let currentMistakes = 0;
-
+let font_size = 28;
+let currentline = 0;
 const jsonData = dialogs;
 
 scene("game", () => {
+    const speedX = 0.1;
+    const speedY = 0.3;
+    const maxLines = 20;
+    const body = document.querySelector("body");
     let currentBlockIndex = 0;
     let currentGroupIndex = 0;
-    const maxLines = 8;
     let txtCharacters = [];
     let cursorPos = 0;
+    let offsetX = 0;
+    let offsetY = 0;
+    animateBackground();
+    constructTransparentBackground();
+
+    function animateBackground() {
+        offsetX += speedX;
+        offsetY += speedY;
+        body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
+
+        requestAnimationFrame(animateBackground);
+    }
+
+    function constructTransparentBackground() {
+        const container = document.createElement('div');
+        document.body.appendChild(container);
+        container.classList.add('backtextbox');
+        const innerRect = document.createElement('div');
+        container.appendChild(innerRect);
+        innerRect.classList.add('innerRect');
+
+    }
 
     const textbox = add([
-        rect(width() - 100, 640, { radius: 32 }),
+        rect(width() * 0.7, height() * 0.7, { radius: 2 }),
         anchor("center"),
-        pos(center().x, height() / 2),
-        outline(4),
+        pos(center().x, height() - height() * 0.5),
+        outline(8, CYAN),
+        color(23, 9, 39),
+        opacity(0.6),
+    ]);
+
+    const headertextbox = add([
+        rect(width() * 0.7, height() * 0.05, { radius: 2 }),
+        anchor("center"),
+        pos(center().x, height() - height() * 0.85),
+        outline(8, CYAN),
+        color(CYAN),
+        opacity(1),
     ]);
 
     const timerLabel = add([
-        text(`[yellow]${timeLeft}[/yellow]`, {
-            size: 32,
-            styles: {
-                "yellow": { color: COLOR_TIMER },
-            },
+        text({ timeLeft }, {
+            size: 48,
+            font: "monogram",
+
         }),
-        pos(center().x - 40, height() / 2 - 250),
-        anchor("top"),
+        pos(width() * 0.80, height() * 0.2),
+        anchor("topright"),
     ]);
 
     const cursorPointer = add([
-        text("_", { size: 32, color: COLOR_TEXT_INCORRECT }),
+        text("_", { size: 16, color: COLOR_TEXT_INCORRECT }),
         pos(0, 0),
-        anchor("center"),
+        opacity(0.6),
+        anchor("left"),
+        color(255, 255, 255),
+    ]);
+
+    const rivalPointer = add([
+        text("_", { size: 16, color: COLOR_TEXT_RIVAL }),
+        pos(0, 0),
+        opacity(0.6),
+        anchor("left"),
+        color(COLOR_TEXT_RIVAL),
     ]);
 
     function selectCurrentBlock() {
-        return jsonData.blocks[currentBlockIndex];
+        if (jsonData.blocks && jsonData.blocks[currentBlockIndex]) {
+            return jsonData.blocks[currentBlockIndex];
+        } else {
+            console.error("jsonData.blocks is undefined or out of range");
+            return [];
+        }
     }
 
     function getCurrentGroup() {
         const currentBlock = selectCurrentBlock();
-        const startIndex = currentGroupIndex * maxLines;
-        return currentBlock.slice(startIndex, startIndex + maxLines);
+        const visibleLines = Math.floor(textbox.height / lineHeight);
+
+        return currentBlock.slice(0, visibleLines);
     }
 
     function applyRivalColor() {
         let rivalIndex = 0;
+        const currentBlockId = currentBlockIndex;
         loop(0.3, () => {
-            if (rivalIndex < txtCharacters.length) {
+            if (rivalIndex < txtCharacters.length && currentBlockIndex === currentBlockId) {
                 const char = txtCharacters[rivalIndex];
                 if (char.color.eq(COLOR_TEXT_DEFAULT)) {
                     char.color = COLOR_TEXT_RIVAL;
                 }
+                rivalPointer.pos = vec2(char.pos.x, char.pos.y * 1.02);
                 rivalIndex++;
             }
         });
     }
 
+    let tagPositions = {};
+
     function updateDialog() {
-        const currentGroup = getCurrentGroup();
-        if (currentGroup.length === 0) {
-            accumulatedCorrectChars = totalCorrectChars;
-            accumulatedIncorrectChars = totalIncorrectChars;
-            accumulatedCorrectLines = totalCorrectLines;
-            currentGroupIndex = 0;
-            completedBlocks++;
-
-            const expectedChars = selectCurrentBlock().join('').length; 
-            const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
-            accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-            console.log(`Miss characters: ${accumulatedMissingChars}`);
-
-            if (completedBlocks >= goalBlocks) {
-                go("endgame");
-                return;
-            }
-
-            currentBlockIndex++;
-            if (currentBlockIndex >= jsonData.blocks.length) {
-                currentBlockIndex = 0;
-            }
-            updateDialog();
-            return;
-        }
-
-        txtCharacters.forEach(character => character.destroy());
-        txtCharacters.length = 0;
+        completedBlocks++;
+        currentGroupIndex = 0;
         cursorPos = 0;
         currentMistakes = 0;
+        txtCharacters.forEach(char => char.destroy());
+        txtCharacters.length = 0;
+        timeLeft = maxtime;
 
-        const lineHeight = 30;
-        const charSpacing = 17;
-        let verticalOffset = height() / 2 - (lineHeight * currentGroup.length) / 2;
+        const currentGroup = getCurrentGroup();
+
+        let totalTextWidth = currentGroup.reduce((width, line) => {
+            return width + line.length * charSpacing;
+        }, 0);
+
+        let initialPosX = Math.max(0, (textbox.width - totalTextWidth) / 2.2) + textbox.pos.x - (textbox.width / 2.2);
+        let verticalOffset = textbox.pos.y * 0.7;
+
+        const textboxTop = textbox.pos.y - textbox.height / 2;
+        const textboxBottom = textbox.pos.y + textbox.height / 2.5;
 
         for (let line of currentGroup) {
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i] === "\n" ? " " : line[i];
-                const charText = add([
-                    text(char, { size: 32 }),
-                    pos(center().x - (line.length * charSpacing) / 2 + (i * charSpacing), verticalOffset),
-                    anchor("center"),
-                    color(COLOR_TEXT_DEFAULT),
-                    { originalChar: line[i], originalColor: COLOR_TEXT_DEFAULT, isModified: false },
-                ]);
+            let i = 0;
+            while (i < line.length) {
+                const char = line[i];
+                let tagFound = false;
+                for (let tag in OmitedtagsLengths) {
+                    if (line.startsWith(tag, i)) {
+                        totalCorrectChars++;
+                        i += OmitedtagsLengths[tag];
+                        tagFound = true;
+                        break;
+                    }
+                }
+                if (!tagFound) {
+                    const charPosY = verticalOffset;
+                    const isVisible = charPosY >= textboxTop && charPosY <= textboxBottom;
 
-                txtCharacters.push(charText);
+                    const charText = add([
+                        text(char, { size: font_size, font: "monogram" }),
+                        pos(initialPosX + (i * charSpacing), verticalOffset),
+                        anchor("left"),
+                        color(COLOR_TEXT_DEFAULT),
+                        opacity(isVisible ? 1 : 0),
+                        { originalChar: char, originalColor: COLOR_TEXT_DEFAULT, isModified: false },
+                    ]);
+                    txtCharacters.push(charText);
+                }
+                i++;
             }
             verticalOffset += lineHeight;
         }
@@ -137,52 +200,89 @@ scene("game", () => {
         applyRivalColor();
     }
 
+
     function updateCursorPosition() {
-        if (cursorPos < txtCharacters.length) {
+        if (cursorPos < txtCharacters.length && txtCharacters[cursorPos]) {
             const currentChar = txtCharacters[cursorPos];
-            cursorPointer.pos = vec2(currentChar.pos.x, currentChar.pos.y);
+            cursorPointer.pos = vec2(currentChar.pos.x, currentChar.pos.y * 1.02);
+            // debug.log(cursorPos);
+        } else {
+            console.warn("undefined or exceeded range");
         }
     }
 
     function startTimer() {
         loop(1, () => {
             timeLeft--;
-            timerLabel.text = `[yellow]${timeLeft}[/yellow]`;
-
+            timerLabel.text = timeLeft;
+            // console.log(totalCorrectChars);
+            // console.log(totalIncorrectChars);
+            // console.log(totalCorrectLines);
             if (timeLeft <= 0) {
-                timerLabel.text = "[yellow]0[/yellow]";
-                
-                const expectedChars = selectCurrentBlock().join('').length; 
-                const totalCharsTyped = totalCorrectChars + totalIncorrectChars;
-                accumulatedMissingChars += Math.max(0, expectedChars - totalCharsTyped);
-                
-                console.log(`Missin Characters: ${accumulatedMissingChars}`);
-                
                 go("endgame");
             }
         });
     }
 
+    function updateLineVisibility() {
+        const textboxTop = textbox.pos.y - textbox.height / 2;
+        const textboxBottom = textbox.pos.y + textbox.height / 2;
+        const adjustedTextboxTop = textboxTop - marginvisiblebox;
+        const adjustedTextboxBottom = textboxBottom + marginvisiblebox;
+
+        for (let char of txtCharacters) {
+            if (!char || !char.pos) {
+                console.warn("Carácter inválido detectado en txtCharacters:", char);
+                continue;
+            }
+            const isVisible = char.pos.y >= adjustedTextboxTop && char.pos.y <= adjustedTextboxBottom;
+            char.opacity = isVisible ? 1 : 0;
+        }
+    }
+
+    function shiftLines(direction) {
+        const shiftAmount = direction === "up" ? -lineHeight : lineHeight;
+        for (let char of txtCharacters) {
+            char.pos.y += shiftAmount;
+            rivalPointer.pos = vec2(char.pos.x, char.pos.y * 1.02);
+
+        }
+
+        updateLineVisibility();
+    }
+
+    let spacePositions = [];
+
     window.addEventListener("keydown", (event) => {
         const key = event.key;
+
         if (key === "Backspace" && cursorPos > 0) {
             const currentChar = txtCharacters[cursorPos - 1];
             const nextChar = cursorPos < txtCharacters.length ? txtCharacters[cursorPos] : null;
-        
-            if (currentChar.originalChar === "\n") {
-                totalCorrectLines--;
+
+            if (cursorPos === 1 && tagPositions.hasOwnProperty(currentChar.originalChar)) {
+                cursorPos--;
+                updateCursorPosition();
+                return;
+            }
+            if (spacePositions.includes(cursorPos - 1)) {
+                currentChar.text = " ";
+                spacePositions = spacePositions.filter(pos => pos !== cursorPos - 1);
             }
 
-            if (currentChar.color.eq(COLOR_TEXT_CORRECT)) {
-                totalCorrectChars--;
-            } else if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
-                totalIncorrectChars--;
+            if (currentChar.originalChar === "\n") {
+
+                totalCorrectLines--;
+                currentline--;
+                if (currentline >= startmoveline - 1) {
+                    shiftLines("down");
+                }
             }
-        
+
             if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 currentMistakes--;
             }
-        
+
             if (nextChar && nextChar.color.eq(COLOR_TEXT_RIVAL)) {
                 currentChar.color = COLOR_TEXT_RIVAL;
             } else {
@@ -190,20 +290,25 @@ scene("game", () => {
             }
             currentChar.isModified = false;
             cursorPos--;
-            accumulatedCorrectChars = totalCorrectChars;
-            accumulatedIncorrectChars = totalIncorrectChars;
-            accumulatedCorrectLines = totalCorrectLines;
-            debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
             updateCursorPosition();
+            applyTagColor();
             return;
         }
-        
+
         if (currentMistakes >= maxMistakes) {
             return;
         }
 
         if (cursorPos < txtCharacters.length) {
             const currentChar = txtCharacters[cursorPos];
+            applyTagColor();
+
+            if (isTag(currentChar.originalChar)) {
+                cursorPos++;
+                totalCorrectChars++;
+                updateCursorPosition();
+                return;
+            }
 
             if (currentChar.originalChar === "\n") {
                 if (key === "Enter") {
@@ -211,11 +316,37 @@ scene("game", () => {
                     totalCorrectChars++;
                     totalCorrectLines++;
                     cursorPos++;
-                    accumulatedCorrectChars = totalCorrectChars;
-                    accumulatedIncorrectChars = totalIncorrectChars;
-                    accumulatedCorrectLines = totalCorrectLines;
-                    debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
+                    currentline++;
                     updateCursorPosition();
+
+                    if (currentline >= startmoveline) {
+                        shiftLines("up");
+                    }
+                    updateCursorPosition();
+
+                    if (cursorPos >= txtCharacters.length) {
+                        const noInvalidColors = txtCharacters.every(char =>
+                            !char.color.eq(COLOR_TEXT_INCORRECT) &&
+                            !char.color.eq(COLOR_TEXT_RIVAL) &&
+                            !char.color.eq(COLOR_TEXT_DEFAULT)
+                        );
+                        if (noInvalidColors) {
+                            currentGroupIndex++;
+                            if (currentGroupIndex >= selectCurrentBlock().length / maxLines) {
+                                if (completedBlocks >= goalBlocks) {
+                                    go("endgame");
+                                    return;
+                                }
+                                currentBlockIndex++;
+                                if (currentBlockIndex >= jsonData.blocks.length) {
+                                    currentBlockIndex = 0;
+                                }
+                                updateDialog();
+                            } else {
+                                updateDialog();
+                            }
+                        }
+                    }
                 }
                 return;
             }
@@ -230,24 +361,63 @@ scene("game", () => {
                     currentChar.color = COLOR_TEXT_INCORRECT;
                     totalIncorrectChars++;
                     currentMistakes++;
+
+                    if (currentChar.originalChar === " ") {
+                        currentChar.text = key;
+                        spacePositions.push(cursorPos);
+                    }
                 }
-                accumulatedCorrectChars = totalCorrectChars;
-                accumulatedIncorrectChars = totalIncorrectChars;
-                accumulatedCorrectLines = totalCorrectLines;
-                debug.log(totalCorrectChars,totalIncorrectChars,totalCorrectLines)
                 cursorPos++;
                 updateCursorPosition();
             }
+        }
+    });
 
-            if (cursorPos >= txtCharacters.length) {
-                const allCorrect = txtCharacters.every(char => char.color.eq(COLOR_TEXT_CORRECT));
-                if (allCorrect) {
-                    currentGroupIndex++;
-                    updateDialog();
+    function applyTagColor() {
+        if (colorTags && currentBlockIndex !== undefined) {
+            // debug.log(` ${cursorPos}`);
+            const currentBlock = colorTags[currentBlockIndex];
+            if (currentBlock) {
+                for (const [tag, positions] of Object.entries(currentBlock)) {
+                    //debug.log(`Checking tag ${tag} with positions ${positions}`);
+
+                    if (positions.includes(cursorPos)) {
+                        switch (tag) {
+                            case "/C1":
+                                COLOR_TEXT_CORRECT = Color.fromHex("#ff37b1");
+                                //  debug.log("/C1");
+                                break;
+                            case "/C2":
+                                COLOR_TEXT_CORRECT = Color.fromHex("#22fcff");
+                                //    debug.log(" /C2");
+                                break;
+                            case "/C3":
+                                COLOR_TEXT_CORRECT = Color.WHITE;
+                                //   debug.log("/C3");
+                                break;
+                            case "/C4":
+                                COLOR_TEXT_CORRECT = Color.WHITE;
+                                //  debug.log("/C4");
+                                break;
+                            case "/C5":
+                                COLOR_TEXT_CORRECT = Color.fromHex("#32ed67");
+                                //   debug.log("/C5");
+                                break;
+                            default:
+                                console.warn(`warn: ${tag}`);
+                                break;
+                        }
+                        break;
+                    }
                 }
             }
         }
-    });
+    }
+
+
+    function isTag(character) {
+        return tagPositions.hasOwnProperty(character);
+    }
 
     startTimer();
     updateDialog();
@@ -260,36 +430,7 @@ scene("endgame", () => {
         anchor("center"),
     ]);
 
-    const totalCharsTyped = accumulatedCorrectChars + accumulatedIncorrectChars + accumulatedMissingChars;
-    const accuracy = totalCharsTyped > 0 ? (accumulatedCorrectChars / totalCharsTyped) * 100 : 0;
-
-    const timeElapsed = 60 - timeLeft;
-    const wpm = (accumulatedCorrectChars / 5) / (timeElapsed / 60);
-    const loc = (accumulatedCorrectLines / timeElapsed) * 60; 
-
-    const statsLabel = add([ 
-        text(`Accuracy: ${accuracy.toFixed(2)}%`, { size: 32 }),
-        pos(center().x, center().y),
-        anchor("center"),
-    ]);
-
-    const wpmLabel = add([
-        text(`WPM: ${wpm.toFixed(2)}`, { size: 32 }),
-        pos(center().x, center().y + 40),
-        anchor("center"),
-    ]);
-
-    const locLabel = add([
-        text(`LOC: ${loc.toFixed(2)}`, { size: 32 }),
-        pos(center().x, center().y + 80),
-        anchor("center"),
-    ]);
-
-    const missingCharsLabel = add([
-        text(`Missing Characters: ${accumulatedMissingChars}`, { size: 32 }),
-        pos(center().x, center().y + 120),
-        anchor("center"),
-    ]);
 });
 
 go("game");
+

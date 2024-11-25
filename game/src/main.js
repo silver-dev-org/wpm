@@ -7,15 +7,18 @@ kaplay({
     background: [10, 10, 27, 0],
 });
 
-loadFont("monogram", "./fonts/monogram.ttf");
+loadFont("monogram", "/fonts/monogram.ttf", {
+    outline: 4,
+    filter: "linear",
+});
 
 const goalBlocks = 2;
 const maxtime = 500;
 const maxMistakes = 2;
 const lineHeight = 24;
-const charSpacing = 12;
-const startmoveline= 5;
-const marginvisiblebox = -40
+const charSpacing = 10;
+const startmoveline = 1;
+const marginvisiblebox = 1;
 let COLOR_TEXT_DEFAULT = Color.fromHex("#553d4d");
 let COLOR_TEXT_RIVAL = Color.fromHex("#fbf236");
 let COLOR_TEXT_CORRECT = Color.WHITE;
@@ -27,7 +30,7 @@ let totalIncorrectChars = 0;
 let totalCorrectLines = 0;
 let timeLeft = maxtime;
 let currentMistakes = 0;
-let font_size = 28;
+let font_size = 24;
 let currentline = 0;
 const jsonData = dialogs;
 
@@ -43,7 +46,9 @@ scene("game", () => {
     let offsetX = 0;
     let offsetY = 0;
     animateBackground();
-    
+    loadSprite("bgpng", "/sprites/bgpng.png");
+    loadSprite("bg2", "/sprites/bg2.png");
+
     function animateBackground() {
         offsetX += speedX;
         offsetY += speedY;
@@ -51,33 +56,38 @@ scene("game", () => {
 
         requestAnimationFrame(animateBackground);
     }
+
     const textbox = add([
-        rect(width() * 0.7, height() * 0.7, { radius: 2 }),
+        rect(width() * 0.7, height() * 0.5),
         anchor("center"),
         pos(center().x, height() - height() * 0.5),
-        outline(8, CYAN), 
-        color(23, 9, 39),
-        opacity(0.6),
-        area(),
+        color(23, 9, 39.),
+        opacity(0),
     ]);
 
-    const headertextbox = add([
-        rect(width() * 0.7, height() * 0.05, { radius: 2 }),
+    const spritetextbox = add([
+        sprite("bg2"),
+        pos(center()),
         anchor("center"),
-        pos(center().x, height() - height() * 0.85),
-        outline(8, CYAN), 
-        color(CYAN),
-        opacity(1),
-        area(),
+        color(),
+        rotate(0),
+        opacity(0.7),
     ]);
-    
+
+    const backtextbox = add([
+        sprite("bgpng"),
+        pos(center()),
+        anchor("center"),
+        color(),
+        rotate(0),
+    ]);
     const timerLabel = add([
         text({ timeLeft }, {
             size: 48,
             font: "monogram",
-            
+
         }),
-        pos(width() * 0.80, height() * 0.2),
+        pos(width() * 0.80, height() * 0.25),
         anchor("topright"),
     ]);
 
@@ -97,6 +107,27 @@ scene("game", () => {
         color(COLOR_TEXT_RIVAL),
     ]);
 
+
+    spritetextbox.onUpdate(() => {
+        const scaleFactorX = width() / 1920;
+        const scaleFactorY = height() / 1080;
+        const scaleFactor = Math.min(scaleFactorX, scaleFactorY);
+
+        spritetextbox.scale = vec2(scaleFactor);
+        spritetextbox.pos = vec2(width() / 2, height() / 2);
+    });
+
+    backtextbox.onUpdate(() => {
+        const scaleFactorX = width() / 1920;
+        const scaleFactorY = height() / 1080;
+        const scaleFactor = Math.min(scaleFactorX, scaleFactorY);
+
+        backtextbox.scale = vec2(scaleFactor);
+        backtextbox.pos = vec2(width() / 2, height() / 2);
+    });
+
+    updateLineVisibility();
+
     function selectCurrentBlock() {
         if (jsonData.blocks && jsonData.blocks[currentBlockIndex]) {
             return jsonData.blocks[currentBlockIndex];
@@ -109,24 +140,24 @@ scene("game", () => {
     function getCurrentGroup() {
         const currentBlock = selectCurrentBlock();
         const visibleLines = Math.floor(textbox.height / lineHeight);
-    
+
         return currentBlock.slice(0, visibleLines);
     }
 
-function applyRivalColor() {
-    let rivalIndex = 0;
-    const currentBlockId = currentBlockIndex;
-    loop(0.3, () => {
-        if (rivalIndex < txtCharacters.length && currentBlockIndex === currentBlockId) {
-            const char = txtCharacters[rivalIndex];
-            if (char.color.eq(COLOR_TEXT_DEFAULT)) {
-                char.color = COLOR_TEXT_RIVAL;
+    function applyRivalColor() {
+        let rivalIndex = 0;
+        const currentBlockId = currentBlockIndex;
+        loop(0.3, () => {
+            if (rivalIndex < txtCharacters.length && currentBlockIndex === currentBlockId) {
+                const char = txtCharacters[rivalIndex];
+                if (char.color.eq(COLOR_TEXT_DEFAULT)) {
+                    char.color = COLOR_TEXT_RIVAL;
+                }
+                rivalPointer.pos = vec2(char.pos.x, char.pos.y * 1.02);
+                rivalIndex++;
             }
-            rivalPointer.pos = vec2(char.pos.x, char.pos.y*1.02);
-            rivalIndex++;
-        }
-    });
-}
+        });
+    }
 
     let tagPositions = {};
 
@@ -138,19 +169,19 @@ function applyRivalColor() {
         txtCharacters.forEach(char => char.destroy());
         txtCharacters.length = 0;
         timeLeft = maxtime;
-    
+
         const currentGroup = getCurrentGroup();
-    
+
         let totalTextWidth = currentGroup.reduce((width, line) => {
-            return width + line.length * charSpacing; 
+            return width + line.length * charSpacing;
         }, 0);
-    
+
         let initialPosX = Math.max(0, (textbox.width - totalTextWidth) / 2.2) + textbox.pos.x - (textbox.width / 2.2);
         let verticalOffset = textbox.pos.y * 0.7;
-    
+
         const textboxTop = textbox.pos.y - textbox.height / 2;
         const textboxBottom = textbox.pos.y + textbox.height / 2.5;
-    
+
         for (let line of currentGroup) {
             let i = 0;
             while (i < line.length) {
@@ -167,7 +198,7 @@ function applyRivalColor() {
                 if (!tagFound) {
                     const charPosY = verticalOffset;
                     const isVisible = charPosY >= textboxTop && charPosY <= textboxBottom;
-    
+
                     const charText = add([
                         text(char, { size: font_size, font: "monogram" }),
                         pos(initialPosX + (i * charSpacing), verticalOffset),
@@ -182,26 +213,29 @@ function applyRivalColor() {
             }
             verticalOffset += lineHeight;
         }
-    
+
         updateCursorPosition();
         applyRivalColor();
     }
 
 
-function updateCursorPosition() {
-    if (cursorPos < txtCharacters.length) {
-        const currentChar = txtCharacters[cursorPos];
-        cursorPointer.pos = vec2(currentChar.pos.x, currentChar.pos.y*1.02);
+    function updateCursorPosition() {
+        if (cursorPos < txtCharacters.length && txtCharacters[cursorPos]) {
+            const currentChar = txtCharacters[cursorPos];
+            cursorPointer.pos = vec2(currentChar.pos.x, currentChar.pos.y * 1.02);
+            // debug.log(cursorPos);
+        } else {
+            console.warn("undefined or exceeded range");
+        }
     }
-}
 
     function startTimer() {
         loop(1, () => {
             timeLeft--;
-            timerLabel.text =timeLeft;
-           // console.log(totalCorrectChars);
-           // console.log(totalIncorrectChars);
-           // console.log(totalCorrectLines);
+            timerLabel.text = timeLeft;
+            // console.log(totalCorrectChars);
+            // console.log(totalIncorrectChars);
+            // console.log(totalCorrectLines);
             if (timeLeft <= 0) {
                 go("endgame");
             }
@@ -215,8 +249,12 @@ function updateCursorPosition() {
         const adjustedTextboxBottom = textboxBottom + marginvisiblebox;
 
         for (let char of txtCharacters) {
+            if (!char || !char.pos) {
+                console.warn("Invalid character:", char);
+                continue;
+            }
             const isVisible = char.pos.y >= adjustedTextboxTop && char.pos.y <= adjustedTextboxBottom;
-            char.opacity = isVisible ? 1 : 0; 
+            char.opacity = isVisible ? 1 : 0;
         }
     }
 
@@ -224,44 +262,45 @@ function updateCursorPosition() {
         const shiftAmount = direction === "up" ? -lineHeight : lineHeight;
         for (let char of txtCharacters) {
             char.pos.y += shiftAmount;
+            rivalPointer.pos = vec2(char.pos.x, char.pos.y * 1.02);
+
         }
-    
-        updateLineVisibility(); 
+
+        updateLineVisibility();
     }
-    
+
     let spacePositions = [];
 
     window.addEventListener("keydown", (event) => {
         const key = event.key;
-    
+
         if (key === "Backspace" && cursorPos > 0) {
             const currentChar = txtCharacters[cursorPos - 1];
             const nextChar = cursorPos < txtCharacters.length ? txtCharacters[cursorPos] : null;
-    
+
             if (cursorPos === 1 && tagPositions.hasOwnProperty(currentChar.originalChar)) {
                 cursorPos--;
                 updateCursorPosition();
                 return;
             }
-            if (spacePositions.includes(cursorPos - 1)) {        
-                currentChar.text = " "; 
-                spacePositions = spacePositions.filter(pos => pos !== cursorPos - 1);
+
+            if (currentChar.text !== currentChar.originalChar) {
+                currentChar.text = currentChar.originalChar;
             }
-    
+
             if (currentChar.originalChar === "\n") {
-                
+
                 totalCorrectLines--;
                 currentline--;
-                if(currentline>=startmoveline-1)
-                    {
-                        shiftLines("down");
-                    }
+                if (currentline >= startmoveline - 1) {
+                    shiftLines("down");
+                }
             }
-    
+
             if (currentChar.color.eq(COLOR_TEXT_INCORRECT)) {
                 currentMistakes--;
             }
-    
+
             if (nextChar && nextChar.color.eq(COLOR_TEXT_RIVAL)) {
                 currentChar.color = COLOR_TEXT_RIVAL;
             } else {
@@ -273,37 +312,36 @@ function updateCursorPosition() {
             applyTagColor();
             return;
         }
-    
+
         if (currentMistakes >= maxMistakes) {
             return;
         }
-    
+
         if (cursorPos < txtCharacters.length) {
             const currentChar = txtCharacters[cursorPos];
             applyTagColor();
-    
+
             if (isTag(currentChar.originalChar)) {
                 cursorPos++;
                 totalCorrectChars++;
                 updateCursorPosition();
                 return;
             }
-    
+
             if (currentChar.originalChar === "\n") {
-                if (key === "Enter") {
+                if (key === "Enter" && currentMistakes == 0) {
                     currentChar.color = COLOR_TEXT_CORRECT;
                     totalCorrectChars++;
                     totalCorrectLines++;
                     cursorPos++;
                     currentline++;
                     updateCursorPosition();
-    
-                    if(currentline>=startmoveline)
-                    {
+
+                    if (currentline >= startmoveline) {
                         shiftLines("up");
                     }
                     updateCursorPosition();
-                    
+
                     if (cursorPos >= txtCharacters.length) {
                         const noInvalidColors = txtCharacters.every(char =>
                             !char.color.eq(COLOR_TEXT_INCORRECT) &&
@@ -333,15 +371,21 @@ function updateCursorPosition() {
 
             if (key.length === 1 || key === " ") {
                 const isCorrect = currentChar.text === key;
-    
+
                 if (isCorrect) {
                     currentChar.color = COLOR_TEXT_CORRECT;
                     totalCorrectChars++;
                 } else {
                     currentChar.color = COLOR_TEXT_INCORRECT;
+                    currentChar.text = key;
+
+                    if (currentChar.text === " ") {
+                        currentChar.text = "_";
+                    }
+
                     totalIncorrectChars++;
                     currentMistakes++;
-    
+
                     if (currentChar.originalChar === " ") {
                         currentChar.text = key;
                         spacePositions.push(cursorPos);
@@ -352,10 +396,10 @@ function updateCursorPosition() {
             }
         }
     });
-    
+
     function applyTagColor() {
         if (colorTags && currentBlockIndex !== undefined) {
-           // debug.log(` ${cursorPos}`);
+            // debug.log(` ${cursorPos}`);
             const currentBlock = colorTags[currentBlockIndex];
             if (currentBlock) {
                 for (const [tag, positions] of Object.entries(currentBlock)) {
@@ -364,31 +408,31 @@ function updateCursorPosition() {
                     if (positions.includes(cursorPos)) {
                         switch (tag) {
                             case "/C1":
-                                COLOR_TEXT_CORRECT =Color.fromHex("#ff37b1");
-                              //  debug.log("/C1");
+                                COLOR_TEXT_CORRECT = Color.fromHex("#ff37b1");
+                                //  debug.log("/C1");
                                 break;
                             case "/C2":
-                                COLOR_TEXT_CORRECT =Color.fromHex("#22fcff");
-                             //    debug.log(" /C2");
+                                COLOR_TEXT_CORRECT = Color.fromHex("#22fcff");
+                                //    debug.log(" /C2");
                                 break;
                             case "/C3":
                                 COLOR_TEXT_CORRECT = Color.WHITE;
-                              //   debug.log("/C3");
+                                //   debug.log("/C3");
                                 break;
                             case "/C4":
                                 COLOR_TEXT_CORRECT = Color.WHITE;
-                               //  debug.log("/C4");
+                                //  debug.log("/C4");
                                 break;
                             case "/C5":
-                                COLOR_TEXT_CORRECT =Color.fromHex("#32ed67");
-                              //   debug.log("/C5");
+                                COLOR_TEXT_CORRECT = Color.fromHex("#32ed67");
+                                //   debug.log("/C5");
                                 break;
                             default:
                                 console.warn(`warn: ${tag}`);
                                 break;
                         }
                         break;
-                    } 
+                    }
                 }
             }
         }

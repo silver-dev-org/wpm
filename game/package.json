@@ -1,16 +1,18 @@
 {
-	"name": "mygame",
-	"type": "module",
-	"scripts": {
-		"build": "vite build",
-		"dev": "vite",
-		"preview": "vite preview",
-		"zip": "npm run build && mkdir -p dist && zip -r dist/game.zip dist -x \"**/.DS_Store\""
-	},
-	"dependencies": {
-		"kaplay": "^3001.0.2"
-	},
-	"devDependencies": {
-		"vite": "^5.4.11"
-	}
+  "name": "mygame",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "zip": "npm run build && mkdir -p dist && zip -r dist/game.zip dist -x \"**/.DS_Store\"",
+    "fmt": "prettier --write ."
+  },
+  "dependencies": {
+    "kaplay": "^3001.0.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.1",
+    "vite": "^5.4.11"
+  }
 }

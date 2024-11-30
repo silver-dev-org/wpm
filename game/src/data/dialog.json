@@ -2,12 +2,12 @@
   "blocks": [
     [
       "function isUnique(str) {\n",
-      "▯▯▯▯let charSet = new Set();\n",
-      "\n",
+      "▯▯▯▯let charSet = new Set()[i];\n",
+      "▯▯▯▯\n",
       "▯▯▯▯for (let i = 0; i < str.length; i++) {\n",
-      "▯▯▯▯▯▯▯if (charSet.has(str[i])) {\n",
-      "▯▯▯▯return false;\n",
-      "▯▯▯▯}\n",
+      "▯▯▯▯▯▯▯▯if (charSet.has(str[i])) {\n",
+      "▯▯▯▯▯▯▯▯▯▯▯▯return false;\n",
+      "▯▯▯▯▯▯▯▯}\n",
       "▯▯▯▯▯▯▯▯charSet.add(str[i]);\n",
       "▯▯▯▯}\n",
       "▯▯▯▯return true;\n",

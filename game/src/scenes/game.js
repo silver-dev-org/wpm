@@ -11,17 +11,17 @@ import { themes } from "../data/themes.js";
 import { resizableObjects, resizablePos } from "../components/resizablePos.js";
 
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#553d4d");
-let COLOR_TEXT_RIVAL = k.Color.fromHex("#fbf236");
+let COLOR_TEXT_RIVAL = k.Color.fromHex("#718703");
 let COLOR_TEXT_CORRECT = k.Color.WHITE;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
-let OmitedtagsLengths = { "▯": 0 };
 let completedBlocks = 0;
 export let totalCorrectChars = 0;
 let totalIncorrectChars = 0;
 let totalCorrectLines = 0;
 let timeLeft = maxtime;
 let currentMistakes = 0;
-let font_size = 24;
+let fontSize = 24;
+let fontWidth = 12;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 // this is the text taken from the json file
@@ -30,7 +30,6 @@ let originalText = "";
 let renderedText = "";
 // this is the text without any special character (for compare with user input)
 let fixedText = "";
-let curLine = 0;
 const theme = themes[0];
 const themeTokens = theme.tokens;
 const themeAssociations = theme.associations;
@@ -41,8 +40,18 @@ k.scene("game", () => {
     const maxLines = 20;
     let currentBlockIndex = 0;
     let currentGroupIndex = 0;
-    let txtCharacters = [];
+    // #region PLAYER variables
     let cursorPos = 0;
+    let curLine = 0;
+    let curIdentSize = 0;
+    let txtCharacters = [];
+    // #endregion
+    // #region RIVAL variables
+    let rivalCursorPos = 0;
+    let curRivalLine = 0;
+    let rivalTxtCharacters = [];
+    // #endregion
+
     let offsetX = 0;
     let offsetY = 0;
     animateBackground();
@@ -52,7 +61,12 @@ k.scene("game", () => {
      */
     const matchColorToken = (i, ch) => {
         if (ch === " ") return COLOR_TEXT_DEFAULT;
-        if (cursorPos - 1 < i) return COLOR_TEXT_DEFAULT;
+        if (cursorPos - 1 < i) {
+            if (rivalCursorPos + 1 > i) {
+                return COLOR_TEXT_RIVAL;
+            }
+            return COLOR_TEXT_DEFAULT;
+        }
 
         const words = originalText.split(" ");
         let wordCharsIndex = 0;
@@ -131,13 +145,12 @@ k.scene("game", () => {
 
     const textboxText = textboxBackParent.add([
         k.text("", {
-            size: font_size,
+            size: fontSize,
             transform: (idx, ch) => ({
                 color: matchColorToken(idx, ch),
             }),
         }),
-        k.anchor("top"),
-        k.pos(0, -textbox.height / 2 + 10),
+        k.pos(-textbox.width / 4, -textbox.height / 2 + 10),
     ]);
 
     const timerLabel = k.add([
@@ -151,15 +164,16 @@ k.scene("game", () => {
 
     const cursorPointer = k.add([
         k.text("_", { size: 16 }),
-        k.pos(k.vec2(textboxText.pos).add(0, font_size)),
+        k.pos(textboxBackParent.pos.add(textboxText.pos).add(0, fontSize)),
         k.opacity(0.6),
         k.anchor("left"),
         k.color(255, 255, 255),
+        k.z(10),
     ]);
 
     const rivalPointer = k.add([
         k.text("_", { size: 16 }),
-        k.pos(0, 0),
+        k.pos(textboxBackParent.pos.add(textboxText.pos).add(0, fontSize)),
         k.opacity(0.6),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
@@ -185,7 +199,7 @@ k.scene("game", () => {
         textboxBorder.pos = k.vec2(k.width() / 2, k.height() / 2);
     });
 
-    updateLineVisibility();
+    //    updateLineVisibility();
 
     function selectCurrentBlock() {
         if (jsonData.blocks && jsonData.blocks[currentBlockIndex]) {
@@ -201,24 +215,6 @@ k.scene("game", () => {
         const visibleLines = Math.floor(textbox.height / lineHeight);
 
         return currentBlock.slice(0, visibleLines);
-    }
-
-    function applyRivalColor() {
-        let rivalIndex = 0;
-        const currentBlockId = currentBlockIndex;
-        k.loop(0.3, () => {
-            if (
-                rivalIndex < txtCharacters.length &&
-                currentBlockIndex === currentBlockId
-            ) {
-                const char = txtCharacters[rivalIndex];
-                if (char.color.eq(COLOR_TEXT_DEFAULT)) {
-                    char.color = COLOR_TEXT_RIVAL;
-                }
-                rivalPointer.pos = k.vec2(char.pos.x, char.pos.y * 1.02);
-                rivalIndex++;
-            }
-        });
     }
 
     /**
@@ -265,8 +261,6 @@ k.scene("game", () => {
         fixedText = currentGroup.join("").replace(/▯/g, " ");
         renderedText = fixedGroup;
         textboxText.text = renderedText;
-
-        applyRivalColor();
     }
 
     function updateDialogErrors() {
@@ -287,76 +281,112 @@ k.scene("game", () => {
         textboxText.text = renderedText;
     }
 
-    function prevChar() {
-        cursorPos--;
-        cursorPointer.pos = k.vec2(cursorPointer.pos).sub(12, 0);
-        logGroupWithColor(fixedText);
+    function prevChar(rival = false) {
+        if (rival) {
+            rivalCursorPos--;
+            rivalPointer.pos = k.vec2(rivalPointer.pos).sub(fontWidth, 0);
+            logGroupWithColor(fixedText);
+        } else {
+            cursorPos--;
+            cursorPointer.pos = k.vec2(cursorPointer.pos).sub(fontWidth, 0);
+            logGroupWithColor(fixedText);
+        }
     }
 
-    function nextChar() {
-        cursorPos++;
-        cursorPointer.pos = k.vec2(cursorPointer.pos).add(12, 0);
-        logGroupWithColor(fixedText);
+    function nextChar(rival = false) {
+        if (rival) {
+            rivalCursorPos++;
+            rivalPointer.pos = k.vec2(rivalPointer.pos).add(fontWidth, 0);
+            logGroupWithColor(fixedText);
+
+            if (fixedText[rivalCursorPos] === "\n") {
+                nextLine(true);
+            }
+        } else {
+            cursorPos++;
+            cursorPointer.pos = k.vec2(cursorPointer.pos).add(fontWidth, 0);
+            logGroupWithColor(fixedText);
+        }
     }
 
-    function nextLine() {
-        curLine++;
-        const line = fixedText.split("\n")[curLine];
-        const lineIdent = line.match(/^\s+/)?.[0].length || 0;
-        cursorPos += lineIdent;
+    function nextLine(rival = false) {
+        if (rival) {
+            curRivalLine++;
+            const line = fixedText.split("\n")[curRivalLine];
+            const lineIdent = line.match(/^\s+/)?.[0].length || 0;
+            rivalCursorPos += lineIdent;
 
-        cursorPointer.pos = k.vec2(
-            textboxText.pos.x + 12 * lineIdent,
-            cursorPointer.pos.y + lineHeight,
-        );
+            rivalPointer.pos = k.vec2(
+                textboxBackParent.pos.add(textboxText.pos).x +
+                    lineIdent * fontWidth,
+                rivalPointer.pos.y + lineHeight,
+            );
+        } else {
+            curLine++;
+            const line = fixedText.split("\n")[curLine];
+            const lineIdent = line.match(/^\s+/)?.[0].length || 0;
+            cursorPos += lineIdent;
+            curIdentSize = lineIdent;
+
+            cursorPointer.pos = k.vec2(
+                textboxBackParent.pos.add(textboxText.pos).x +
+                    lineIdent * fontWidth,
+                cursorPointer.pos.y + lineHeight,
+            );
+        }
     }
 
     function startTimer() {
         k.loop(1, () => {
             timeLeft--;
             timerLabel.text = String(timeLeft);
-            // console.log(totalCorrectChars);
-            // console.log(totalIncorrectChars);
-            // console.log(totalCorrectLines);
             if (timeLeft <= 0) {
                 k.go("endgame");
             }
         });
+
+        k.loop(0.3, () => {
+            nextChar(true);
+        });
     }
 
-    function updateLineVisibility() {
-        const textboxTop = textbox.pos.y - textbox.height / 2;
-        const textboxBottom = textbox.pos.y + textbox.height / 2;
-        const adjustedTextboxTop = textboxTop - marginvisiblebox;
-        const adjustedTextboxBottom = textboxBottom + marginvisiblebox;
+    // function updateLineVisibility() {
+    //     const textboxTop = textbox.pos.y - textbox.height / 2;
+    //     const textboxBottom = textbox.pos.y + textbox.height / 2;
+    //     const adjustedTextboxTop = textboxTop - marginvisiblebox;
+    //     const adjustedTextboxBottom = textboxBottom + marginvisiblebox;
 
-        for (let char of txtCharacters) {
-            if (!char || !char.pos) {
-                console.warn("Invalid character:", char);
-                continue;
-            }
-            const isVisible =
-                char.pos.y >= adjustedTextboxTop &&
-                char.pos.y <= adjustedTextboxBottom;
-            char.opacity = isVisible ? 1 : 0;
-        }
-    }
+    //     for (let char of txtCharacters) {
+    //         if (!char || !char.pos) {
+    //             console.warn("Invalid character:", char);
+    //             continue;
+    //         }
+    //         const isVisible =
+    //             char.pos.y >= adjustedTextboxTop &&
+    //             char.pos.y <= adjustedTextboxBottom;
+    //         char.opacity = isVisible ? 1 : 0;
+    //     }
+    // }
 
-    function shiftLines(direction) {
-        const shiftAmount = direction === "up" ? -lineHeight : lineHeight;
-        for (let char of txtCharacters) {
-            char.pos.y += shiftAmount;
-            rivalPointer.pos = k.vec2(char.pos.x, char.pos.y * 1.02);
-        }
+    // function shiftLines(direction) {
+    //     const shiftAmount = direction === "up" ? -lineHeight : lineHeight;
+    //     for (let char of txtCharacters) {
+    //         char.pos.y += shiftAmount;
+    //         rivalPointer.pos = k.vec2(char.pos.x, char.pos.y * 1.02);
+    //     }
 
-        updateLineVisibility();
-    }
+    //     updateLineVisibility();
+    // }
 
     k.onKeyPress((key) => {
         // only letters on this hanadler
         let isCorrect = false;
         let isNextLine = false;
         const correctChar = fixedText[cursorPos];
+
+        if (errorCharsIndexes.length > 1) {
+            return k.shake(5);
+        }
 
         if (key.length == 1) {
             if (k.isKeyDown("shift")) {

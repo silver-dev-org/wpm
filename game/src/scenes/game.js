@@ -388,6 +388,10 @@ k.scene("game", () => {
             return k.shake(5);
         }
 
+        if(correctChar === "\n" && errorCharsIndexes.length > 0) {
+            return k.shake(5);
+        }
+
         if (key.length == 1) {
             if (k.isKeyDown("shift")) {
                 key = key.toUpperCase();
@@ -417,8 +421,6 @@ k.scene("game", () => {
             updateDialogErrors();
             nextChar();
         }
-
-        console.log("cursorPos", cursorPos);
     });
 
     k.onKeyPressRepeat("backspace", () => {

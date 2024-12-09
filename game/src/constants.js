@@ -10,3 +10,12 @@ export const charSpacing = 10;
 export const startmoveline = 1;
 export const marginvisiblebox = 1;
 export const jsonData = dialogs;
+// modifiable data in game
+export const data = {
+    /**
+     * Allocated resizable objects for update on resize
+     *
+     * @type {import("kaplay").GameObj[]}
+     */
+    resizableObjects: [],
+};

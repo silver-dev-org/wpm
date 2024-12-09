@@ -1,22 +1,31 @@
 /**
- * @typedef {import("../types").Vec2} Vec2
+ * @typedef {import("kaplay").Vec2} Vec2
+ * @typedef {import("kaplay").GameObj} GameObj
+ * @typedef {import("kaplay").PosComp} PosComp
  */
 
-export let resizableObjects = [];
+import { data } from "../constants.js";
+
 
 /**
  * Set the position on resize
  *
- * @param {() => Vec2} posFunc
+ * @param {() => Vec2} sizeFunc
  */
-export const resizablePos = (posFunc) => ({
+export const resizablePos = (sizeFunc) => ({
     id: "resizablePos",
-    posFunc,
+    sizeFunc,
     add() {
-        resizableObjects.push(this);
-        this.pos = this.posFunc();
+        data.resizableObjects.push(this);
+        this.pos = this.sizeFunc();
     },
+    /**
+     * @type { GameObj<PosComp> } this
+     */
     updatePos() {
-        this.pos = this.posFunc();
+        this.pos = this.sizeFunc();
     },
+    destroy() {
+        data.resizableObjects = data.resizableObjects.filter((obj) => obj !== this);
+    }
 });

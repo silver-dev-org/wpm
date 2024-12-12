@@ -1,57 +1,55 @@
 // @ts-check
-
+import "../types.js";
 import {
     data,
-    jsonData,
+    dialogsData,
     lineHeight,
-    marginvisiblebox,
     maxtime,
+    EASY_RIVAL_SPEED,
 } from "../constants.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
+
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#553d4d");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#718703");
-let COLOR_TEXT_CORRECT = k.Color.WHITE;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
+
 let completedBlocks = 0;
 export let totalCorrectChars = 0;
-let totalIncorrectChars = 0;
-let totalCorrectLines = 0;
 let timeLeft = maxtime;
-let currentMistakes = 0;
 let fontSize = 24;
 let fontWidth = 12;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
-// this is the text taken from the json file
+
+/**
+ * Text taken from the dialogs.json file
+ */
 let originalText = "";
-// this is the rendered text
+/**
+ * The rendered and escaped text
+ */
 let renderedText = "";
-// this is the text without any special character (for compare with user input)
+/**
+ * Text for comparison with user input
+ */
 let fixedText = "";
 
-// allocating all resizable objects in one
-const theme = themes[0];
-const themeTokens = theme.tokens;
-const themeAssociations = theme.associations;
-
-k.scene("game", () => {
+/**
+ * @param {GameParams} params
+ */
+const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
+    let theme = themes[0];
+    let offsetX = 0;
+    let offsetY = 0;
     let currentBlockIndex = 0;
+    let rivalSpeed = params.rivalSpeed ?? EASY_RIVAL_SPEED;
 
     // #region PLAYER  & RIVAL VARIABLES
-    /**
-     * @typedef {Object} PlayerState
-     * @property {number} cursorPos
-     * @property {string} line
-     * @property {number} curLineCount
-     * @property {number} curCharInLine
-     * @property {number} curIdentSize
-     * @property {import("kaplay").GameObj | null} cursorPointer
-     */
 
     /**
      * @type {PlayerState}
@@ -79,14 +77,15 @@ k.scene("game", () => {
 
     // #endregion
 
-    let offsetX = 0;
-    let offsetY = 0;
     animateBackground();
 
     /**
      * @param {number} i
      */
     const matchColorToken = (i, ch) => {
+        const themeTokens = theme.tokens;
+        const themeAssociations = theme.associations;
+
         if (ch === " ") return COLOR_TEXT_DEFAULT;
         if (playerState.cursorPos - 1 < i) {
             if (rivalState.cursorPos + 1 > i) {
@@ -131,13 +130,38 @@ k.scene("game", () => {
         requestAnimationFrame(animateBackground);
     }
 
-    // fondo
-    const textboxSize = () => k.vec2(k.width() * 0.7, k.height());
+    // background
+    // Files & Folders
+    const filesFoldersSize = () => {
+        if (k.width() > 1080) {
+            return k.vec2(323, k.height());
+        } else {
+            return k.vec2(k.width() * 0.3, k.height());
+        }
+    };
+    const filesFoldersPos = () => k.vec2(0, 0);
+
+    k.add([
+        resizableRect(filesFoldersSize),
+        resizablePos(filesFoldersPos),
+        k.anchor("topleft"),
+        k.color(k.RED),
+        k.opacity(0.5),
+    ]);
+
+    const textboxSize = () => k.vec2(k.width(), k.height());
+    const textboxPos = () => {
+        if (k.width() > 1080) {
+            return k.vec2(323, 0);
+        }
+
+        return k.vec2(k.width() * 0.3, 0);
+    };
     const textPadding = k.vec2(12, 12);
 
     const textbox = k.add([
         resizableRect(textboxSize),
-        resizablePos(() => k.vec2(0 + textboxSize().x / 2, 0)),
+        resizablePos(textboxPos),
         k.anchor("topleft"),
         k.color(23, 9, 39),
         k.opacity(0.5),
@@ -145,7 +169,7 @@ k.scene("game", () => {
 
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
-        resizablePos(() => k.vec2(0 + textboxSize().x / 2, 0)),
+        resizablePos(textboxPos),
         k.anchor("topleft"),
         k.color(),
         k.rotate(0),
@@ -206,20 +230,13 @@ k.scene("game", () => {
     playerState.cursorPointer = cursorPointer;
     rivalState.cursorPointer = rivalPointer;
 
-    function selectCurrentBlock() {
-        if (jsonData.blocks && jsonData.blocks[currentBlockIndex]) {
-            return jsonData.blocks[currentBlockIndex];
+    function getCurrentDialog() {
+        if (dialogsData && dialogsData[currentBlockIndex]) {
+            return dialogsData[currentBlockIndex];
         } else {
-            console.error("jsonData.blocks is undefined or out of range");
-            return [];
+            console.error("dialogs.json is undefined or out of range");
+            return dialogsData[0];
         }
-    }
-
-    function getCurrentGroup() {
-        const currentBlock = selectCurrentBlock();
-        const visibleLines = Math.floor(textbox.height / lineHeight);
-
-        return currentBlock.slice(0, visibleLines);
     }
 
     /**
@@ -241,26 +258,31 @@ k.scene("game", () => {
     };
 
     function updateDialog() {
+        const currentDialog = getCurrentDialog();
         completedBlocks++;
         playerState.cursorPos = 0;
-        currentMistakes = 0;
         timeLeft = maxtime;
 
+        // theme
+        const themesByLanguage = themes.filter(
+            (t) => t.language === currentDialog.language,
+        );
+        theme = themesByLanguage[0] || themes[0];
+
         // the sentences
-        const currentGroup = getCurrentGroup();
+        const currentBlocks = currentDialog.blocks;
 
         // we replace [] characters with \[ and \] to avoid them being interpreted as tags
         // also ▯ is replaced with a space
+        originalText = currentBlocks.join("");
 
-        originalText = currentGroup.join("");
-
-        const fixedGroup = currentGroup
+        const fixedGroup = currentBlocks
             .join("")
             .replace(/\[/g, "\\[")
             .replace(/\]/g, "\\]")
             .replace(/▯/g, " ");
 
-        fixedText = currentGroup.join("").replace(/▯/g, " ");
+        fixedText = currentBlocks.join("").replace(/▯/g, " ");
         renderedText = fixedGroup;
         textboxText.text = renderedText;
         playerState.line = fixedText.split("\n")[0];
@@ -300,7 +322,7 @@ k.scene("game", () => {
 
         player.cursorPos--;
         player.curCharInLine--;
-        player.cursorPointer.pos = cursorPos();
+        player.cursorPointer.pos = cursorPos(rival);
         logGroupWithColor(fixedText);
     }
 
@@ -323,16 +345,9 @@ k.scene("game", () => {
     }
 
     function rivalWrite() {
-        const isFinalLine =
-            rivalState.curLineCount === fixedText.split("\n").length - 1;
-        const isFinalLineChar =
-            rivalState.curCharInLine === rivalState.line.length;
+        const curChar = fixedText[rivalState.cursorPos];
 
-        if (isFinalLineChar) {
-            if (isFinalLine) {
-                return k.go("endgame");
-            }
-
+        if (curChar === "\n") {
             nextLine(true);
         } else {
             nextChar(true);
@@ -348,7 +363,7 @@ k.scene("game", () => {
             }
         });
 
-        k.loop(0.2, () => {
+        k.loop(rivalSpeed, () => {
             rivalWrite();
         });
     }
@@ -429,4 +444,6 @@ k.scene("game", () => {
 
     startTimer();
     updateDialog();
-});
+};
+
+k.scene("game", gameScene);

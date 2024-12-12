@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "isUnique",
+    "language": "js",
+    "blocks": [
+      "function isUnique(str) {\n",
+      "▯▯▯▯let charSet = new Set();\n",
+      "▯▯▯▯\n",
+      "▯▯▯▯for (let i = 0; i < str.length; i++) {\n",
+      "▯▯▯▯▯▯▯▯if (charSet.has(str[i])) {\n",
+      "▯▯▯▯▯▯▯▯▯▯▯▯return false;\n",
+      "▯▯▯▯▯▯▯▯}\n",
+      "▯▯▯▯▯▯▯▯charSet.add(str[i]);\n",
+      "▯▯▯▯}\n",
+      "▯▯▯▯return true;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 2,
+    "title": "isUnique",
+    "language": "ts",
+    "blocks": [
+      "function isUnique(str: string): boolean {\n",
+      "▯▯▯▯let charSet = new Set();\n",
+      "▯▯▯▯\n",
+      "▯▯▯▯for (let i = 0; i < str.length; i++) {\n",
+      "▯▯▯▯▯▯▯▯if (charSet.has(str[i])) {\n",
+      "▯▯▯▯▯▯▯▯▯▯▯▯return false;\n",
+      "▯▯▯▯▯▯▯▯}\n",
+      "▯▯▯▯▯▯▯▯charSet.add(str[i]);\n",
+      "▯▯▯▯}\n",
+      "▯▯▯▯return true;\n",
+      "}\n"
+    ]
+  }
+]

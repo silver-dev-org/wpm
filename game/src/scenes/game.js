@@ -94,6 +94,8 @@ const gameScene = (params) => {
             return COLOR_TEXT_DEFAULT;
         }
 
+        let charColor = COLOR_TEXT_DEFAULT;
+
         const words = originalText.split(" ");
         let wordCharsIndex = 0;
         const word =
@@ -104,22 +106,27 @@ const gameScene = (params) => {
             }) || "";
 
         if (errorCharsIndexes.includes(i)) {
-            return COLOR_TEXT_INCORRECT;
-        }
-
-        if (ch.match(themeAssociations.brackets)) {
-            return k.Color.fromHex(themeTokens.brackets);
-        }
-
-        if (word.match(themeAssociations.classes)) {
-            return k.CYAN;
+            charColor = COLOR_TEXT_INCORRECT;
+        } else if (ch.match(themeAssociations.brackets)) {
+            charColor = k.Color.fromHex(themeTokens.brackets);
+        } else if (word.match(themeAssociations.classes)) {
+            charColor = k.Color.fromHex(themeTokens.classes);
         } else if (word.match(themeAssociations.functions)) {
-            return k.Color.fromHex(themeTokens.functions);
+            charColor = k.Color.fromHex(themeTokens.functions);
         } else if (word.match(themeAssociations.keywords)) {
-            return k.Color.fromHex(themeTokens.keywords);
-        } else {
-            return new k.Color(255, 255, 255);
+            charColor = k.Color.fromHex(themeTokens.keywords);
+        } else if (word.match(themeAssociations.strings)) {
+            charColor = k.Color.fromHex(themeTokens.strings);
         }
+
+        if (
+            rivalState.cursorPos < playerState.cursorPos &&
+            rivalState.cursorPos > i
+        ) {
+            return charColor.darken(80);
+        }
+
+        return charColor;
     };
 
     function animateBackground() {

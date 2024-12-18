@@ -4,8 +4,7 @@
  * @typedef {import("kaplay").PosComp} PosComp
  */
 
-import { data } from "../constants.js";
-
+import { gameState } from "../constants.js";
 
 /**
  * Set the position on resize
@@ -16,7 +15,7 @@ export const resizablePos = (sizeFunc) => ({
     id: "resizablePos",
     sizeFunc,
     add() {
-        data.resizableObjects.push(this);
+        gameState.resizableObjects.push(this);
         this.pos = this.sizeFunc();
     },
     /**
@@ -26,6 +25,8 @@ export const resizablePos = (sizeFunc) => ({
         this.pos = this.sizeFunc();
     },
     destroy() {
-        data.resizableObjects = data.resizableObjects.filter((obj) => obj !== this);
-    }
+        gameState.resizableObjects = gameState.resizableObjects.filter(
+            (obj) => obj !== this,
+        );
+    },
 });

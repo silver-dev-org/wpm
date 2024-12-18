@@ -1,10 +1,10 @@
 // @ts-check
 import "../types.js";
 import {
-    data,
+    gameState,
     dialogsData,
     lineHeight,
-    maxtime,
+    MAX_TIME,
     EASY_RIVAL_SPEED,
 } from "../constants.js";
 import { k } from "../kaplay.js";
@@ -18,7 +18,6 @@ let COLOR_TEXT_INCORRECT = k.Color.RED;
 
 let completedBlocks = 0;
 export let totalCorrectChars = 0;
-let timeLeft = maxtime;
 let fontSize = 24;
 let fontWidth = 12;
 let errorCharsIndexes = [];
@@ -46,8 +45,12 @@ const gameScene = (params) => {
     let theme = themes[0];
     let offsetX = 0;
     let offsetY = 0;
-    let currentBlockIndex = 0;
+    let currentBlockIndex = -1;
     let rivalSpeed = params.rivalSpeed ?? EASY_RIVAL_SPEED;
+    let curBlockData = {
+        lineCount: 0,
+    };
+    let defaultTime = params.time ?? MAX_TIME;
 
     // #region PLAYER  & RIVAL VARIABLES
 
@@ -61,6 +64,16 @@ const gameScene = (params) => {
         curCharInLine: 0,
         curIdentSize: 0,
         cursorPointer: null,
+        reset: () => {
+            playerState.cursorPos = 0;
+            playerState.line = "";
+            playerState.curLineCount = 0;
+            playerState.curCharInLine = 0;
+            playerState.curIdentSize = 0;
+            if (playerState.cursorPointer) {
+                playerState.cursorPointer.pos = cursorPos();
+            }
+        },
     };
 
     /**
@@ -73,6 +86,16 @@ const gameScene = (params) => {
         curCharInLine: 0,
         curIdentSize: 0,
         cursorPointer: null,
+        reset: () => {
+            rivalState.cursorPos = 0;
+            rivalState.line = "";
+            rivalState.curLineCount = 0;
+            rivalState.curCharInLine = 0;
+            rivalState.curIdentSize = 0;
+            if (rivalState.cursorPointer) {
+                rivalState.cursorPointer.pos = cursorPos(true);
+            }
+        },
     };
 
     // #endregion
@@ -109,6 +132,8 @@ const gameScene = (params) => {
             charColor = COLOR_TEXT_INCORRECT;
         } else if (ch.match(themeAssociations.brackets)) {
             charColor = k.Color.fromHex(themeTokens.brackets);
+        } else if (ch.match(themeAssociations.punctuation)) {
+            charColor = k.Color.fromHex(themeTokens.punctuation);
         } else if (word.match(themeAssociations.classes)) {
             charColor = k.Color.fromHex(themeTokens.classes);
         } else if (word.match(themeAssociations.functions)) {
@@ -117,6 +142,8 @@ const gameScene = (params) => {
             charColor = k.Color.fromHex(themeTokens.keywords);
         } else if (word.match(themeAssociations.strings)) {
             charColor = k.Color.fromHex(themeTokens.strings);
+        } else {
+            charColor = k.Color.fromHex(themeTokens.text);
         }
 
         if (
@@ -196,7 +223,7 @@ const gameScene = (params) => {
     ]);
 
     const timerLabel = k.add([
-        k.text(String(timeLeft), {
+        k.text(String(gameState.timeLeft), {
             size: 48,
             font: "monogram",
         }),
@@ -265,19 +292,20 @@ const gameScene = (params) => {
     };
 
     function updateDialog() {
-        const currentDialog = getCurrentDialog();
+        currentBlockIndex++;
         completedBlocks++;
-        playerState.cursorPos = 0;
-        timeLeft = maxtime;
+        playerState.reset();
+        rivalState.reset();
+
+        gameState.timeLeft = MAX_TIME;
+        const currentDialog = getCurrentDialog();
 
         // theme
-        const themesByLanguage = themes.filter(
-            (t) => t.language === currentDialog.language,
-        );
-        theme = themesByLanguage[0] || themes[0];
+        theme = themes[0];
 
         // the sentences
         const currentBlocks = currentDialog.blocks;
+        curBlockData.lineCount = currentBlocks.length;
 
         // we replace [] characters with \[ and \] to avoid them being interpreted as tags
         // also ▯ is replaced with a space
@@ -301,6 +329,7 @@ const gameScene = (params) => {
             .split("")
             .map((char, index) => {
                 if (errorCharsIndexes.includes(index)) {
+                    if (char === "\n") return `${errorCharsReplaces[index]}\n`;
                     return errorCharsReplaces[index];
                 } else {
                     return char;
@@ -333,6 +362,10 @@ const gameScene = (params) => {
         logGroupWithColor(fixedText);
     }
 
+    function preventError() {
+        k.shake(5);
+    }
+
     function nextLine(rival = false) {
         const player = rival ? rivalState : playerState;
         if (!player.cursorPointer) return;
@@ -355,6 +388,7 @@ const gameScene = (params) => {
         const curChar = fixedText[rivalState.cursorPos];
 
         if (curChar === "\n") {
+            nextChar(true);
             nextLine(true);
         } else {
             nextChar(true);
@@ -363,9 +397,9 @@ const gameScene = (params) => {
 
     function startTimer() {
         k.loop(1, () => {
-            timeLeft--;
-            timerLabel.text = String(timeLeft);
-            if (timeLeft <= 0) {
+            gameState.timeLeft--;
+            timerLabel.text = String(gameState.timeLeft);
+            if (gameState.timeLeft <= 0) {
                 k.go("endgame");
             }
         });
@@ -375,50 +409,59 @@ const gameScene = (params) => {
         });
     }
 
-    k.onKeyPress((key) => {
-        // only letters on this hanadler
-        let isCorrect = false;
-        let isNextLine = false;
+    k.onKeyPress((keyPressed) => {
         const correctChar = fixedText[playerState.cursorPos];
+        const shifting = k.isKeyDown("shift");
+        let key = keyPressed;
+        let errorKey = key;
+        let isCorrect = false;
 
-        if (errorCharsIndexes.length > 1) {
-            return k.shake(5);
-        }
-
-        if (correctChar === "\n" && errorCharsIndexes.length > 0) {
-            return k.shake(5);
-        }
-
-        if (key.length == 1) {
-            if (k.isKeyDown("shift")) {
-                key = key.toUpperCase();
-                isCorrect = key === correctChar;
-            } else {
-                isCorrect = key === correctChar;
-            }
-        } else if (key === "space") {
-            isCorrect = " " === correctChar;
-        } else if (key === "enter") {
-            isCorrect = correctChar === "\n";
-            if (isCorrect) isNextLine = true;
-        } else if (key.length > 1) {
+        if (key == "enter" || key == "backspace") {
             return;
         }
 
-        if (isCorrect && isNextLine) {
-            totalCorrectChars++;
-            nextChar();
-            nextLine();
-        } else if (isCorrect) {
+        if (errorCharsIndexes.length > 1) {
+            return preventError();
+        }
+
+        // Setting key
+        if (key.length == 1) {
+            key = shifting ? key.toUpperCase() : key;
+        } else if (key == "space") {
+            key = " ";
+            errorKey = "_";
+        } else {
+            return;
+        }
+
+        isCorrect = key === correctChar;
+
+        if (isCorrect) {
             totalCorrectChars++;
             nextChar();
         } else {
             errorCharsIndexes.push(playerState.cursorPos);
-            errorCharsReplaces[playerState.cursorPos] =
-                key === "space" ? "_" : key;
+            errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
         }
+    });
+
+    // Line jump
+    k.onKeyPress("enter", () => {
+        const correctChar = fixedText[playerState.cursorPos];
+        const isCorrect = "\n" === correctChar;
+
+        if (errorCharsIndexes.length > 0 || !isCorrect) {
+            return preventError();
+        }
+
+        if (playerState.curLineCount >= curBlockData.lineCount - 1) {
+            return updateDialog();
+        }
+
+        nextChar();
+        nextLine();
     });
 
     k.onKeyPressRepeat("backspace", () => {
@@ -443,7 +486,7 @@ const gameScene = (params) => {
     });
 
     k.onResize(() => {
-        for (const obj of data.resizableObjects) {
+        for (const obj of gameState.resizableObjects) {
             if (obj.is("resizablePos")) obj.updatePos();
             if (obj.is("resizableRect")) obj.updateRectSize();
         }

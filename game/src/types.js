@@ -1,6 +1,7 @@
 /**
  * @typedef {Object} GameParams
  * @property {number} rivalSpeed
+ * @property {number} time
  */
 
 /**
@@ -11,4 +12,5 @@
  * @property {number} curCharInLine
  * @property {number} curIdentSize
  * @property {import("kaplay").GameObj | null} cursorPointer
+ * @property {Function} reset
  */

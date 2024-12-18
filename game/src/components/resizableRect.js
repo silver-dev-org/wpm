@@ -4,7 +4,7 @@
  * @typedef {import("kaplay").RectComp} RectComp
  */
 
-import { data } from "../constants.js";
+import { gameState } from "../constants.js";
 import { k } from "../kaplay.js";
 
 /**
@@ -22,7 +22,7 @@ export const resizableRect = (resizeFunc) => ({
         this.use(k.rect(this.resizeFunc().x, this.resizeFunc().y));
     },
     destroy() {
-        data.resizableObjects = data.resizableObjects.filter(
+        gameState.resizableObjects = gameState.resizableObjects.filter(
             (obj) => obj !== this,
         );
     },

@@ -3,8 +3,8 @@
 import dialogs from "./data/dialogs.json";
 
 export const EASY_RIVAL_SPEED = 1;
+export const MAX_TIME = 60;
 export const goalBlocks = 2;
-export const maxtime = 500;
 export const maxMistakes = 2;
 export const lineHeight = 24;
 export const charSpacing = 10;
@@ -13,7 +13,7 @@ export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
 
 // modifiable data in game
-export const data = {
+export const gameState = {
     /**
      * Allocated resizable objects for update on resize
      *
@@ -21,7 +21,7 @@ export const data = {
      */
     resizableObjects: [],
     /**
-     * Current block
+     * Time left
      */
-    currentBlock: 0,
+    timeLeft: 0,
 };

@@ -12,19 +12,24 @@ import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 
+const titles = dialogsData.map(item => item.title);
+console.log(titles);
 
+const startscenemain = 0;
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#bebf7a");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
+
 let barTimeValue = 100;
 let completedBlocks = 0;
+export let userName = "";
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
-export let totalTypedCharacters =0;
-export let totalCorrectlines= 0;
-let fontSize = 48;
-let fontWidth = 24;
+export let totalTypedCharacters = 0;
+export let totalCorrectlines = 0;
+let fontSize = 24;
+let fontWidth = 12;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -193,29 +198,30 @@ const gameScene = (params) => {
 
     k.add([
         k.sprite("icon_01"),
-        resizablePos(() => k.vec2(k.width()*0.01, k.height()* 0.04)),
+        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.04)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_02"), ,
-        resizablePos(() => k.vec2(k.width()*0.04, k.height()* 0.20)),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.20)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width()*0.02, k.height()* 0.30)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.30)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width()*0.02, k.height()* 0.40)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.40)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_04"),
-        resizablePos(() => k.vec2(k.width()*0.02, k.height()* 0.50)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.50)),
         k.opacity(1),
     ]);
+
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
@@ -226,6 +232,14 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(48, 48);
 
+    const messagebox = k.add([
+        k.anchor("top"),
+        k.pos(k.width() / 2, 0),
+        k.text("Insert you name"),
+        k.z(21),
+    ]);
+
+
     const textbox = k.add([
         // resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -235,6 +249,14 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
 
+    const introbox = k.add([
+        resizablePos(filesFoldersPos),
+        k.sprite("bg",),
+        k.anchor("topleft"),
+        //k.color(k.RED),
+        k.opacity(1),
+        k.z(20),
+    ]);
 
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
@@ -245,13 +267,22 @@ const gameScene = (params) => {
         k.scale(1),
         k.z(10),
         k.opacity(0),
-    ]);
 
+    ]);
+    let initialname = false;
+    const name = k.add([
+        k.text(""),
+        k.textInput(true, 10),
+        k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(21),
+    ]);
     const textboxText = textboxBackParent.add([
         k.text("", {
             size: fontSize,
             transform: (idx, ch) => ({
                 color: matchColorToken(idx, ch),
+
             }),
         }),
         resizablePos(() => k.vec2(textPadding)),
@@ -271,7 +302,7 @@ const gameScene = (params) => {
     const timeprogressBar = k.add([
         k.rect(150, 20),
         k.anchor("topleft"),
-        resizablePos(() => k.vec2(k.width()*0.05, k.height()* 0.08)),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.08)),
         k.color(k.YELLOW),
         k.anchor("left"),
         k.outline(2),
@@ -291,7 +322,7 @@ const gameScene = (params) => {
     };
 
     const cursorPointer = k.add([
-        k.text("_", { size: 36 }),
+        k.text("_", { size: 24 }),
         resizablePos(() => cursorPos()),
         k.opacity(0.6),
         k.anchor("left"),
@@ -300,7 +331,7 @@ const gameScene = (params) => {
     ]);
 
     const rivalPointer = k.add([
-        k.text("_", { size: 36 }),
+        k.text("_", { size: 24 }),
         resizablePos(() => cursorPos(true)),
         k.opacity(0.6),
         k.anchor("left"),
@@ -339,7 +370,7 @@ const gameScene = (params) => {
 
     function updateDialog() {
         gameState.timeLeft = MAX_TIME;
-        
+
         currentBlockIndex++;
         completedBlocks++;
         playerState.reset();
@@ -391,7 +422,7 @@ const gameScene = (params) => {
     }
 
     function updateProgressBar() {
-        const targetWidth = (gameState.timeLeft / MAX_TIME)*100;
+        const targetWidth = (gameState.timeLeft / MAX_TIME) * 100;
         barTimeValue = k.lerp(barTimeValue, targetWidth, 0.2);
         timeprogressBar.width = barTimeValue;
     }
@@ -450,20 +481,36 @@ const gameScene = (params) => {
     }
 
     function startTimer() {
-        k.loop(1, () => {
-            gameState.timeLeft--;
-            updateProgressBar()
-            //console.log(gameState.timeLeft);
-            //  timerLabel.text = String(gameState.timeLeft);
-            if (gameState.timeLeft <= 0) {
-                k.go("endgame");
-            }
-        });
+        if(!initialname){
+            k.loop(1, () => {
+                gameState.timeLeft--;
+                updateProgressBar()
+                //console.log(gameState.timeLeft);
+                //  timerLabel.text = String(gameState.timeLeft);
+                if (gameState.timeLeft <= 0) {
+                    k.go("endgame");
+                }
+            });
+        }
+
 
         k.loop(rivalSpeed, () => {
             rivalWrite();
         });
     }
+
+    k.onKeyPress("enter", () => {
+        if(!initialname){
+            userName = name.text;
+            console.log(userName);
+            k.destroy(introbox);
+            k.destroy(name);
+            k.destroy(messagebox);
+            initialname = true;
+        }
+
+
+    });
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
@@ -558,3 +605,6 @@ const gameScene = (params) => {
 };
 
 k.scene("game", gameScene);
+
+
+

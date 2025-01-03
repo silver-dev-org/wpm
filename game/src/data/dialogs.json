@@ -4,35 +4,40 @@
     "title": "test",
     "language": "js",
     "blocks": [
-      "class Test {\n",
-      "    constructor() {\n",
-      "        this.name = \"test\";\n",
-      "    }\n",
-      "}\n"
-    ]
-  },
-  {
-    "id": 2,
-    "title": "isUnique",
-    "language": "js",
-    "blocks": [
       "function isUnique(str) {\n",
-      "    let charSet = new Set();\n",
-      "    \n",
-      "    for (let i = 0; i < str.length; i++) {\n",
-      "        if (charSet.has(str[i])) {\n",
-      "            return false;\n",
-      "        }\n",
-      "        charSet.add(str[i]);\n",
+      "    const charSet = new Set();\n",
+      "        if (charSet.has(char)) return false;\n",
+      "        charSet.add(char);\n",
       "    }\n",
       "    return true;\n",
       "}\n"
     ]
   },
   {
+    "id": 2,
+    "title": "removeDups",
+    "language": "js",
+    "blocks": [
+      "function removeDups(head) {\n",
+      " const seen = new Set();\n",
+      "    let current = head;",
+      "    let prev = null;\n",
+      "    while (current) {\n",
+      "        if (seen.has(current.val)) {\n",
+      "            prev.next = current.next;\n",
+      "        } else {\n",
+      "            seen.add(current.val);\n",
+      "            prev = current;\n",
+      "        }\n",
+      "        current = current.next;\n",
+         "}\n",
+      "}\n"
+    ]
+  },
+  {
     "id": 3,
-    "title": "isUnique",
-    "language": "ts",
+    "title": "ThreeInOne",
+    "language": "js",
     "blocks": [
       "function isUnique(str: string): boolean {\n",
       "    let charSet = new Set();\n",
@@ -46,5 +51,39 @@
       "    return true;\n",
       "}\n"
     ]
+  },
+
+  {
+    "id": 4,
+    "title": "constructor",
+    "language": "js",
+    "blocks": [
+      "constructor(stackSize) {\n",
+      "        this.stackSize = stackSize;\n",
+      "        this.values = Array(stackSize * 3).fill(null);\n",
+      "        this.sizes = [0, 0, 0];\n",
+      "    }\n",
+      "    push(stackNum, value) {\n",
+      "    if (this.sizes[stackNum] >= this.stackSize) throw new Error(\"Stack is full\");\n",
+      "        this.values[stackNum * this.stackSize + this.sizes[stackNum]] = value;\n",
+      "        this.sizes[stackNum]++;\n",
+      "        this.sizes[stackNum]++;\n",
+      "}\n",
+      "        if (this.sizes[stackNum] === 0) throw new Error(\"Stack is empty\");\n",
+      "        const index = stackNum * this.stackSize + this.sizes[stackNum] - 1;\n",
+      "        const value = this.values[index];\n",
+      "        this.values[index] = null;\n",
+      "        this.sizes[stackNum]--;\n",
+      "        return value;\n",
+      "    }\n",
+      "        if (this.sizes[stackNum] === 0) throw new Error(\"Stack is empty\");\n",
+      "        return this.values[stackNum * this.stackSize + this.sizes[stackNum] - 1];\n",
+      "    isEmpty(stackNum) {\n",  
+      "        return this.sizes[stackNum] === 0;\n",
+      "    }\n",
+      "}\n"
+    ]
   }
+
+
 ]

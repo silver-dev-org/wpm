@@ -202,7 +202,7 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.sprite("icon_02"), ,
+        k.sprite("icon_02"),
         resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.20)),
         k.opacity(1),
     ]);

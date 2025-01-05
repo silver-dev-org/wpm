@@ -10,7 +10,10 @@ export const charSpacing = 30;
 export const startmoveline = 1;
 export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
-// modifiable data in game
+
+/**
+ * Object for manage different states and configurations in the game
+ */
 export const gameState = {
     /**
      * Allocated resizable objects for update on resize

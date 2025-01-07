@@ -6,20 +6,18 @@ import {
     lineHeight,
     MAX_TIME,
     EASY_RIVAL_SPEED,
+    JUMP_AFTER,
 } from "../constants.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 
-const titles = dialogsData.map(item => item.title);
-console.log(titles);
+const titles = dialogsData.map((item) => item.title);
 
-const startscenemain = 0;
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#bebf7a");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
-
 
 let barTimeValue = 100;
 let completedBlocks = 0;
@@ -50,9 +48,10 @@ let fixedText = "";
  * @param {GameParams} params
  */
 const gameScene = (params) => {
-    //remove old BG
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
+    const userName = params.userName;
+    let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
     let offsetY = 0;
@@ -61,7 +60,6 @@ const gameScene = (params) => {
     let curBlockData = {
         lineCount: 0,
     };
-    let defaultTime = params.time ?? MAX_TIME;
 
     // #region PLAYER  & RIVAL VARIABLES
 
@@ -189,12 +187,11 @@ const gameScene = (params) => {
     k.add([
         //resizableRect(filesFoldersSize),
         resizablePos(filesFoldersPos),
-        k.sprite("bg",),
+        k.sprite("bg"),
         k.anchor("topleft"),
         //k.color(k.RED),
         k.opacity(1),
     ]);
-
 
     k.add([
         k.sprite("icon_01"),
@@ -203,22 +200,22 @@ const gameScene = (params) => {
     ]);
     k.add([
         k.sprite("icon_02"),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.20)),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.2)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.30)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.3)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.40)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.4)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_04"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.50)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.5)),
         k.opacity(1),
     ]);
 
@@ -232,30 +229,13 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(48, 48);
 
-    const messagebox = k.add([
-        k.anchor("top"),
-        k.pos(k.width() / 2, 0),
-        k.text("Insert you name"),
-        k.z(21),
-    ]);
-
-
     const textbox = k.add([
         // resizableRect(textboxSize),
         resizablePos(textboxPos),
-        k.sprite("bg2",),
+        k.sprite("bg2"),
         k.anchor("topleft"),
         // k.color(23, 9, 39),
         k.opacity(1),
-    ]);
-
-    const introbox = k.add([
-        resizablePos(filesFoldersPos),
-        k.sprite("bg",),
-        k.anchor("topleft"),
-        //k.color(k.RED),
-        k.opacity(1),
-        k.z(20),
     ]);
 
     const textboxBackParent = k.add([
@@ -267,25 +247,21 @@ const gameScene = (params) => {
         k.scale(1),
         k.z(10),
         k.opacity(0),
+    ]);
 
-    ]);
-    let initialname = false;
-    const name = k.add([
-        k.text(""),
-        k.textInput(true, 10),
-        k.pos(k.width() / 2, k.height() / 2),
-        k.anchor("center"),
-        k.z(21),
-    ]);
+    const textboxTextPos = () => {
+        return k.vec2(textPadding).sub(0, lineHeight * jumpCount);
+    }
+
     const textboxText = textboxBackParent.add([
         k.text("", {
             size: fontSize,
             transform: (idx, ch) => ({
                 color: matchColorToken(idx, ch),
-
             }),
         }),
-        resizablePos(() => k.vec2(textPadding)),
+        k.pos(0, 0),
+        resizablePos(textboxTextPos),
     ]);
 
     // const timerLabel = k.add([
@@ -295,8 +271,8 @@ const gameScene = (params) => {
     //  }),
     // resizablePos(() => k.vec2(k.width(), k.height())),
 
-    //   k.pos(k.width() * 0.01, k.height() * 0.02),               
-    // k.anchor("botleft"),
+    //   k.pos(k.width() * 0.01, k.height() * 0.02),
+    //  k.anchor("botleft"),
     // ]);
 
     const timeprogressBar = k.add([
@@ -306,7 +282,7 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.anchor("left"),
         k.outline(2),
-    ])
+    ]);
 
     const cursorPos = (rival = false) => {
         const player = rival ? rivalState : playerState;
@@ -377,6 +353,8 @@ const gameScene = (params) => {
         rivalState.reset();
 
         gameState.timeLeft = MAX_TIME;
+        jumpCount = 0;
+        textboxText.updatePos();
         const currentDialog = getCurrentDialog();
 
         // theme
@@ -451,11 +429,17 @@ const gameScene = (params) => {
         k.shake(5);
     }
 
-    function nextLine(rival = false) {
-        const player = rival ? rivalState : playerState;
+    function nextLine(isRival = false) {
+        const player = isRival ? rivalState : playerState;
         if (!player.cursorPointer) return;
 
         player.curLineCount++;
+
+        // line movement (jump)
+        if (player.curLineCount / JUMP_AFTER > jumpCount) {
+            jumpCount++;
+            textboxText.updatePos();
+        }
 
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
@@ -466,7 +450,7 @@ const gameScene = (params) => {
         player.curIdentSize = lineIdent;
         player.curCharInLine = lineIdent;
 
-        player.cursorPointer.pos = cursorPos(rival);
+        player.cursorPointer.pos = cursorPos(isRival);
     }
 
     function rivalWrite() {
@@ -481,36 +465,20 @@ const gameScene = (params) => {
     }
 
     function startTimer() {
-        if(!initialname){
-            k.loop(1, () => {
-                gameState.timeLeft--;
-                updateProgressBar()
-                //console.log(gameState.timeLeft);
-                //  timerLabel.text = String(gameState.timeLeft);
-                if (gameState.timeLeft <= 0) {
-                    k.go("endgame");
-                }
-            });
-        }
-
+        k.loop(1, () => {
+            gameState.timeLeft--;
+            updateProgressBar();
+            //console.log(gameState.timeLeft);
+            //  timerLabel.text = String(gameState.timeLeft);
+            if (gameState.timeLeft <= 0) {
+                k.go("endgame");
+            }
+        });
 
         k.loop(rivalSpeed, () => {
             rivalWrite();
         });
     }
-
-    k.onKeyPress("enter", () => {
-        if(!initialname){
-            userName = name.text;
-            console.log(userName);
-            k.destroy(introbox);
-            k.destroy(name);
-            k.destroy(messagebox);
-            initialname = true;
-        }
-
-
-    });
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
@@ -605,6 +573,3 @@ const gameScene = (params) => {
 };
 
 k.scene("game", gameScene);
-
-
-

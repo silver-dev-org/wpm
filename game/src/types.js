@@ -2,6 +2,7 @@
  * @typedef {Object} GameParams
  * @property {number} rivalSpeed
  * @property {number} time
+ * @property {string} userName
  */
 
 /**

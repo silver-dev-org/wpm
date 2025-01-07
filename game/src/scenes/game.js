@@ -6,6 +6,7 @@ import {
     lineHeight,
     MAX_TIME,
     EASY_RIVAL_SPEED,
+    JUMP_AFTER,
 } from "../constants.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
@@ -50,6 +51,7 @@ const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
     const userName = params.userName;
+    let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
     let offsetY = 0;
@@ -247,6 +249,10 @@ const gameScene = (params) => {
         k.opacity(0),
     ]);
 
+    const textboxTextPos = () => {
+        return k.vec2(textPadding).sub(0, lineHeight * jumpCount);
+    }
+
     const textboxText = textboxBackParent.add([
         k.text("", {
             size: fontSize,
@@ -254,7 +260,8 @@ const gameScene = (params) => {
                 color: matchColorToken(idx, ch),
             }),
         }),
-        resizablePos(() => k.vec2(textPadding)),
+        k.pos(0, 0),
+        resizablePos(textboxTextPos),
     ]);
 
     // const timerLabel = k.add([
@@ -346,6 +353,8 @@ const gameScene = (params) => {
         rivalState.reset();
 
         gameState.timeLeft = MAX_TIME;
+        jumpCount = 0;
+        textboxText.updatePos();
         const currentDialog = getCurrentDialog();
 
         // theme
@@ -420,11 +429,17 @@ const gameScene = (params) => {
         k.shake(5);
     }
 
-    function nextLine(rival = false) {
-        const player = rival ? rivalState : playerState;
+    function nextLine(isRival = false) {
+        const player = isRival ? rivalState : playerState;
         if (!player.cursorPointer) return;
 
         player.curLineCount++;
+
+        // line movement (jump)
+        if (player.curLineCount / JUMP_AFTER > jumpCount) {
+            jumpCount++;
+            textboxText.updatePos();
+        }
 
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
@@ -435,7 +450,7 @@ const gameScene = (params) => {
         player.curIdentSize = lineIdent;
         player.curCharInLine = lineIdent;
 
-        player.cursorPointer.pos = cursorPos(rival);
+        player.cursorPointer.pos = cursorPos(isRival);
     }
 
     function rivalWrite() {

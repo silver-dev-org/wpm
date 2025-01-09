@@ -19,7 +19,7 @@ let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#bebf7a");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
-let barTimeValue = 100;
+let barTimeValue = 60;
 let completedBlocks = 0;
 export let userName = "";
 export let totalCorrectChars = 0;
@@ -200,23 +200,98 @@ const gameScene = (params) => {
     ]);
     k.add([
         k.sprite("icon_02"),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.2)),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.2)),
         k.opacity(1),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.3)),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.3)),
         k.opacity(1),
+    ]);
+    k.add([
+        k.text("isUnique", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.32)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
     ]);
     k.add([
         k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.4)),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.4)),
         k.opacity(1),
     ]);
     k.add([
-        k.sprite("icon_04"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.5)),
+        k.text("removeDups", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.42)),
+        k.color(k.YELLOW),
         k.opacity(1),
+        k.outline(4),
+    ]);
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.5)),
+        k.opacity(1),
+    ]);
+
+    k.add([
+        k.text("routeBetweenNodes", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.52)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
+    ]);
+
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.6)),
+        k.opacity(1),
+    ]);
+
+    k.add([
+        k.text("insertion", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.62)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
+    ]);
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.7)),
+        k.opacity(1),
+    ]);
+
+    k.add([
+        k.text("getPermutations", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.72)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
+    ]);
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.8)),
+        k.opacity(1),
+    ]);
+
+    k.add([
+        k.text("sortedMerge", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.82)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
+    ]);
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.9)),
+        k.opacity(1),
+    ]);
+
+    k.add([
+        k.text("rotateMatrix", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.92)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.outline(4),
     ]);
 
     const textboxSize = () => k.vec2(k.width(), k.height());
@@ -229,6 +304,12 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(48, 48);
 
+    k.volume(0.5);
+    //  const music = k.play("WPM_OP1", {
+    //    loop: true,
+    //   paused: false,
+    // });
+  
     const textbox = k.add([
         // resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -482,6 +563,10 @@ const gameScene = (params) => {
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
+        k.play("code_sound", {
+            volume: 1,
+            speed: 1,
+        });
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -510,9 +595,13 @@ const gameScene = (params) => {
 
         if (isCorrect) {
             totalCorrectChars++;
-            gameState.timeLeft += 0.2;
+           // gameState.timeLeft += 0.2;
             nextChar();
         } else {
+            k.play("wrong_typing", {
+                volume: 1,
+                speed: 1,
+            });
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
@@ -573,3 +662,5 @@ const gameScene = (params) => {
 };
 
 k.scene("game", gameScene);
+
+

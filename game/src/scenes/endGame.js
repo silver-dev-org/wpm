@@ -1,9 +1,13 @@
+// @ts-check
+
+import { k } from "../kaplay";
 import { totalCorrectChars } from "./game.js";
 import { totalCorrectlines } from "./game.js";
 import { totalIcorrectCorrectChars } from "./game.js";
 import { totalTypedCharacters } from "./game.js";
-
-scene("endgame", () => {
+import { userName } from "./game.js";
+import "../types.js";
+k.scene("endgame", () => {
     let wpm_totalChars = (totalCorrectChars / 5);
     let wpm = (wpm_totalChars / 60);
     let wpm_totalLines = (totalCorrectlines / 5);
@@ -15,49 +19,70 @@ scene("endgame", () => {
 
     //const accuracy = (totalCorrectCharacters / totalTypedCharacters) * 100;
 
-    const endgameLabel = add([
-        text("Analytics", { size: 48 }),
-        pos(center().x, center().y - 100),
-        anchor("center"),
+    
+    const background = k.add([
+        k.sprite("bg2"),
+        k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    
+    const endgameLabel = k.add([
+        k.text("Analytics", { size: 48 }),
+        k.pos(k.center().x, k.center().y - 100),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const WPMLabel = add([
-        text("WPM", { size: 48 }),
-        pos(center().x - 200, center().y + 50),
-        anchor("center"),
+    const WPMLabel = k.add([
+        k.text("WPM", { size: 48 }),
+        k.pos(k.center().x - 200, k.center().y + 50),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const LOClabel = add([
-        text("LOC", { size: 48 }),
-        pos(center().x, center().y + 50),
-        anchor("center"),
+    const LOClabel = k.add([
+        k.text("LOC", { size: 48 }),
+        k.pos(k.center().x, k.center().y + 50),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const ACClabel = add([
-        text("ACC", { size: 48 }),
-        pos(center().x + 200, center().y + 50),
-        anchor("center"),
+    const ACClabel = k.add([
+        k.text("ACC", { size: 48 }),
+        k.pos(k.center().x + 200, k.center().y + 50),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const WPMNumber = add([
-        text(wpm, { size: 48 }),
-        pos(center().x - 200, center().y + 120),
-        anchor("center"),
+    const WPMNumber = k.add([
+        k. text(wpm.toString(), { size: 48 }),
+        k.pos(k.center().x - 200, k.center().y + 120),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const LOCNumber = add([
-        text(lpm, { size: 48 }),
-        pos(center().x, center().y + 120),
-        anchor("center"),
+    const LOCNumber = k.add([
+        k.text(lpm.toString(), { size: 48 }),
+        k.pos(k.center().x, k.center().y + 120),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    const ACCNumber = add([
-        text(acc, { size: 48 }),
-        pos(center().x + 200, center().y + 120),
-        anchor("center"),
+    const ACCNumber = k.add([
+        k.text(acc.toString(), { size: 48 }),
+        k.pos(k.center().x + 200, k.center().y + 120),
+        k.anchor("center"),
+        k.z(19),
     ]);
 
-    console.log(acc);
+   const icon_position = k.add([
+    k. sprite("icon_0"),
+    k.pos(k.width() / 2, k.height() / 4),
+    k.anchor("center"),
+    k. z(18),
+    
+    ]);
 });
 
 

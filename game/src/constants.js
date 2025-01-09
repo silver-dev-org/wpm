@@ -10,7 +10,7 @@ export const charSpacing = 30;
 export const startmoveline = 1;
 export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
-export const JUMP_AFTER = 1;
+export const JUMP_AFTER = 5;
 
 /**
  * Object for manage different states and configurations in the game

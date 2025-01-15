@@ -304,12 +304,12 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(48, 48);
 
-    k.volume(0.5);
-    //  const music = k.play("WPM_OP1", {
-    //    loop: true,
-    //   paused: false,
-    // });
-  
+    k.volume(0.2);
+    const music = k.play("videogame", {
+        loop: true,
+        paused: false,
+    });
+
     const textbox = k.add([
         // resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -355,13 +355,13 @@ const gameScene = (params) => {
     //   k.pos(k.width() * 0.01, k.height() * 0.02),
     //  k.anchor("botleft"),
     // ]);
+    const BAR_INITIAL_WIDTH = 150;
 
     const timeprogressBar = k.add([
-        k.rect(150, 20),
+        k.rect(BAR_INITIAL_WIDTH, 20), 
         k.anchor("topleft"),
         resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.08)),
         k.color(k.YELLOW),
-        k.anchor("left"),
         k.outline(2),
     ]);
 
@@ -479,12 +479,12 @@ const gameScene = (params) => {
 
         textboxText.text = renderedText;
     }
+    
 
-    function updateProgressBar() {
-        const targetWidth = (gameState.timeLeft / MAX_TIME) * 100;
-        barTimeValue = k.lerp(barTimeValue, targetWidth, 0.2);
-        timeprogressBar.width = barTimeValue;
-    }
+function updateProgressBar() {
+    const targetWidth = (gameState.timeLeft / MAX_TIME) * BAR_INITIAL_WIDTH; 
+    timeprogressBar.width = targetWidth; 
+}
 
     function nextChar(rival = false) {
         const player = rival ? rivalState : playerState;
@@ -515,7 +515,7 @@ const gameScene = (params) => {
         if (!player.cursorPointer) return;
 
         player.curLineCount++;
-
+        gameState.timeLeft += 2;
         // line movement (jump)
         if (player.curLineCount / JUMP_AFTER > jumpCount) {
             jumpCount++;

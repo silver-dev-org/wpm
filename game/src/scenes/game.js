@@ -19,7 +19,6 @@ let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#bebf7a");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
-let barTimeValue = 60;
 let completedBlocks = 0;
 export let userName = "";
 export let totalCorrectChars = 0;
@@ -185,19 +184,17 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
 
     k.add([
-        //resizableRect(filesFoldersSize),
-        resizablePos(filesFoldersPos),
-        k.sprite("bg"),
-        k.anchor("topleft"),
-        //k.color(k.RED),
-        k.opacity(1),
+        resizablePos(filesFoldersPos), 
+        k.sprite("bg"),              
+        k.anchor("topleft"),          
+        k.opacity(1),              
     ]);
 
-    k.add([
+   /* k.add([
         k.sprite("icon_01"),
         resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.04)),
         k.opacity(1),
-    ]);
+    ]);*/
     k.add([
         k.sprite("icon_02"),
         resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.2)),
@@ -209,8 +206,8 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.text("isUnique", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.32)),
+        k.text("isUnique", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.33)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -221,8 +218,8 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.text("removeDups", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.42)),
+        k.text("removeDups", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.43)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -234,8 +231,8 @@ const gameScene = (params) => {
     ]);
 
     k.add([
-        k.text("routeBetweenNodes", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.52)),
+        k.text("routeBetweenNodes", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.53)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -248,8 +245,8 @@ const gameScene = (params) => {
     ]);
 
     k.add([
-        k.text("insertion", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.62)),
+        k.text("insertion", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.63)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -261,8 +258,8 @@ const gameScene = (params) => {
     ]);
 
     k.add([
-        k.text("getPermutations", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.72)),
+        k.text("getPermutations", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.73)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -274,8 +271,8 @@ const gameScene = (params) => {
     ]);
 
     k.add([
-        k.text("sortedMerge", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.82)),
+        k.text("sortedMerge", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.83)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -287,8 +284,8 @@ const gameScene = (params) => {
     ]);
 
     k.add([
-        k.text("rotateMatrix", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.92)),
+        k.text("rotateMatrix", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.93)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.outline(4),
@@ -304,11 +301,11 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(48, 48);
 
-    k.volume(0.2);
-    const music = k.play("videogame", {
-        loop: true,
-        paused: false,
-    });
+    k.volume(0.05);
+  //  const music = k.play("videogame", {
+   //     loop: true,
+    //    paused: false,
+   // });
 
     const textbox = k.add([
         // resizableRect(textboxSize),
@@ -426,10 +423,11 @@ const gameScene = (params) => {
     };
 
     function updateDialog() {
-        gameState.timeLeft = MAX_TIME;
+       // gameState.timeLeft = MAX_TIME;
 
         currentBlockIndex++;
         completedBlocks++;
+        gameState.timeLeft += 60;
         playerState.reset();
         rivalState.reset();
 
@@ -507,7 +505,7 @@ function updateProgressBar() {
     }
 
     function preventError() {
-        k.shake(5);
+        k.shake(2);
     }
 
     function nextLine(isRival = false) {
@@ -515,7 +513,7 @@ function updateProgressBar() {
         if (!player.cursorPointer) return;
 
         player.curLineCount++;
-        gameState.timeLeft += 2;
+
         // line movement (jump)
         if (player.curLineCount / JUMP_AFTER > jumpCount) {
             jumpCount++;
@@ -564,7 +562,6 @@ function updateProgressBar() {
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
         k.play("code_sound", {
-            volume: 1,
             speed: 1,
         });
         const correctChar = fixedText[playerState.cursorPos];
@@ -599,14 +596,13 @@ function updateProgressBar() {
             nextChar();
         } else {
             k.play("wrong_typing", {
-                volume: 1,
                 speed: 1,
             });
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
-            gameState.timeLeft -= 0.5;
+
             totalIcorrectCorrectChars++;
         }
     });
@@ -636,7 +632,7 @@ function updateProgressBar() {
             playerState.curCharInLine === playerState.curIdentSize &&
             playerState.curLineCount > 0
         ) {
-            return k.shake(5);
+            return k.shake(2);
         } else {
             prevChar();
         }

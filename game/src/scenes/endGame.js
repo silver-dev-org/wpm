@@ -15,6 +15,10 @@ k.scene("endgame", () => {
     let lpm = wpm_totalLines / 60;
     let acc = (totalCorrectChars / totalTypedCharacters) * 100;
 
+    let prev_wpm = 0;
+    let prev_lpm = 0;
+    let prev_acc = 0;
+
     wpm = parseFloat(wpm.toFixed(2));
     lpm = parseFloat(lpm.toFixed(2));
     acc = parseFloat(acc.toFixed(2));
@@ -90,43 +94,54 @@ k.scene("endgame", () => {
 
     const username = actualname;
     const retrievedData = getPlay(username);
-    let prev_wpm = 0;
-    let prev_lpm = 0;
-    let prev_acc = 0;
 
     if (retrievedData) {
         console.log("Load data:", retrievedData);
+    
         prev_wpm = retrievedData.wpm || 0;
         prev_lpm = retrievedData.lpm || 0;
         prev_acc = retrievedData.acc || 0;
+    
+        k.add([
+            k.text(prev_wpm.toFixed(2), { size: 48 }),
+            k.pos(k.center().x - 200, k.center().y + 250),
+            k.anchor("center"),
+            k.z(19),
+        ]);
+    
+        k.add([
+            k.text(prev_lpm.toFixed(2), { size: 48 }),
+            k.pos(k.center().x, k.center().y + 250),
+            k.anchor("center"),
+            k.z(19),
+        ]);
+    
+        k.add([
+            k.text(prev_acc.toFixed(2), { size: 48 }),
+            k.pos(k.center().x + 200, k.center().y + 250),
+            k.anchor("center"),
+            k.z(19),
+        ]);
     } else {
         console.log("Empty load, load default data.");
     }
 
     k.add([
-        k.text(prev_wpm.toFixed(2), { size: 48 }),
-        k.pos(k.center().x - 200, k.center().y + 200),
-        k.anchor("center"),
-        k.z(19),
-    ]);
-
-    k.add([
-        k.text(prev_lpm.toFixed(2), { size: 48 }),
+        k.text("Previous result", { size: 48 }),
         k.pos(k.center().x, k.center().y + 200),
         k.anchor("center"),
         k.z(19),
     ]);
 
-    k.add([
-        k.text(prev_acc.toFixed(2), { size: 48 }),
-        k.pos(k.center().x + 200, k.center().y + 200),
-        k.anchor("center"),
-        k.z(19),
-    ]);
     savePlay({
         userName: username,
         wpm: currentResults.wpm,
         lpm: currentResults.lpm,
         acc: currentResults.acc,
     });
+
+    onKeyPress("enter", () => {
+        k.go("name_selection");
+    });
+
 });

@@ -6,6 +6,7 @@ k.loadFont("monogram", "/fonts/monogram.ttf", {
     outline: 4,
     filter: "linear",
 });
+k.loadMusic("intro", "/sounds/intro.mp3");
 k.loadMusic("videogame", "/sounds/videogame.mp3");
 k.loadMusic("code_sound", "/sounds/code_sound.mp3");
 k.loadMusic("wrong_typing", "/sounds/wrong typing.mp3");

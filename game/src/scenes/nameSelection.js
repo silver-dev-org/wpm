@@ -1,11 +1,14 @@
 import { k } from "../kaplay";
 import { EASY_RIVAL_SPEED } from "../constants";
-import { savePlay, getPlay } from "../systems/saves.js";
+import { savePlay } from "../systems/saves.js";
 
 export let actualname;
+export let setdifficulty;
+
+
+k.volume(0.05);
 
 k.scene("name_selection", () => {
-    
     k.add([
         k.anchor("top"),
         k.pos(k.width() / 2, k.height() / 8),
@@ -13,6 +16,11 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
+    const music = k.play("intro", {
+        loop: true,
+        paused: false,
+    });
+    
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -41,21 +49,6 @@ k.scene("name_selection", () => {
         nameLines.text = "_".repeat(lineLength);
     });
 
-    k.onKeyPress("enter", () => {
-
-        const playData = {
-            userName: name.text, 
-        };
-
-      
-        savePlay(playData); 
-        
-        k.go("game", {
-            rivalSpeed: EASY_RIVAL_SPEED,
-            userName: name.text,
-        });
-    });
-
     const challengetitles = k.add([
         k.text("Select challenge", { size: 32 }),
         k.pos(k.width() / 2, k.height() / 1.5), 
@@ -63,7 +56,8 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
-    const options = ["easy", "medium", "high"];
+    const options = ["easy", "medium", "hard"];
+    const difficultyValues = [1, 2, 3]; 
     let selectedOption = 0;
 
     const optionTexts = options.map((option, index) => {
@@ -99,6 +93,22 @@ k.scene("name_selection", () => {
                 selectedOption = index;
                 selector.pos.x = option.pos.x - 100; 
             }
+        });
+    });
+
+    k.onKeyPress("enter", () => {
+        setdifficulty = difficultyValues[selectedOption];
+
+        const playData = {
+            userName: name.text, 
+        };
+
+        savePlay(playData); 
+        console.log(setdifficulty);
+        k.go("game", {
+            rivalSpeed: EASY_RIVAL_SPEED,
+            userName: name.text,
+            difficulty: setdifficulty, 
         });
     });
 });

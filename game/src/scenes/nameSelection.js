@@ -48,11 +48,6 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
-    const music = k.play("intro", {
-        loop: true,
-        paused: false,
-    });
-
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),

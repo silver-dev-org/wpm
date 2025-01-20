@@ -19,7 +19,6 @@ let COLOR_TEXT_RIVAL = k.Color.fromHex("#f7f023");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
 let completedBlocks = 0;
-export let userName = "";
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = 0;
@@ -48,7 +47,6 @@ let fixedText = "";
 const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
-    const userName = params.userName;
     let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
@@ -350,7 +348,6 @@ const gameScene = (params) => {
     };
     const textPadding = k.vec2(150, 150);
 
-    k.volume(0.05);
   //  const music = k.play("videogame", {
    //     loop: true,
     //    paused: false,
@@ -608,9 +605,6 @@ function updateProgressBar() {
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
-        k.play("code_sound", {
-            speed: 1,
-        });
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -642,9 +636,6 @@ function updateProgressBar() {
            // gameState.timeLeft += 0.2;
             nextChar();
         } else {
-            k.play("wrong_typing", {
-                speed: 1,
-            });
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();

@@ -1,18 +1,50 @@
 import { k } from "../kaplay";
 import { EASY_RIVAL_SPEED } from "../constants";
 import { savePlay } from "../systems/saves.js";
-
+import { resizablePos } from "../components/resizablePos.js";
+import { resizableRect } from "../components/resizableRect.js";
 export let actualname;
-export let setdifficulty;
-
 
 k.volume(0.05);
 
 k.scene("name_selection", () => {
     k.add([
         k.anchor("top"),
-        k.pos(k.width() / 2, k.height() / 8),
-        k.text("Insert your name"),
+        k.pos(k.width() / 2 - 250, k.height() / 4),
+        k.text("Typing", {
+            size: 38,
+        }),
+        k.color(k.WHITE),
+        k.z(21),
+    ]);
+
+
+    k.add([
+        k.anchor("top"),
+        k.pos(k.width() / 2 - 110, k.height() / 4),
+        k.text("Start", {
+            size: 38,
+        }),
+        k.color(k.YELLOW),
+        k.z(21),
+    ]);
+
+
+    k.add([
+        k.anchor("top"),
+        k.pos(k.width() / 2 + 210, k.height() / 4),
+        k.text("to begin the speed test", {
+            size: 38,
+        }),
+        k.color(k.WHITE),
+        k.z(21),
+    ]);
+
+    k.add([
+        k.sprite("WPM"),
+        resizablePos(() => k.vec2(k.width() * 0.005, k.height() * 0.1)),
+        k.opacity(0),
+        k.outline(8),
         k.z(21),
     ]);
 
@@ -20,7 +52,7 @@ k.scene("name_selection", () => {
         loop: true,
         paused: false,
     });
-    
+
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -29,86 +61,42 @@ k.scene("name_selection", () => {
     ]);
 
     const name = k.add([
-        k.text(""),
-        k.textInput(true, 20), 
-        k.pos(k.width() / 2, k.height() / 2.5), 
+        k.text("", {
+            size: 38,
+
+        }),
+        k.textInput(true, 20),
+        k.pos(k.width() / 2, k.height() / 2.0),
         k.anchor("center"),
+        k.color(k.YELLOW),
         k.z(21),
     ]);
-    
+
     const nameLines = k.add([
-        k.text("_".repeat(5), { size: 36 }), 
-        k.pos(k.width() / 2, k.height() / 2.5 + 20), 
+        k.text("_".repeat(5), {
+            size: 38,
+        }),
+        k.pos(k.width() / 2, k.height() / 2.0 + 30),
         k.color(k.YELLOW),
         k.anchor("center"),
         k.z(20),
     ]);
 
     name.onUpdate(() => {
-        const lineLength = Math.min(20, Math.max(5, name.text.length)); 
+        const lineLength = Math.min(20, Math.max(5, name.text.length));
         nameLines.text = "_".repeat(lineLength);
+
+        if (name.text === "Start") {
+            const playData = {
+                userName: name.text,
+            };
+
+            savePlay(playData);
+            k.go("game", {
+                rivalSpeed: EASY_RIVAL_SPEED,
+                userName: name.text,
+            });
+        }
     });
 
-    const challengetitles = k.add([
-        k.text("Select challenge", { size: 32 }),
-        k.pos(k.width() / 2, k.height() / 1.5), 
-        k.anchor("center"),
-        k.z(21),
-    ]);
-
-    const options = ["easy", "medium", "hard"];
-    const difficultyValues = [1, 2, 3]; 
-    let selectedOption = 0;
-
-    const optionTexts = options.map((option, index) => {
-        return k.add([
-            k.text(option, { size: 24 }),
-            k.pos(k.width() / 4 + index * (k.width() / 4), k.height() / 1.3), 
-            k.anchor("center"),
-            k.z(20),
-        ]);
-    });
-
-    const selector = k.add([
-        k.rect(200, 30), 
-        k.pos(k.width() / 4 + selectedOption * (k.width() / 4) - 100, k.height() / 1.3 - 10), 
-        k.color(255, 255, 255), 
-        k.z(19),
-    ]);
-
-    k.onKeyPress("right", () => {
-        selectedOption = (selectedOption + 1) % options.length;
-        selector.pos.x = k.width() / 4 + selectedOption * (k.width() / 4) - 100;
-    });
-
-    k.onKeyPress("left", () => {
-        selectedOption = (selectedOption - 1 + options.length) % options.length;
-        selector.pos.x = k.width() / 4 + selectedOption * (k.width() / 4) - 100;
-    });
-
-    k.onMouseMove((pos) => {
-        optionTexts.forEach((option, index) => {
-            if (pos.x > option.pos.x - option.width / 2 && pos.x < option.pos.x + option.width / 2 &&
-                pos.y > option.pos.y - option.height / 2 && pos.y < option.pos.y + option.height / 2) {
-                selectedOption = index;
-                selector.pos.x = option.pos.x - 100; 
-            }
-        });
-    });
-
-    k.onKeyPress("enter", () => {
-        setdifficulty = difficultyValues[selectedOption];
-
-        const playData = {
-            userName: name.text, 
-        };
-
-        savePlay(playData); 
-        console.log(setdifficulty);
-        k.go("game", {
-            rivalSpeed: EASY_RIVAL_SPEED,
-            userName: name.text,
-            difficulty: setdifficulty, 
-        });
-    });
 });

@@ -18,7 +18,8 @@ k.scene("endgame", () => {
     let prev_wpm = 0;
     let prev_lpm = 0;
     let prev_acc = 0;
-
+    let reciveprevdata = 0;
+    let prevdata =0;
     wpm = parseFloat(wpm.toFixed(2));
     lpm = parseFloat(lpm.toFixed(2));
     acc = parseFloat(acc.toFixed(2));
@@ -36,12 +37,6 @@ k.scene("endgame", () => {
         k.z(18),
     ]);
 
-    k.add([
-        k.text("Analytics", { size: 48 }),
-        k.pos(k.center().x, k.center().y - 100),
-        k.anchor("center"),
-        k.z(19),
-    ]);
 
     k.add([
         k.text("WPM", { size: 48 }),
@@ -97,25 +92,28 @@ k.scene("endgame", () => {
 
     if (retrievedData) {
         console.log("Load data:", retrievedData);
-    
-        prev_wpm = retrievedData.wpm || 0;
-        prev_lpm = retrievedData.lpm || 0;
-        prev_acc = retrievedData.acc || 0;
-    
+        reciveprevdata = retrievedData;
+        console.log(prevdata);
+        prevdata = JSON.parse(reciveprevdata);
+        prev_wpm =  parseFloat(prevdata.wpm) || 0;;
+        prev_lpm = parseFloat(prevdata.lpm) || 0;
+        prev_acc = parseFloat(prevdata.acc) || 0;
+        
+        console.log(prev_wpm, prev_lpm, prev_acc);
         k.add([
             k.text(prev_wpm.toFixed(2), { size: 48 }),
             k.pos(k.center().x - 200, k.center().y + 250),
             k.anchor("center"),
             k.z(19),
         ]);
-    
+
         k.add([
             k.text(prev_lpm.toFixed(2), { size: 48 }),
             k.pos(k.center().x, k.center().y + 250),
             k.anchor("center"),
             k.z(19),
         ]);
-    
+
         k.add([
             k.text(prev_acc.toFixed(2), { size: 48 }),
             k.pos(k.center().x + 200, k.center().y + 250),

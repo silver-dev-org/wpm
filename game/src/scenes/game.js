@@ -4,7 +4,6 @@ import {
     gameState,
     dialogsData,
     lineHeight,
-    MAX_TIME,
     EASY_RIVAL_SPEED,
     JUMP_AFTER,
 } from "../constants.js";
@@ -15,8 +14,8 @@ import { resizableRect } from "../components/resizableRect.js";
 
 const titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
-let COLOR_TEXT_RIVAL = k.Color.fromHex("#bebf7a");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#635b5b");
+let COLOR_TEXT_RIVAL = k.Color.fromHex("#f7f023");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
 let completedBlocks = 0;
@@ -25,8 +24,8 @@ export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = 0;
 export let totalCorrectlines = 0;
-let fontSize = 24;
-let fontWidth = 12;
+let fontSize = 28;
+let fontWidth = 16;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -195,102 +194,152 @@ const gameScene = (params) => {
         resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.04)),
         k.opacity(1),
     ]);*/
-    k.add([
-        k.sprite("icon_02"),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.2)),
-        k.opacity(1),
-    ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.3)),
-        k.opacity(1),
-    ]);
-    k.add([
-        k.text("isUnique", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.33)),
+    const icons = {
+        icon_02: [
+            k.add([
+                k.sprite("icon_02"),
+                resizablePos(() => k.vec2(k.width() * 0.006, k.height() * 0.1)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.text("Challenges", { size: 28, }), 
+                resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.12)), 
+                k.opacity(1),
+            ]),
+            k.add([
+                k.rect(k.width() * 0.1, 2), 
+                resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.13 + 25)), 
+                k.color(k.WHITE), 
+                k.opacity(1),
+            ]),
+            
+        ],
+        icon_03: [
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.2)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.3)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.4)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.5)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.6)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.7)),
+                k.opacity(1),
+            ]),
+            k.add([
+                k.sprite("icon_03"),
+                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.8)),
+                k.opacity(1),
+            ]),
+        ],
+    };
+    
+    const texts = [
+        k.add([
+            k.text("isUnique.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.23)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+        ]),
+        k.add([
+            k.text("removeDups.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.33)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+
+        ]),
+        k.add([
+            k.text("routeBetweenNodes.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.43)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+
+        ]),
+        k.add([
+            k.text("insertion.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.53)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+
+        ]),
+        k.add([
+            k.text("getPermutations.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.63)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+
+        ]),
+        k.add([
+            k.text("sortedMerge.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width()* 0.05, k.height() * 0.73)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+
+        ]),
+        k.add([
+            k.text("rotateMatrix.js", { size: 20 }),
+            resizablePos(() => k.vec2(k.width()* 0.05, k.height() * 0.83)),
+            k.color(k.YELLOW),
+            k.opacity(1),
+        ]),
+    ];
+
+    const rest_text = k.add([
+        k.text("ESCAPE to reset", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.05)),
         k.color(k.YELLOW),
         k.opacity(1),
-        k.outline(4),
     ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.4)),
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.005, k.height() * 0.01), 
         k.opacity(1),
+        k.animate(),
+        k.z(18),
     ]);
-    k.add([
-        k.text("removeDups", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.43)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-        k.outline(4),
-    ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.5)),
-        k.opacity(1),
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.005, k.height() * 0.01), 
+        k.opacity(0),
+        k.animate(),
+        k.z(17),
     ]);
 
-    k.add([
-        k.text("routeBetweenNodes", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.53)),
-        k.color(k.YELLOW),
+    k.onKeyPress("m", () => {
+        button_muteOFF.opacity = 1;
+        button_muteON.opacity = 0;
+    });
+    const arrow = k.add([
+        k.sprite("arrow_yellow"),
+        k.pos(k.width() * 0.001, k.height() * 0.12), 
         k.opacity(1),
-        k.outline(4),
+        k.animate(),
     ]);
 
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.6)),
-        k.opacity(1),
-    ]);
-
-    k.add([
-        k.text("insertion", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.63)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-        k.outline(4),
-    ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.7)),
-        k.opacity(1),
-    ]);
-
-    k.add([
-        k.text("getPermutations", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.73)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-        k.outline(4),
-    ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.8)),
-        k.opacity(1),
-    ]);
-
-    k.add([
-        k.text("sortedMerge", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.83)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-        k.outline(4),
-    ]);
-    k.add([
-        k.sprite("icon_03"),
-        resizablePos(() => k.vec2(k.width() * 0.001, k.height() * 0.9)),
-        k.opacity(1),
-    ]);
-
-    k.add([
-        k.text("rotateMatrix", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.93)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-        k.outline(4),
-    ]);
-
+  //  arrow.animate("pos", [k.vec2(0, k.height() * 0.22), k.vec2(10, k.height() * 0.22)], {
+      //  duration: 0.5,
+     //   direction: "ping-pong",
+ //   });
+ 
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
@@ -299,7 +348,7 @@ const gameScene = (params) => {
 
         return k.vec2(k.width() * 0.3, 0);
     };
-    const textPadding = k.vec2(48, 48);
+    const textPadding = k.vec2(150, 150);
 
     k.volume(0.05);
   //  const music = k.play("videogame", {
@@ -352,15 +401,6 @@ const gameScene = (params) => {
     //   k.pos(k.width() * 0.01, k.height() * 0.02),
     //  k.anchor("botleft"),
     // ]);
-    const BAR_INITIAL_WIDTH = 150;
-
-    const timeprogressBar = k.add([
-        k.rect(BAR_INITIAL_WIDTH, 20), 
-        k.anchor("topleft"),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.08)),
-        k.color(k.YELLOW),
-        k.outline(2),
-    ]);
 
     const cursorPos = (rival = false) => {
         const player = rival ? rivalState : playerState;
@@ -376,7 +416,7 @@ const gameScene = (params) => {
     };
 
     const cursorPointer = k.add([
-        k.text("_", { size: 24 }),
+        k.text("_", { size: 28 }),
         resizablePos(() => cursorPos()),
         k.opacity(0.6),
         k.anchor("left"),
@@ -385,12 +425,21 @@ const gameScene = (params) => {
     ]);
 
     const rivalPointer = k.add([
-        k.text("_", { size: 24 }),
+        k.text("_", { size: 28 }),
         resizablePos(() => cursorPos(true)),
         k.opacity(0.6),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
     ]);
+
+    makeBlink(cursorPointer);
+    makeBlink(rivalPointer);
+
+    function makeBlink(entity) {
+        k.loop(0.5, () => {
+            entity.opacity = entity.opacity === 0 ? 0.3 : 0;
+        });
+    }
 
     playerState.cursorPointer = cursorPointer;
     rivalState.cursorPointer = rivalPointer;
@@ -427,11 +476,11 @@ const gameScene = (params) => {
 
         currentBlockIndex++;
         completedBlocks++;
-        gameState.timeLeft += 60;
+        arrow.pos.y += 88;
+        console.log(currentBlockIndex);
         playerState.reset();
         rivalState.reset();
 
-        gameState.timeLeft = MAX_TIME;
         jumpCount = 0;
         textboxText.updatePos();
         const currentDialog = getCurrentDialog();
@@ -480,8 +529,6 @@ const gameScene = (params) => {
     
 
 function updateProgressBar() {
-    const targetWidth = (gameState.timeLeft / MAX_TIME) * BAR_INITIAL_WIDTH; 
-    timeprogressBar.width = targetWidth; 
 }
 
     function nextChar(rival = false) {
@@ -545,19 +592,19 @@ function updateProgressBar() {
 
     function startTimer() {
         k.loop(1, () => {
-            gameState.timeLeft--;
-            updateProgressBar();
             //console.log(gameState.timeLeft);
             //  timerLabel.text = String(gameState.timeLeft);
-            if (gameState.timeLeft <= 0) {
-                k.go("endgame");
-            }
         });
 
         k.loop(rivalSpeed, () => {
             rivalWrite();
         });
     }
+
+    k.onKeyPress(["escape"], () => {
+        k.go("name_selection");
+       // k.go("endgame");
+    });
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
@@ -658,5 +705,3 @@ function updateProgressBar() {
 };
 
 k.scene("game", gameScene);
-
-

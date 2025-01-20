@@ -1,7 +1,6 @@
 import { k } from "../kaplay";
 import { totalCorrectChars } from "./game.js";
 import { totalCorrectlines } from "./game.js";
-import { totalIcorrectCorrectChars } from "./game.js";
 import { totalTypedCharacters } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname } from "./nameSelection.js";

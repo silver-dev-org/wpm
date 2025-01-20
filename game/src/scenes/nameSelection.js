@@ -1,11 +1,7 @@
 import { k } from "../kaplay";
 import { EASY_RIVAL_SPEED } from "../constants";
 import { savePlay } from "../systems/saves.js";
-import { resizablePos } from "../components/resizablePos.js";
-import { resizableRect } from "../components/resizableRect.js";
 export let actualname;
-
-k.volume(0.05);
 
 k.scene("name_selection", () => {
     k.add([
@@ -37,14 +33,6 @@ k.scene("name_selection", () => {
             size: 38,
         }),
         k.color(k.WHITE),
-        k.z(21),
-    ]);
-
-    k.add([
-        k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.005, k.height() * 0.1)),
-        k.opacity(0),
-        k.outline(8),
         k.z(21),
     ]);
 

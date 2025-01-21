@@ -1,14 +1,15 @@
 import { k } from "../kaplay";
 import { EASY_RIVAL_SPEED } from "../constants";
 import { savePlay } from "../systems/saves.js";
+import { resizablePos } from "../components/resizablePos.js";
 export let actualname;
 
 k.scene("name_selection", () => {
     k.add([
         k.anchor("top"),
-        k.pos(k.width() / 2 - 250, k.height() / 4),
+        k.pos(k.width() / 2 - 300, k.height() / 4),
         k.text("Typing", {
-            size: 32,
+            size: 38,
         }),
         k.color(k.WHITE),
         k.z(21),
@@ -17,9 +18,9 @@ k.scene("name_selection", () => {
 
     k.add([
         k.anchor("top"),
-        k.pos(k.width() / 2 - 140, k.height() / 4),
+        k.pos(k.width() / 2 - 170, k.height() / 4),
         k.text("Start", {
-            size: 32,
+            size: 38,
         }),
         k.color(k.YELLOW),
         k.z(21),
@@ -28,9 +29,9 @@ k.scene("name_selection", () => {
 
     k.add([
         k.anchor("top"),
-        k.pos(k.width() / 2 + 150, k.height() / 4),
-        k.text("to begin the code speed test", {
-            size: 32,
+        k.pos(k.width() / 2 + 120, k.height() / 4),
+        k.text("to begin the speed test", {
+            size: 38,
         }),
         k.color(k.WHITE),
         k.z(21),
@@ -39,6 +40,12 @@ k.scene("name_selection", () => {
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    const title = k.add([
+        k.sprite("WPM"),
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.1)),
         k.anchor("center"),
         k.z(18),
     ]);

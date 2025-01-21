@@ -8,6 +8,7 @@ import {
     EASY_RIVAL_SPEED,
     JUMP_AFTER,
 } from "../constants.js";
+import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
@@ -20,13 +21,12 @@ let COLOR_TEXT_RIVAL = k.Color.fromHex("#e3cf5b");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
 let completedBlocks = 0;
-export let userName = "";
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = 0;
 export let totalCorrectlines = 0;
 let fontSize = 28;
-let fontWidth = 14.8;
+let fontWidth = 13.9;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -49,7 +49,6 @@ let fixedText = "";
 const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
-    const userName = params.userName;
     let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
@@ -265,16 +264,20 @@ const gameScene = (params) => {
         k.z(17),
     ]);
 
-    k.onKeyPress("m", () => {
-        button_muteOFF.opacity = 1;
-        button_muteON.opacity = 0;
-    });
 
     k.onKeyPress(["escape"], () => {
-        // k.go("name_selection");
-        k.go("endgame");
+        k.go("game", {
+            rivalSpeed: EASY_RIVAL_SPEED,
+
+        });
     });
 
+    k.onKeyPress(["up"], () => {
+        k.go("endgame", {
+            rivalSpeed: EASY_RIVAL_SPEED,
+
+        });
+    });
     const arrow = k.add([
         k.sprite("arrow_yellow"),
         k.pos(k.width() * 0.001, k.height() * (TEXT_START_Y - SPACING * 0.5)),
@@ -302,7 +305,7 @@ const gameScene = (params) => {
 
         return k.vec2(k.width() * 0.3, 0);
     };
-    const textPadding = k.vec2(80, 80);
+    const textPadding = k.vec2(100, 100);
 
     k.volume(0.05);
 

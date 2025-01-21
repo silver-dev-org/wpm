@@ -3,7 +3,7 @@
 import { k } from "./kaplay.js";
 
 k.loadFont("monogram", "/fonts/monogram.ttf", {
-    outline: 5,
+    outline: 4,
     filter: "nearest",
 });
 

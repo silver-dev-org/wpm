@@ -5,7 +5,6 @@ import { totalTypedCharacters } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname } from "./nameSelection.js";
 import { resizablePos } from "../components/resizablePos.js";
-import { resizableRect } from "../components/resizableRect.js";
 import "../types.js";
 
 k.scene("endgame", () => {
@@ -36,27 +35,32 @@ k.scene("endgame", () => {
     };
 
     const background = k.add([
-        k.sprite("bg2"),
-        resizablePos(() => k.vec2(k.width(), k.height())), 
-        k.anchor("center"),
+        k.sprite("bg3"),
+        resizablePos(() => k.vec2(k.width()-0.1, k.height()))*0.1, 
+        k.anchor("left"),
         k.z(17),
     ]);
-
+    const title = k.add([
+        k.sprite("WPM"),
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.1)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
     k.add([
         k.text(lpm.toFixed(2), { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() * 0.25, k.height() * 0.31)), 
+        resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
     k.add([
         k.text(wpm.toFixed(2), { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() * 0.46, k.height() * 0.31)), 
+        resizablePos(() => k.vec2(k.width() * 0.47, k.height() *0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
     k.add([
         k.text(acc.toFixed(2)+"%", { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() *0.67, k.height() * 0.31)), 
+        resizablePos(() => k.vec2(k.width() *0.62, k.height() * 0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
@@ -97,19 +101,19 @@ k.scene("endgame", () => {
 
         k.add([
             k.text(best_lpm.toFixed(2), { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.24, k.height() * 0.64)), 
+            resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.56)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_wpm.toFixed(2), { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.46, k.height() * 0.64)), 
+            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.56)), 
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_acc.toFixed(2)+"%", { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.67, k.height() * 0.64)), 
+            resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.56)), 
             k.opacity(1),
             k.z(19),
         ]);
@@ -145,7 +149,7 @@ k.scene("endgame", () => {
     });
 
     onKeyPress("enter", () => {
-        k.go("game");
+        k.go("name_selection");
     });
 
 });

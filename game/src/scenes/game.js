@@ -4,6 +4,7 @@ import {
     gameState,
     dialogsData,
     lineHeight,
+    MAX_TIME,
     EASY_RIVAL_SPEED,
     JUMP_AFTER,
 } from "../constants.js";
@@ -14,17 +15,18 @@ import { resizableRect } from "../components/resizableRect.js";
 
 const titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#635b5b");
-let COLOR_TEXT_RIVAL = k.Color.fromHex("#f7f023");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
+let COLOR_TEXT_RIVAL = k.Color.fromHex("#e3cf5b");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
 let completedBlocks = 0;
+export let userName = "";
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = 0;
 export let totalCorrectlines = 0;
 let fontSize = 28;
-let fontWidth = 16;
+let fontWidth = 14.8;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -47,6 +49,7 @@ let fixedText = "";
 const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
+    const userName = params.userName;
     let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
@@ -155,7 +158,7 @@ const gameScene = (params) => {
             rivalState.cursorPos < playerState.cursorPos &&
             rivalState.cursorPos > i
         ) {
-            return charColor.darken(80);
+            return charColor.lighten(60);
         }
 
         return charColor;
@@ -181,142 +184,82 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
 
     k.add([
-        resizablePos(filesFoldersPos), 
-        k.sprite("bg"),              
-        k.anchor("topleft"),          
-        k.opacity(1),              
-    ]);
-
-   /* k.add([
-        k.sprite("icon_01"),
-        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.04)),
+        resizablePos(filesFoldersPos),
+        k.sprite("bg"),
+        k.anchor("topleft"),
         k.opacity(1),
-    ]);*/
-    const icons = {
-        icon_02: [
-            k.add([
-                k.sprite("icon_02"),
-                resizablePos(() => k.vec2(k.width() * 0.006, k.height() * 0.1)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.text("Challenges", { size: 28, }), 
-                resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.12)), 
-                k.opacity(1),
-            ]),
-            k.add([
-                k.rect(k.width() * 0.1, 2), 
-                resizablePos(() => k.vec2(k.width() * 0.04, k.height() * 0.13 + 25)), 
-                k.color(k.WHITE), 
-                k.opacity(1),
-            ]),
-            
-        ],
-        icon_03: [
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.2)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.3)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.4)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.5)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.6)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.7)),
-                k.opacity(1),
-            ]),
-            k.add([
-                k.sprite("icon_03"),
-                resizablePos(() => k.vec2(k.width() * 0.020, k.height() * 0.8)),
-                k.opacity(1),
-            ]),
-        ],
-    };
-    
-    const texts = [
-        k.add([
-            k.text("isUnique.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.23)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-        ]),
-        k.add([
-            k.text("removeDups.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.33)),
-            k.color(k.YELLOW),
-            k.opacity(1),
+    ]);
+    const ICON_START_Y = 0.2;
+    const TEXT_START_Y = 0.12;
+    const SPACING = 0.1;
 
-        ]),
-        k.add([
-            k.text("routeBetweenNodes.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.43)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-
-        ]),
-        k.add([
-            k.text("insertion.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.53)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-
-        ]),
-        k.add([
-            k.text("getPermutations.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.63)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-
-        ]),
-        k.add([
-            k.text("sortedMerge.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width()* 0.05, k.height() * 0.73)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-
-        ]),
-        k.add([
-            k.text("rotateMatrix.js", { size: 20 }),
-            resizablePos(() => k.vec2(k.width()* 0.05, k.height() * 0.83)),
-            k.color(k.YELLOW),
-            k.opacity(1),
-        ]),
+    const icons = [
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
+        { sprite: "icon_03" },
     ];
 
+    const texts = [
+        { text: "Challenges", size: 20 },
+        { text: "isUnique.js", size: 20 },
+        { text: "removeDups.js", size: 21 },
+        { text: "routeBetweenNodes.js", size: 20 },
+        { text: "insertion.js", size: 20 },
+        { text: "getPermutations.js", size: 20 },
+        { text: "sortedMerge.js", size: 20 },
+        { text: "rotateMatrix.js", size: 20 },
+    ];
+
+    icons.forEach((icon, index) => {
+        k.add([
+            k.sprite(icon.sprite),
+            resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (ICON_START_Y + SPACING * index))),
+            k.opacity(1),
+        ]);
+    });
+
+    texts.forEach((text, index) => {
+        k.add([
+            k.text(text.text, { size: text.size }),
+            resizablePos(() => k.vec2(k.width() * 0.055, k.height() * (TEXT_START_Y + SPACING * index))),
+            k.color(k.WHITE),
+            k.opacity(1),
+        ]);
+    });
+
+    const iconChallenge = k.add([
+        k.sprite("icon_02"),
+        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.1)),
+        k.opacity(1),
+    ]);
     const rest_text = k.add([
-        k.text("ESCAPE to reset", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.05)),
+        k.text("Press ESC to reset", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.9)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
+    /*   const button_retry = k.add([
+           k.sprite("retry"),
+           k.pos(k.width() * 0.01, k.height() * 0.01),
+           k.opacity(1),
+           k.animate(),
+           k.z(18),
+       ]);*/
+
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.005, k.height() * 0.01), 
+        k.pos(k.width() * 0.02, k.height() * 0.01),
         k.opacity(1),
         k.animate(),
         k.z(18),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.005, k.height() * 0.01), 
+        k.pos(k.width() * 0.02, k.height() * 0.01),
         k.opacity(0),
         k.animate(),
         k.z(17),
@@ -326,18 +269,31 @@ const gameScene = (params) => {
         button_muteOFF.opacity = 1;
         button_muteON.opacity = 0;
     });
+
+    k.onKeyPress(["escape"], () => {
+        // k.go("name_selection");
+        k.go("endgame");
+    });
+
     const arrow = k.add([
         k.sprite("arrow_yellow"),
-        k.pos(k.width() * 0.001, k.height() * 0.12), 
+        k.pos(k.width() * 0.001, k.height() * (TEXT_START_Y - SPACING * 0.5)),
         k.opacity(1),
         k.animate(),
     ]);
 
-  //  arrow.animate("pos", [k.vec2(0, k.height() * 0.22), k.vec2(10, k.height() * 0.22)], {
-      //  duration: 0.5,
-     //   direction: "ping-pong",
- //   });
- 
+    let currentIndex = 0;
+    let arrow_ypos = arrow.pos.y;
+
+    function moveArrow() {
+        const newY = k.height() * (TEXT_START_Y + SPACING * currentIndex);
+        arrow.pos = k.vec2(arrow.pos.x, newY);
+        arrow.animate("pos", [k.vec2(0, newY), k.vec2(10, newY)], {
+            duration: 0.5,
+            direction: "ping-pong",
+        });
+    }
+
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
@@ -346,12 +302,9 @@ const gameScene = (params) => {
 
         return k.vec2(k.width() * 0.3, 0);
     };
-    const textPadding = k.vec2(150, 150);
+    const textPadding = k.vec2(80, 80);
 
-  //  const music = k.play("videogame", {
-   //     loop: true,
-    //    paused: false,
-   // });
+    k.volume(0.05);
 
     const textbox = k.add([
         // resizableRect(textboxSize),
@@ -388,16 +341,15 @@ const gameScene = (params) => {
         resizablePos(textboxTextPos),
     ]);
 
-    // const timerLabel = k.add([
-    //     k.text(String(gameState.timeLeft), {
-    //       size: 48,
-    //      font: "monogram",
-    //  }),
-    // resizablePos(() => k.vec2(k.width(), k.height())),
+    const BAR_INITIAL_WIDTH = 0;
 
-    //   k.pos(k.width() * 0.01, k.height() * 0.02),
-    //  k.anchor("botleft"),
-    // ]);
+    const timeprogressBar = k.add([
+        k.rect(BAR_INITIAL_WIDTH, 20),
+        k.anchor("topleft"),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.08)),
+        k.color(k.YELLOW),
+        k.outline(2),
+    ]);
 
     const cursorPos = (rival = false) => {
         const player = rival ? rivalState : playerState;
@@ -437,7 +389,6 @@ const gameScene = (params) => {
             entity.opacity = entity.opacity === 0 ? 0.3 : 0;
         });
     }
-
     playerState.cursorPointer = cursorPointer;
     rivalState.cursorPointer = rivalPointer;
 
@@ -469,15 +420,16 @@ const gameScene = (params) => {
     };
 
     function updateDialog() {
-       // gameState.timeLeft = MAX_TIME;
-
         currentBlockIndex++;
         completedBlocks++;
-        arrow.pos.y += 88;
-        console.log(currentBlockIndex);
         playerState.reset();
         rivalState.reset();
-
+        arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
+        if (currentIndex < texts.length - 1) {
+            currentIndex++;
+            moveArrow();
+        }
+        gameState.timeLeft = MAX_TIME;
         jumpCount = 0;
         textboxText.updatePos();
         const currentDialog = getCurrentDialog();
@@ -523,10 +475,12 @@ const gameScene = (params) => {
 
         textboxText.text = renderedText;
     }
-    
 
-function updateProgressBar() {
-}
+
+    function updateProgressBar() {
+        const targetWidth = (gameState.timeLeft / MAX_TIME) * BAR_INITIAL_WIDTH;
+        timeprogressBar.width = targetWidth;
+    }
 
     function nextChar(rival = false) {
         const player = rival ? rivalState : playerState;
@@ -589,8 +543,7 @@ function updateProgressBar() {
 
     function startTimer() {
         k.loop(1, () => {
-            //console.log(gameState.timeLeft);
-            //  timerLabel.text = String(gameState.timeLeft);
+            updateProgressBar();
         });
 
         k.loop(rivalSpeed, () => {
@@ -598,13 +551,11 @@ function updateProgressBar() {
         });
     }
 
-    k.onKeyPress(["escape"], () => {
-        k.go("name_selection");
-       // k.go("endgame");
-    });
-
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
+        k.play("code_sound", {
+            speed: 1,
+        });
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -633,9 +584,12 @@ function updateProgressBar() {
 
         if (isCorrect) {
             totalCorrectChars++;
-           // gameState.timeLeft += 0.2;
+
             nextChar();
         } else {
+            k.play("wrong_typing", {
+                speed: 1,
+            });
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
@@ -696,3 +650,5 @@ function updateProgressBar() {
 };
 
 k.scene("game", gameScene);
+
+

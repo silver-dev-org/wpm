@@ -3,7 +3,7 @@
 import { k } from "./kaplay.js";
 
 k.loadFont("monogram", "/fonts/monogram.ttf", {
-    outline: 6,
+    outline: 5,
     filter: "nearest",
 });
 
@@ -15,8 +15,10 @@ k.loadSprite("bgpng", "/sprites/bgpng.png");
 k.loadSprite("bg3", "/sprites/bg3.png");
 k.loadSprite("bg2", "/sprites/bg2.png");
 k.loadSprite("bg", "/sprites/bg.png");
+k.loadSprite("bg_analitycs", "/sprites/Bg_backAnalitycs.png");
 k.loadSprite("muteON", "/sprites/muteON.png");
 k.loadSprite("muteOff", "/sprites/muteOFF.png");
+k.loadSprite("retry", "/sprites/retry.png");
 k.loadSprite("WPM", "/sprites/WPM.png");
 k.loadSprite("icon_0", "/sprites/icon_0.png");
 k.loadSprite("icon_01", "/sprites/icon_01.png");

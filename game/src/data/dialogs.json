@@ -39,7 +39,7 @@
     "title": "routeBetweenNodes",
     "language": "js",
     "blocks": [
-      "function routeBetweenNodes(graph, start, end) { \n",
+      "function routeBetweenNodes(graph, start, end) {\n",
       "    if (start === end) return true;\n",
       "    const visited = new Set();\n",
       "    const queue = [start];\n",

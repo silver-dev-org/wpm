@@ -188,7 +188,7 @@ const gameScene = (params) => {
 
     k.add([
         resizablePos(filesFoldersPos),
-        k.sprite("bg"),
+        k.sprite("bg3"),
         k.anchor("topleft"),
         k.opacity(1),
     ]);
@@ -275,7 +275,7 @@ const gameScene = (params) => {
         {
             button_muteON.opacity = 1;
             button_muteOFF.opacity = 0;
-            mute_enable= true;
+            mute_enable= false;
         }
 
     });

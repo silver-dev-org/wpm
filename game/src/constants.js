@@ -7,7 +7,7 @@ export const goalBlocks = 3;
 export const maxMistakes = 2;
 export const lineHeight = 28;
 export const charSpacing = 30;
-export const startmoveline = 1;
+export const startmoveline = 3;
 export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
 /**

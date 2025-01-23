@@ -305,6 +305,7 @@ const gameScene = (params) => {
 
         return k.vec2(k.width() * 0.3, 0);
     };
+
     const textPadding = k.vec2(100, 100);
 
     k.volume(0.05);
@@ -330,7 +331,7 @@ const gameScene = (params) => {
     ]);
 
     const textboxTextPos = () => {
-        return k.vec2(textPadding).sub(0, lineHeight * jumpCount);
+        return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
     }
 
     const textboxText = textboxBackParent.add([
@@ -459,6 +460,8 @@ const gameScene = (params) => {
         textboxText.text = renderedText;
         playerState.line = fixedText.split("\n")[0];
         rivalState.line = fixedText.split("\n")[0];
+        cursorPointer.updatePos();
+        rivalPointer.updatePos();
     }
 
     function updateDialogErrors() {
@@ -515,10 +518,11 @@ const gameScene = (params) => {
 
         player.curLineCount++;
 
-        // line movement (jump)
-        if (player.curLineCount / JUMP_AFTER > jumpCount) {
+        if (JUMP_AFTER == 1) {
             jumpCount++;
-            textboxText.updatePos();
+        }
+        else if (player.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
+            jumpCount++;
         }
 
         const line = fixedText.split("\n")[player.curLineCount];
@@ -530,7 +534,10 @@ const gameScene = (params) => {
         player.curIdentSize = lineIdent;
         player.curCharInLine = lineIdent;
 
+        textboxText.updatePos();
         player.cursorPointer.pos = cursorPos(isRival);
+        cursorPointer.updatePos();
+        rivalPointer.updatePos();
     }
 
     function rivalWrite() {

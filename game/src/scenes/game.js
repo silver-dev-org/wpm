@@ -170,7 +170,7 @@ const gameScene = (params) => {
 
         requestAnimationFrame(animateBackground);
     }
- // Music
+    // Music
     k.volume(0.5);
     const music = k.play("videogame", {
         loop: true,
@@ -525,7 +525,7 @@ const gameScene = (params) => {
         if (JUMP_AFTER == 1) {
             jumpCount++;
         }
-        else if (player.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
+        else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
             jumpCount++;
         }
 

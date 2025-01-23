@@ -170,7 +170,11 @@ const gameScene = (params) => {
 
         requestAnimationFrame(animateBackground);
     }
-
+ // Music
+    k.volume(0.5);
+    const music = k.play("videogame", {
+        loop: true,
+    });
     // background
     // Files & Folders
     const filesFoldersSize = () => {
@@ -563,9 +567,7 @@ const gameScene = (params) => {
 
     k.onKeyPress((keyPressed) => {
         totalTypedCharacters++;
-        k.play("code_sound", {
-            speed: 1,
-        });
+
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -597,9 +599,6 @@ const gameScene = (params) => {
 
             nextChar();
         } else {
-            k.play("wrong_typing", {
-                speed: 1,
-            });
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();

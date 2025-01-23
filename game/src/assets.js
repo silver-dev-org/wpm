@@ -12,6 +12,8 @@ k.loadMusic("videogame", "/sounds/videogame.mp3");
 k.loadMusic("code_sound", "/sounds/code_sound.mp3");
 k.loadMusic("wrong_typing", "/sounds/wrong typing.mp3");
 k.loadSprite("bgpng", "/sprites/bgpng.png");
+k.loadSprite("github_icon", "/sprites/github_icon.png");
+k.loadSprite("about_icon", "/sprites/about_icon.png");
 k.loadSprite("bg3", "/sprites/bg3.png");
 k.loadSprite("bg2", "/sprites/bg2.png");
 k.loadSprite("bg", "/sprites/bg.png");

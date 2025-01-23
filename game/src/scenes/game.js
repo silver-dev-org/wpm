@@ -252,7 +252,33 @@ const gameScene = (params) => {
            k.animate(),
            k.z(18),
        ]);*/
+       const btn_mute = k.add([
+        k.rect(60, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
+        k.area(),
+        k.scale(1),
+        k.anchor("center"),
+        k.color(255, 255, 255),
+        k.z(21),
+        k.opacity(0),
+    ]);
+    let mute_enable= true;
 
+    btn_mute.onClick (() => {
+        if(mute_enable)
+        {
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            mute_enable= false;
+        }
+        else
+        {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            mute_enable= true;
+        }
+
+    });
     const button_muteON = k.add([
         k.sprite("muteON"),
         k.pos(k.width() * 0.02, k.height() * 0.01),

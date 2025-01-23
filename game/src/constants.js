@@ -13,7 +13,7 @@ export const dialogsData = dialogs;
 /**
  * @type {number}
  */
-export const JUMP_AFTER = 2;
+export const JUMP_AFTER = 1;
 
 /**
  * Object for manage different states and configurations in the game

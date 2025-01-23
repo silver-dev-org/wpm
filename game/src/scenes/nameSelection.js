@@ -6,6 +6,22 @@ export let actualname;
 
 k.scene("name_selection", () => {
 
+    const btn_githublink = add([
+        rect(80, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.92)),
+        area(),
+        scale(1),
+        anchor("center"),
+        color(255, 255, 255),
+        k.z(21),
+        k.opacity(0),
+    ]);
+    btn_githublink.onClick (() => {
+        console.log("click");
+        window.open("https://github.com/conanbatt/wpm", "_blank");
+
+    });
+
     k.add([
         k.anchor("top"),
         k.pos(k.width() / 2 - 250, k.height() / 3),
@@ -19,7 +35,7 @@ k.scene("name_selection", () => {
 
     k.add([
         k.anchor("top"),
-        k.pos(k.width() / 2 - 130, k.height() / 3),
+        k.pos(k.width() / 2 - 130, k.height() / 3.05),
         k.text("Start", {
             size: 38,
         }),
@@ -71,22 +87,8 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
     
-    k.add([
-        k.sprite("muteON"),
-        k.pos(k.width() * 0.04, k.height() * 0.04),
-        k.opacity(1),
-        k.animate(),
-        k.z(21),
-    ]);
-    k.add([
-        k.sprite("muteOff"),
-        k.pos(k.width() * 0.02, k.height() * 0.01),
-        k.opacity(0),
-        k.animate(),
-        k.z(17),
-    ]);
     const background = k.add([
-        k.sprite("bg2"),
+        k.sprite("bg3"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),

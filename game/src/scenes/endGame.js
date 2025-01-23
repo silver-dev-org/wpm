@@ -48,19 +48,19 @@ k.scene("endgame", () => {
     ]);
     k.add([
         k.text(lpm.toFixed(2), { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.34)), 
+        resizablePos(() => k.vec2(k.width() * 0.255, k.height() * 0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
     k.add([
         k.text(wpm.toFixed(2), { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() * 0.47, k.height() *0.34)), 
+        resizablePos(() => k.vec2(k.width() * 0.465, k.height() *0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
     k.add([
         k.text(acc.toFixed(2)+"%", { size: 48, }), 
-        resizablePos(() => k.vec2(k.width() *0.62, k.height() * 0.34)), 
+        resizablePos(() => k.vec2(k.width() *0.65, k.height() * 0.34)), 
         k.opacity(1),
         k.z(19),
     ]),
@@ -76,6 +76,44 @@ k.scene("endgame", () => {
     k.add([
         k.sprite("bg_analitycs"),
         resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.40)),
+        k.anchor("center"),
+        k.opacity(0),
+        k.z(18),
+    ]);
+
+    k.add([
+        k.sprite("BG_analitycs1"),
+        resizablePos(() => k.vec2(k.width() * 0.28, k.height() * 0.36)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs2"),
+        resizablePos(() => k.vec2(k.width() *  0.49, k.height()* 0.36)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs3"),
+        resizablePos(() => k.vec2(k.width() * 0.68, k.height() * 0.36)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs4"),
+        resizablePos(() => k.vec2(k.width() * 0.28, k.height() * 0.60)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs5"),
+        resizablePos(() => k.vec2(k.width() * 0.49, k.height() * 0.60)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs6"),
+        resizablePos(() => k.vec2(k.width() * 0.68, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -101,19 +139,19 @@ k.scene("endgame", () => {
 
         k.add([
             k.text(best_lpm.toFixed(2), { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.56)),
+            resizablePos(() => k.vec2(k.width() * 0.255, k.height() * 0.58)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_wpm.toFixed(2), { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.56)), 
+            resizablePos(() => k.vec2(k.width() * 0.465, k.height() *  0.58)), 
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_acc.toFixed(2)+"%", { size: 48, }), 
-            resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.56)), 
+            resizablePos(() => k.vec2(k.width() * 0.65, k.height() *  0.58)), 
             k.opacity(1),
             k.z(19),
         ]);
@@ -123,20 +161,20 @@ k.scene("endgame", () => {
 
     k.add([
         k.text("Press", { size: 32 }),
-        k.pos(k.center().x-100, k.center().y + 200),
+        k.pos(k.center().x-120, k.center().y + 300),
         k.anchor("center"),
         k.z(19),
     ]);
     k.add([
         k.text("ENTER", { size: 32 }),
-        k.pos(k.center().x, k.center().y + 200),
+        k.pos(k.center().x-20, k.center().y + 295),
         k.anchor("center"),
         k.color(k.YELLOW), 
         k.z(19),
     ]);
     k.add([
         k.text("to retry", { size: 32 }),
-        k.pos(k.center().x+130, k.center().y + 200),
+        k.pos(k.center().x+110, k.center().y + 300),
         k.anchor("center"),
         k.z(19),
     ]);

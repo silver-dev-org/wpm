@@ -488,6 +488,7 @@ const gameScene = (params) => {
         currentBlockIndex++;
         completedBlocks++;
         console.log(completedBlocks);
+        
         if(completedBlocks>2){
             k.go("endgame", {
                 rivalSpeed: EASY_RIVAL_SPEED,

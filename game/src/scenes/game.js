@@ -324,7 +324,6 @@ const gameScene = (params) => {
         k.z(17),
     ]);
 
-
     k.onKeyPress(["escape"], () => {
         music.stop();
         k.go("game", {
@@ -685,9 +684,9 @@ const gameScene = (params) => {
             const timeElapsedInSeconds = (Date.now() - startTime) / 1000;
             if (timeElapsedInSeconds > 0) {
                 time_text.text = "Time: " + timeElapsedInSeconds.toFixed(2);
-                actual_wpm = (totalCorrectChars / 5) / (timeElapsedInSeconds / 60);
-                actual_lpm = (totalCorrectlines / 5) / (timeElapsedInSeconds / 60);
-                actual_acc = (totalCorrectChars / totalTypedCharacters) * 100;
+                actual_wpm = (totalCorrectChars && timeElapsedInSeconds > 0) ? (totalCorrectChars / 5) / (timeElapsedInSeconds / 60) : 0;
+                actual_lpm = (totalCorrectlines && timeElapsedInSeconds > 0) ? (totalCorrectlines / 5) / (timeElapsedInSeconds / 60) : 0;
+                actual_acc = (totalCorrectChars && totalTypedCharacters > 0) ? (totalCorrectChars / totalTypedCharacters) * 100 : 0;
                 wmp_text.text = "WPM: " + (actual_wpm || 0).toFixed(2);
                 lpm_text.text = "LPM: " + (actual_lpm || 0).toFixed(2);
                 acc_text.text = "ACC: " + (actual_acc || 0).toFixed(2);

@@ -5,7 +5,8 @@ import { resizablePos } from "../components/resizablePos.js";
 export let actualname;
 
 k.scene("name_selection", () => {
-
+    const sound = k.play("videogame");
+    sound.stop();
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.92)),
@@ -22,27 +23,37 @@ k.scene("name_selection", () => {
 
     });
 
-    k.add([
+    const text_a = k.add([
         k.anchor("top"),
         k.pos(k.width() / 2 - 250, k.height() / 3),
         k.text("Typing", {
             size: 38,
         }),
         k.color(k.WHITE),
+        k.animate(),
         k.z(21),
     ]);
 
 
-    k.add([
+    const text_b= k.add([
         k.anchor("top"),
         k.pos(k.width() / 2 - 130, k.height() / 3.05),
         k.text("Start", {
             size: 38,
         }),
         k.color(k.YELLOW),
+        k.animate(),
         k.z(21),
     ]);
 
+    moveText();
+    
+    function moveText() {
+        text_b.animate("pos", [k.vec2(text_b.pos.x, text_b.pos.y+5), k.vec2(text_b.pos.x, text_b.pos.y-5)], {
+            duration: 0.5,
+            direction: "ping-pong",
+        });
+    }
 
     k.add([
         k.anchor("top"),
@@ -126,7 +137,7 @@ k.scene("name_selection", () => {
         const lineLength = Math.min(20, Math.max(5, name.text.length));
         nameLines.text = "_".repeat(lineLength);
 
-        if (name.text === "Start") {
+        if (name.text.toLowerCase() === "start".toLowerCase()) {
             const playData = {
                 userName: name.text,
             };

@@ -1,5 +1,5 @@
 import { k } from "../kaplay";
-import { totalCorrectChars } from "./game.js";
+import { totalCorrectChars,goal_acc,goal_lpm,goal_wpm } from "./game.js";
 import { totalCorrectlines } from "./game.js";
 import { totalTypedCharacters } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
@@ -8,11 +8,11 @@ import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 
 k.scene("endgame", () => {
-    let wpm_totalChars = totalCorrectChars / 5;
-    let wpm = wpm_totalChars / 60;
-    let wpm_totalLines = totalCorrectlines / 5;
-    let lpm = wpm_totalLines / 60;
-    let acc = (totalCorrectChars / totalTypedCharacters) * 100;
+   // let wpm_totalChars = totalCorrectChars / 5;
+    let wpm = goal_wpm;
+    //let wpm_totalLines = totalCorrectlines / 5;
+    let lpm = goal_lpm;
+    let acc = goal_acc;
 
     let prev_wpm = 0;
     let prev_lpm = 0;
@@ -130,13 +130,10 @@ k.scene("endgame", () => {
         prev_lpm = parseFloat(prevdata.lpm) || 0;
         prev_acc = parseFloat(prevdata.acc) || 0;
 
-        best_wpm = Math.max(prevdata.best_wpm || 0, wpm);
-        best_lpm = Math.max(prevdata.best_lpm || 0, lpm);
-        best_acc = Math.max(prevdata.best_acc || 0, acc);
-
-        console.log(best_wpm, best_lpm, best_acc);
-        console.log(prev_wpm, prev_lpm, prev_acc);
-
+        best_wpm = Math.max(prevdata.wpm || 0, wpm);
+        best_lpm = Math.max(prevdata.lpm || 0, lpm);
+        best_acc = Math.max(prevdata.acc || 0, acc);
+        
         k.add([
             k.text(best_lpm.toFixed(2), { size: 48, }), 
             resizablePos(() => k.vec2(k.width() * 0.255, k.height() * 0.58)),
@@ -155,6 +152,9 @@ k.scene("endgame", () => {
             k.opacity(1),
             k.z(19),
         ]);
+        console.log(best_wpm, best_lpm, best_acc);
+        console.log(prev_wpm, prev_lpm, prev_acc);
+
     } else {
         console.log("Empty load, load default data.");
     }
@@ -165,13 +165,21 @@ k.scene("endgame", () => {
         k.anchor("center"),
         k.z(19),
     ]);
-    k.add([
+   const textC= k.add([
         k.text("ENTER", { size: 32 }),
         k.pos(k.center().x-20, k.center().y + 295),
         k.anchor("center"),
         k.color(k.YELLOW), 
+        k.animate(),
         k.z(19),
     ]);
+    moveText();
+    function moveText() {
+        textC.animate("pos", [k.vec2(textC.pos.x, textC.pos.y+5), k.vec2(textC.pos.x, textC.pos.y-5)], {
+            duration: 0.5,
+            direction: "ping-pong",
+        });
+    }
     k.add([
         k.text("to retry", { size: 32 }),
         k.pos(k.center().x+110, k.center().y + 300),

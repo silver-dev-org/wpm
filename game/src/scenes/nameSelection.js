@@ -5,7 +5,8 @@ import { resizablePos } from "../components/resizablePos.js";
 export let actualname;
 
 k.scene("name_selection", () => {
-
+    const sound = k.play("videogame");
+    sound.stop();
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.92)),
@@ -136,7 +137,7 @@ k.scene("name_selection", () => {
         const lineLength = Math.min(20, Math.max(5, name.text.length));
         nameLines.text = "_".repeat(lineLength);
 
-        if (name.text === "Start") {
+        if (name.text.toLowerCase() === "start".toLowerCase()) {
             const playData = {
                 userName: name.text,
             };

@@ -326,6 +326,12 @@ const gameScene = (params) => {
 
     k.onKeyPress(["escape"], () => {
         music.stop();
+        actual_wpm = 0,
+        actual_lpm =0,
+        actual_acc = 0,
+        totalCorrectChars = 0;
+        totalCorrectlines =0;
+        totalTypedCharacters =-1;
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
@@ -487,11 +493,6 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
-        if(completedBlocks>2){
-            k.go("endgame", {
-                rivalSpeed: EASY_RIVAL_SPEED,
-            });
-        }
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -650,15 +651,6 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.z(21),
     ]);
-    const acc_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.15),
-        k.text("ACC: " + actual_acc, {
-            size: 28,
-        }),
-        k.color(k.YELLOW),
-        k.z(21),
-    ]);
     const time_text = k.add([
         k.anchor("top"),
         k.pos(k.width() * 0.9, k.height() * 0.20),
@@ -685,10 +677,8 @@ const gameScene = (params) => {
                 time_text.text = "Time: " + timeElapsedInSeconds.toFixed(2);
                 actual_wpm = (totalCorrectChars && timeElapsedInSeconds > 0) ? (totalCorrectChars / 5) / (timeElapsedInSeconds / 60) : 0;
                 actual_lpm = (totalCorrectlines && timeElapsedInSeconds > 0) ? (totalCorrectlines / 5) / (timeElapsedInSeconds / 60) : 0;
-                actual_acc = (totalCorrectChars && totalTypedCharacters > 0) ? (totalCorrectChars / totalTypedCharacters) * 100 : 0;
                 wmp_text.text = "WPM: " + (actual_wpm || 0).toFixed(2);
                 lpm_text.text = "LPM: " + (actual_lpm || 0).toFixed(2);
-                acc_text.text = "ACC: " + (actual_acc || 0).toFixed(2);
                 char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
             }
         }

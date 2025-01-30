@@ -66,7 +66,7 @@ let fixedText = "";
 const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
-    let startTime = Date.now();
+    let startTime = 0;
     let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
@@ -196,7 +196,7 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
-        startTime =0;
+        startTime = 0;
         completedBlocks = 0;
         actual_wpm = 0;
         actual_lpm = 0;
@@ -619,12 +619,9 @@ const gameScene = (params) => {
     }
 
     function startTimer() {
-        actual_wpm = 0.; //reset wpm
-        actual_lpm = 0;
-        actual_acc = 0;
-        k.loop(0.1, () => {
+        k.loop(1, () => {
             updateProgressBar();
-
+            startTime+=1;
             analitycs_calculate();
 
         });
@@ -662,20 +659,17 @@ const gameScene = (params) => {
     ]);
 
      function analitycs_calculate() {
-        if (startTime > 0) {
-            const timeElapsedInSeconds = (Date.now() - startTime) / 1000;
+            if (startTime > 0) {
+                time_text.text = "Time: " + startTime.toFixed(1);
 
-            if (timeElapsedInSeconds > 0) {
-                time_text.text = "Time: " + timeElapsedInSeconds.toFixed(1);
-
-                if (totalCorrectChars >= 5 && timeElapsedInSeconds > 0) {
-                    actual_wpm = Math.floor((totalCorrectChars / 5) / (timeElapsedInSeconds / 60));
+                if (totalCorrectChars >= 5 && startTime > 0) {
+                    actual_wpm = Math.floor((totalCorrectChars / 5) / (startTime / 60));
                 } else {
                     actual_wpm = 0;
                 }
     
-                if (totalCorrectlines && timeElapsedInSeconds > 1) {
-                    actual_lpm = Math.floor((totalCorrectlines / 5) / (timeElapsedInSeconds / 60));
+                if (totalCorrectlines && startTime > 0) {
+                    actual_lpm = Math.floor((totalCorrectlines) / (startTime / 60));
                 } else {
                     actual_lpm = 0;
                 }
@@ -691,7 +685,6 @@ const gameScene = (params) => {
                 lpm_text.text = "LPM: " + actual_lpm;
             }
         }
-    }
 
     k.onKeyPress((keyPressed) => {
 
@@ -753,7 +746,6 @@ const gameScene = (params) => {
             return updateDialog();
         }
 
-        // totalCorrectlines++;
 
         nextChar();
         nextLine();

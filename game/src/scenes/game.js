@@ -72,8 +72,9 @@ const gameScene = (params) => {
     };
     // Music
   
-    k.volume(0.5);
-    const music =k.play("videogame")
+    k.volume(1);
+    const music =k.play("videogame");
+    music.volume = 0.4;
     music.loop = true;
     // #region PLAYER  & RIVAL VARIABLES
 

@@ -40,7 +40,13 @@ let fontWidth = 13.9;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
-
+const music = k.play("videogame");
+music.loop = true;
+music.paused = true;
+if(!music.play)
+{
+    music.play();
+}
 /**
  * Text taken from the dialogs.json file
  */
@@ -70,18 +76,19 @@ const gameScene = (params) => {
     let curBlockData = {
         lineCount: 0,
     };
-    // Music
-  
+    let startmusic = 0;
     k.volume(0.5);
-    const music =k.play("videogame")
-    music.loop = true;
+    if (!startmusic) {
+        music.paused = false;
+        startmusic = 1;
+    }
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
      * @type {PlayerState}
      */
     const playerState = {
-        
+
         cursorPos: 0,
         line: "",
         curLineCount: 0,
@@ -181,28 +188,28 @@ const gameScene = (params) => {
     };
 
 
-    function StatsforAnalitics(){
-        console.log("wpm"+goal_wpm);
-         goal_wpm = actual_wpm;
-         goal_lpm = actual_lpm;
-         goal_acc = actual_acc;
+    function StatsforAnalitics() {
+        console.log("wpm" + goal_wpm);
+        goal_wpm = actual_wpm;
+        goal_lpm = actual_lpm;
+        goal_acc = actual_acc;
     }
 
     function resetGameStats() {
+        startTime =0;
         completedBlocks = 0;
         actual_wpm = 0;
         actual_lpm = 0;
         actual_acc = 0;
         totalCorrectChars = 0;
-        totalIcorrectCorrectChars = 0;
-        totalTypedCharacters = 0;
-        totalCorrectlines = 0;
+        totalCorrectlines = 1;
+        totalTypedCharacters = -1;
         errorCharsIndexes = [];
         errorCharsReplaces = {};
     }
     function animateBackground() {
         offsetX += BG_SPEED_X;
-        
+
         offsetY += BG_SPEED_Y;
         document.body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
 
@@ -325,13 +332,7 @@ const gameScene = (params) => {
     ]);
 
     k.onKeyPress(["escape"], () => {
-        music.stop();
-        actual_wpm = 0,
-        actual_lpm =0,
-        actual_acc = 0,
-        totalCorrectChars = 0;
-        totalCorrectlines =1;
-        totalTypedCharacters =-1;
+        resetGameStats();
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
@@ -340,7 +341,6 @@ const gameScene = (params) => {
     k.onKeyPress(["up"], () => {
         StatsforAnalitics();
         resetGameStats();
-        music.stop();
         k.go("endgame", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
@@ -493,7 +493,7 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
-        rivalSpeed-=0.02;
+        rivalSpeed -= 0.02;
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -587,10 +587,10 @@ const gameScene = (params) => {
             jumpCount++;
         }
         else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
-            jumpCount++;       
+            jumpCount++;
         }
         if (!isRival) {
-            totalCorrectlines++;  
+            totalCorrectlines++;
         }
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
@@ -660,42 +660,46 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.z(21),
     ]);
-   /* const char_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.20),
-        k.text("TTC: " + totalTypedCharacters + " TCC: " + totalCorrectChars, {
-            size: 20,
-        }),
-        k.color(k.YELLOW),
-        k.z(21),
-    ]);*/
 
-    function analitycs_calculate() {
+     function analitycs_calculate() {
         if (startTime > 0) {
             const timeElapsedInSeconds = (Date.now() - startTime) / 1000;
-            if (timeElapsedInSeconds > 0) {
-                time_text.text = "Time: " + timeElapsedInSeconds.toFixed(2);
-                actual_wpm = (totalCorrectChars && timeElapsedInSeconds > 0) ? (totalCorrectChars / 5) / (timeElapsedInSeconds / 60) : 0;
-                actual_lpm = (totalCorrectlines && timeElapsedInSeconds > 0) ? (totalCorrectlines / 5) / (timeElapsedInSeconds / 60) : 0;
-                actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
 
+            if (timeElapsedInSeconds > 0) {
+                time_text.text = "Time: " + timeElapsedInSeconds.toFixed(1);
+
+                if (totalCorrectChars >= 5 && timeElapsedInSeconds > 0) {
+                    actual_wpm = Math.floor((totalCorrectChars / 5) / (timeElapsedInSeconds / 60));
+                } else {
+                    actual_wpm = 0;
+                }
+    
+                if (totalCorrectlines && timeElapsedInSeconds > 1) {
+                    actual_lpm = Math.floor((totalCorrectlines / 5) / (timeElapsedInSeconds / 60));
+                } else {
+                    actual_lpm = 0;
+                }
+    
+                actual_acc = totalTypedCharacters > 0 
+                    ? Math.floor((totalCorrectChars / totalTypedCharacters) * 100)
+                    : 100;
+    
                 if (isNaN(actual_acc)) {
                     actual_acc = 100;
                 }
-                wmp_text.text = "WPM: " + (actual_wpm || 0).toFixed(2);
-                lpm_text.text = "LPM: " + (actual_lpm || 0).toFixed(2);
-                //char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
+                wmp_text.text = "WPM: " + actual_wpm;
+                lpm_text.text = "LPM: " + actual_lpm;
             }
         }
     }
 
     k.onKeyPress((keyPressed) => {
-        
+
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
-        
+
         let isCorrect = false;
 
         if (keyPressed != "backspace") {
@@ -750,7 +754,7 @@ const gameScene = (params) => {
         }
 
         // totalCorrectlines++;
-        
+
         nextChar();
         nextLine();
     });

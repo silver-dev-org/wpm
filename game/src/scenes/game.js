@@ -60,7 +60,7 @@ let fixedText = "";
 const gameScene = (params) => {
     const BG_SPEED_X = 0.1;
     const BG_SPEED_Y = 0.3;
-    let startTime = Date.now();
+    let startTime = 0;
     let jumpCount = 0;
     let theme = themes[0];
     let offsetX = 0;
@@ -619,12 +619,9 @@ const gameScene = (params) => {
     }
 
     function startTimer() {
-        actual_wpm = 0.; //reset wpm
-        actual_lpm = 0;
-        actual_acc = 0;
-        k.loop(0.1, () => {
+        k.loop(1, () => {
             updateProgressBar();
-
+            startTime +=1
             analitycs_calculate();
 
         });
@@ -672,11 +669,10 @@ const gameScene = (params) => {
 
     function analitycs_calculate() {
         if (startTime > 0) {
-            const timeElapsedInSeconds = (Date.now() - startTime) / 1000;
-            if (timeElapsedInSeconds > 0) {
-                time_text.text = "Time: " + timeElapsedInSeconds.toFixed(2);
-                actual_wpm = (totalCorrectChars && timeElapsedInSeconds > 0) ? (totalCorrectChars / 5) / (timeElapsedInSeconds / 60) : 0;
-                actual_lpm = (totalCorrectlines && timeElapsedInSeconds > 0) ? (totalCorrectlines / 5) / (timeElapsedInSeconds / 60) : 0;
+            if (startTime > 0) {
+                time_text.text = "Time: " + startTime.toFixed(2);
+                actual_wpm = (totalCorrectChars && startTime > 0) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
+                actual_lpm = (totalCorrectlines && startTime > 0) ? (totalCorrectlines) / (startTime / 60) : 0;
                 actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
 
                 if (isNaN(actual_acc)) {

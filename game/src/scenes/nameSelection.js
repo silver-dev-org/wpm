@@ -5,8 +5,9 @@ import { resizablePos } from "../components/resizablePos.js";
 export let actualname;
 
 k.scene("name_selection", () => {
-    const sound = k.play("videogame");
-    sound.stop();
+    k.volume(0.5);
+    // const sound = k.play("videogame");
+    //  sound.stop();
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.92)),
@@ -16,11 +17,39 @@ k.scene("name_selection", () => {
         color(255, 255, 255),
         k.z(21),
         k.opacity(0),
+        k.onHover,
     ]);
-    btn_githublink.onClick (() => {
-        console.log("click");
+
+    btn_githublink.onClick(() => {
         window.open("https://github.com/conanbatt/wpm", "_blank");
 
+    });
+    btn_githublink.onHover(() => {
+        gitText.color = k.rgb(255, 215, 0);
+    });
+    btn_githublink.onHoverEnd(() => {
+        gitText.color = k.rgb(255, 255, 255);;
+        console.log("exit");
+    });
+
+    const btn_aboutlink = add([
+        rect(80, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.92)),
+        area(),
+        scale(1),
+        anchor("center"),
+        color(255, 255, 255),
+        k.z(21),
+        k.opacity(0),
+        k.onHover,
+    ]);
+
+    btn_aboutlink.onHover(() => {
+        aboutText.color = k.rgb(255, 215, 0);
+    });
+    btn_githublink.onHoverEnd(() => {
+        aboutText.color = k.rgb(255, 255, 255);;
+        console.log("exit");
     });
 
     const text_a = k.add([
@@ -34,8 +63,7 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
-
-    const text_b= k.add([
+    const text_b = k.add([
         k.anchor("top"),
         k.pos(k.width() / 2 - 130, k.height() / 3.05),
         k.text("Start", {
@@ -46,10 +74,29 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
+    const gitText = k.add([
+        k.anchor("top"),
+        k.text("github", {
+            size: 28,
+        }),
+        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.89)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const aboutText = add([
+        k.anchor("top"),
+        k.text("about", {
+            size: 28,
+        }),
+        resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.89)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+
     moveText();
-    
+
     function moveText() {
-        text_b.animate("pos", [k.vec2(text_b.pos.x, text_b.pos.y+5), k.vec2(text_b.pos.x, text_b.pos.y-5)], {
+        text_b.animate("pos", [k.vec2(text_b.pos.x, text_b.pos.y + 5), k.vec2(text_b.pos.x, text_b.pos.y - 5)], {
             duration: 0.5,
             direction: "ping-pong",
         });
@@ -65,39 +112,20 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
     k.add([
-        k.anchor("top"),
-        k.text("github", {
-            size: 28,
-        }),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.89)),
-        k.opacity(1),
-        k.z(21),
-    ]);
-
-    k.add([
-        k.anchor("top"),
-        k.text("about", {
-            size: 28,
-        }),
-        resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.89)),
-        k.opacity(1),
-        k.z(21),
-    ]);
-    k.add([
         k.sprite("github_icon"),
         k.anchor("top"),
-        resizablePos(() => k.vec2(k.width() * 0.60, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.59, k.height() * 0.896)),
         k.opacity(1),
         k.z(21),
     ]);
     k.add([
         k.sprite("about_icon"),
         k.anchor("top"),
-        resizablePos(() => k.vec2(k.width() * 0.49, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.49, k.height() * 0.896)),
         k.opacity(1),
         k.z(21),
     ]);
-    
+
     const background = k.add([
         k.sprite("bg3"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -148,6 +176,14 @@ k.scene("name_selection", () => {
                 userName: name.text,
             });
         }
+    });
+
+    k.onKeyPress((keyPressed) => {
+
+        if (keyPressed != "backspace") {
+            k.play("code_sound");
+        }
+
     });
 
 });

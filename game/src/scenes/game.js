@@ -70,7 +70,11 @@ const gameScene = (params) => {
     let curBlockData = {
         lineCount: 0,
     };
-
+    // Music
+  
+    k.volume(0.5);
+    const music =k.play("videogame")
+    music.loop = true;
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
@@ -204,12 +208,6 @@ const gameScene = (params) => {
 
         requestAnimationFrame(animateBackground);
     }
-    // Music
-  
-    k.volume(0.6);
-    const music = k.play("videogame", {
-        loop: true,
-    });
     // background
     // Files & Folders
     const filesFoldersSize = () => {
@@ -301,11 +299,13 @@ const gameScene = (params) => {
             button_muteON.opacity = 0;
             button_muteOFF.opacity = 1;
             mute_enable = false;
+            k.volume(0);
         }
         else {
             button_muteON.opacity = 1;
             button_muteOFF.opacity = 0;
-            mute_enable = false;
+            mute_enable = true;
+            k.volume(0.5);
         }
 
     });
@@ -330,7 +330,7 @@ const gameScene = (params) => {
         actual_lpm =0,
         actual_acc = 0,
         totalCorrectChars = 0;
-        totalCorrectlines =0;
+        totalCorrectlines =1;
         totalTypedCharacters =-1;
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
@@ -375,7 +375,7 @@ const gameScene = (params) => {
 
     const textPadding = k.vec2(100, 200);
 
-    k.volume(0.05);
+    k.volume(0.5);
 
     const textbox = k.add([
         // resizableRect(textboxSize),
@@ -493,6 +493,7 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
+        rivalSpeed-=0.02;
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -504,7 +505,6 @@ const gameScene = (params) => {
         jumpCount = 0;
         textboxText.updatePos();
         const currentDialog = getCurrentDialog();
-
         // theme
         theme = themes[0];
 
@@ -582,16 +582,16 @@ const gameScene = (params) => {
     function nextLine(isRival = false) {
         const player = isRival ? rivalState : playerState;
         if (!player.cursorPointer) return;
-        totalCorrectlines++;
         player.curLineCount++;
-
         if (JUMP_AFTER == 1) {
             jumpCount++;
         }
         else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
-            jumpCount++;
+            jumpCount++;       
         }
-
+        if (!isRival) {
+            totalCorrectlines++;  
+        }
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
         const lineIdent = line.match(/^\s+/)?.[0].length || 0;
@@ -635,40 +635,40 @@ const gameScene = (params) => {
     }
     const wmp_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.05),
+        k.pos(k.width() * 0.9, k.height() * 0.10),
         k.text("WPM: " + actual_wpm, {
-            size: 28,
+            size: 20,
         }),
         k.color(k.YELLOW),
         k.z(21),
     ]);
     const lpm_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.10),
+        k.pos(k.width() * 0.9, k.height() * 0.15),
         k.text("LPM: " + actual_lpm, {
-            size: 28,
+            size: 20,
         }),
         k.color(k.YELLOW),
         k.z(21),
     ]);
     const time_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.20),
+        k.pos(k.width() * 0.9, k.height() * 0.05),
         k.text("time: ", {
-            size: 28,
+            size: 20,
         }),
         k.color(k.YELLOW),
         k.z(21),
     ]);
-    const char_text = k.add([
+   /* const char_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.25),
+        k.pos(k.width() * 0.9, k.height() * 0.20),
         k.text("TTC: " + totalTypedCharacters + " TCC: " + totalCorrectChars, {
-            size: 28,
+            size: 20,
         }),
         k.color(k.YELLOW),
         k.z(21),
-    ]);
+    ]);*/
 
     function analitycs_calculate() {
         if (startTime > 0) {
@@ -677,22 +677,30 @@ const gameScene = (params) => {
                 time_text.text = "Time: " + timeElapsedInSeconds.toFixed(2);
                 actual_wpm = (totalCorrectChars && timeElapsedInSeconds > 0) ? (totalCorrectChars / 5) / (timeElapsedInSeconds / 60) : 0;
                 actual_lpm = (totalCorrectlines && timeElapsedInSeconds > 0) ? (totalCorrectlines / 5) / (timeElapsedInSeconds / 60) : 0;
+                actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
+
+                if (isNaN(actual_acc)) {
+                    actual_acc = 100;
+                }
                 wmp_text.text = "WPM: " + (actual_wpm || 0).toFixed(2);
                 lpm_text.text = "LPM: " + (actual_lpm || 0).toFixed(2);
-                char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
+                //char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
             }
         }
     }
 
     k.onKeyPress((keyPressed) => {
-        totalTypedCharacters++;
-
+        
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
+        
         let isCorrect = false;
 
+        if (keyPressed != "backspace") {
+            totalTypedCharacters++;
+        }
         if (key == "enter" || key == "backspace") {
             return;
         }
@@ -714,6 +722,7 @@ const gameScene = (params) => {
         isCorrect = key === correctChar;
 
         if (isCorrect) {
+            k.play("code_sound");
             totalCorrectChars++;
 
             nextChar();
@@ -722,7 +731,7 @@ const gameScene = (params) => {
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
-
+            k.play("wrong_typing");
             totalIcorrectCorrectChars++;
         }
     });
@@ -741,6 +750,7 @@ const gameScene = (params) => {
         }
 
         // totalCorrectlines++;
+        
         nextChar();
         nextLine();
     });

@@ -71,9 +71,9 @@ const gameScene = (params) => {
         lineCount: 0,
     };
     // Music
-  
+
     k.volume(1);
-    const music =k.play("videogame");
+    const music = k.play("videogame");
     music.volume = 0.4;
     music.loop = true;
     // #region PLAYER  & RIVAL VARIABLES
@@ -82,7 +82,7 @@ const gameScene = (params) => {
      * @type {PlayerState}
      */
     const playerState = {
-        
+
         cursorPos: 0,
         line: "",
         curLineCount: 0,
@@ -182,11 +182,11 @@ const gameScene = (params) => {
     };
 
 
-    function StatsforAnalitics(){
-        console.log("wpm"+goal_wpm);
-         goal_wpm = actual_wpm;
-         goal_lpm = actual_lpm;
-         goal_acc = actual_acc;
+    function StatsforAnalitics() {
+        console.log("wpm" + goal_wpm);
+        goal_wpm = actual_wpm;
+        goal_lpm = actual_lpm;
+        goal_acc = actual_acc;
     }
 
     function resetGameStats() {
@@ -203,7 +203,7 @@ const gameScene = (params) => {
     }
     function animateBackground() {
         offsetX += BG_SPEED_X;
-        
+
         offsetY += BG_SPEED_Y;
         document.body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
 
@@ -328,11 +328,11 @@ const gameScene = (params) => {
     k.onKeyPress(["escape"], () => {
         music.stop();
         actual_wpm = 0,
-        actual_lpm =0,
-        actual_acc = 0,
-        totalCorrectChars = 0;
-        totalCorrectlines =1;
-        totalTypedCharacters =-1;
+            actual_lpm = 0,
+            actual_acc = 0,
+            totalCorrectChars = 0;
+        totalCorrectlines = 1;
+        totalTypedCharacters = -1;
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
@@ -494,7 +494,7 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
-        rivalSpeed-=0.02;
+        rivalSpeed -= 0.02;
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -588,10 +588,10 @@ const gameScene = (params) => {
             jumpCount++;
         }
         else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
-            jumpCount++;       
+            jumpCount++;
         }
         if (!isRival) {
-            totalCorrectlines++;  
+            totalCorrectlines++;
         }
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
@@ -622,13 +622,15 @@ const gameScene = (params) => {
     function startTimer() {
         k.loop(1, () => {
             updateProgressBar();
-            startTime +=1
+            startTime += 1
             analitycs_calculate();
 
         });
 
         k.loop(rivalSpeed, () => {
-            rivalWrite();
+            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                rivalWrite();
+            }
         });
     }
     const wmp_text = k.add([
@@ -658,15 +660,15 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.z(21),
     ]);
-   /* const char_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.20),
-        k.text("TTC: " + totalTypedCharacters + " TCC: " + totalCorrectChars, {
-            size: 20,
-        }),
-        k.color(k.YELLOW),
-        k.z(21),
-    ]);*/
+    /* const char_text = k.add([
+         k.anchor("top"),
+         k.pos(k.width() * 0.9, k.height() * 0.20),
+         k.text("TTC: " + totalTypedCharacters + " TCC: " + totalCorrectChars, {
+             size: 20,
+         }),
+         k.color(k.YELLOW),
+         k.z(21),
+     ]);*/
 
     function analitycs_calculate() {
         if (startTime > 0) {
@@ -687,12 +689,12 @@ const gameScene = (params) => {
     }
 
     k.onKeyPress((keyPressed) => {
-        
+
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
-        
+
         let isCorrect = false;
 
         if (keyPressed != "backspace") {
@@ -747,7 +749,7 @@ const gameScene = (params) => {
         }
 
         // totalCorrectlines++;
-        
+
         nextChar();
         nextLine();
     });

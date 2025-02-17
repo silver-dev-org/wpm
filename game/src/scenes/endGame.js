@@ -1,11 +1,15 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, mute_enable } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname } from "./nameSelection.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 
 k.scene("endgame", () => {
+    const music = k.play("endgame");
+    music.volume = 0.3;
+    music.loop = true;
+    let mute_state = mute_enable;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
     let acc = goal_acc;
@@ -30,6 +34,56 @@ k.scene("endgame", () => {
         acc: acc,
     };
 
+    const btn_mute = k.add([
+        k.rect(60, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
+        k.area(),
+        k.scale(1),
+        k.anchor("center"),
+        k.color(255, 255, 255),
+        k.z(21),
+        k.opacity(0),
+    ]);
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(1),
+        k.animate(),
+        k.z(19),
+    ]);
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(0),
+        k.animate(),
+        k.z(18),
+    ]);
+
+    btn_mute.onClick(() => {
+        if (mute_state) {
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            mute_state = false;
+            k.volume(0);
+        }
+        else {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            mute_state = true;
+            k.volume(0.5);
+        }
+
+    });
+    if(mute_state)
+        {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+        }
+        else{
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+        }
+
     const background = k.add([
         k.sprite("bg3"),
         resizablePos(() => k.vec2(k.width() - 0.1, k.height())) * 0.1,
@@ -38,7 +92,7 @@ k.scene("endgame", () => {
     ]);
     const title = k.add([
         k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.1)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.1)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -162,13 +216,13 @@ k.scene("endgame", () => {
 
     k.add([
         k.text("Press", { size: 32 }),
-        k.pos(k.center().x - 120, k.center().y + 300),
+        k.pos(k.center().x - 120, k.center().y + 270),
         k.anchor("center"),
         k.z(19),
     ]);
     const textC = k.add([
         k.text("ENTER", { size: 32 }),
-        k.pos(k.center().x - 20, k.center().y + 295),
+        k.pos(k.center().x - 20, k.center().y + 265),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.animate(),
@@ -233,7 +287,7 @@ k.scene("endgame", () => {
     }
     k.add([
         k.text("to retry", { size: 32 }),
-        k.pos(k.center().x + 110, k.center().y + 300),
+        k.pos(k.center().x + 110, k.center().y +270),
         k.anchor("center"),
         k.z(19),
     ]);
@@ -246,7 +300,8 @@ k.scene("endgame", () => {
     });
 
     onKeyPress("enter", () => {
-        k.go("name_selection");
+        music.stop();
+        k.go("name_selection");        
     });
 
 });

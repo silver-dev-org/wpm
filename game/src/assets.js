@@ -7,11 +7,13 @@ k.loadFont("monogram", "/fonts/monogram.ttf", {
     filter: "nearest",
 });
 k.loadMusic("videogame", "/sounds/videogame.mp3");
+k.loadMusic("endgame", "/sounds/endgame.mp3");
 k.loadSound("code_sound", "/sounds/code_sound.mp3");
 k.loadSound("wrong_typing", "/sounds/wrong typing.mp3");
 k.loadSprite("bgpng", "/sprites/bgpng.png");
 k.loadSprite("github_icon", "/sprites/github_icon.png");
 k.loadSprite("about_icon", "/sprites/about_icon.png");
+k.loadSprite("bg4", "/sprites/bg4.png");
 k.loadSprite("bg3", "/sprites/bg3.png");
 k.loadSprite("bg2", "/sprites/bg2.png");
 k.loadSprite("bg", "/sprites/bg.png");
@@ -22,10 +24,13 @@ k.loadSprite("BG_analitycs3", "/sprites/BG_analitycs3.png");
 k.loadSprite("BG_analitycs4", "/sprites/BG_analitycs4.png");
 k.loadSprite("BG_analitycs5", "/sprites/BG_analitycs5.png");
 k.loadSprite("BG_analitycs6", "/sprites/BG_analitycs6.png");
+k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
+k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
 k.loadSprite("muteON", "/sprites/muteON.png");
 k.loadSprite("muteOff", "/sprites/muteOFF.png");
 k.loadSprite("retry", "/sprites/retry.png");
 k.loadSprite("WPM", "/sprites/WPM.png");
+k.loadSprite("SilverDev", "/sprites/SilverDevs.png");
 k.loadSprite("icon_0", "/sprites/icon_0.png");
 k.loadSprite("icon_01", "/sprites/icon_01.png");
 k.loadSprite("icon_02", "/sprites/icon_02.png");

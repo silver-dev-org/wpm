@@ -10,7 +10,6 @@ import {
     ICON_START_Y,
     TEXT_START_Y,
     SPACING,
-    goalBlocks,
 } from "../constants.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
@@ -30,11 +29,12 @@ export let actual_lpm = 0;
 export let actual_acc = 0;
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
-export let totalTypedCharacters = 0;
+export let totalTypedCharacters = -1;
 export let totalCorrectlines = 0;
 export let goal_wpm = actual_wpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
+export let mute_enable = true;
 let fontSize = 28;
 let fontWidth = 13.9;
 let errorCharsIndexes = [];
@@ -196,7 +196,7 @@ const gameScene = (params) => {
         actual_acc = 0;
         totalCorrectChars = 0;
         totalIcorrectCorrectChars = 0;
-        totalTypedCharacters = 0;
+        totalTypedCharacters = -1;
         totalCorrectlines = 0;
         errorCharsIndexes = [];
         errorCharsReplaces = {};
@@ -226,7 +226,18 @@ const gameScene = (params) => {
         k.anchor("topleft"),
         k.opacity(1),
     ]);
-
+    k.add([
+        k.sprite("BG_analitycs7"),
+        k.pos(k.width() *0.3, k.height() * 0.06),
+        k.anchor("center"),
+        k.z(25),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs8"),
+        k.pos(k.width() * 0.45, k.height() * 0.06), 
+        k.anchor("center"),
+        k.z(25),
+    ]);
     const icons = [
         { sprite: "icon_03" },
         { sprite: "icon_03" },
@@ -293,7 +304,6 @@ const gameScene = (params) => {
         k.z(21),
         k.opacity(0),
     ]);
-    let mute_enable = true;
 
     btn_mute.onClick(() => {
         if (mute_enable) {
@@ -310,6 +320,7 @@ const gameScene = (params) => {
         }
 
     });
+
     const button_muteON = k.add([
         k.sprite("muteON"),
         k.pos(k.width() * 0.02, k.height() * 0.01),
@@ -327,12 +338,7 @@ const gameScene = (params) => {
 
     k.onKeyPress(["escape"], () => {
         music.stop();
-        actual_wpm = 0,
-            actual_lpm = 0,
-            actual_acc = 0,
-            totalCorrectChars = 0;
-        totalCorrectlines = 1;
-        totalTypedCharacters = -1;
+        resetGameStats();
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
@@ -368,13 +374,13 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(323, 0);
+            return k.vec2(310, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
     };
 
-    const textPadding = k.vec2(100, 200);
+    const textPadding = k.vec2(70, 180);
 
     k.volume(0.5);
 
@@ -384,9 +390,16 @@ const gameScene = (params) => {
         k.sprite("bg2"),
         k.anchor("topleft"),
         // k.color(23, 9, 39),
-        k.opacity(1),
+        k.opacity(0.9),
     ]);
-
+    const textboxBack = k.add([
+        resizablePos(textboxPos),
+        k.sprite("bg4"),
+        k.anchor("topleft"),
+        k.opacity(1),
+        k.z(24),
+    ]);
+    
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -397,6 +410,7 @@ const gameScene = (params) => {
         k.z(10),
         k.opacity(0),
     ]);
+
 
     const textboxTextPos = () => {
         return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
@@ -620,9 +634,9 @@ const gameScene = (params) => {
     }
 
     function startTimer() {
-        k.loop(1, () => {
+        k.loop(0.1, () => {
             updateProgressBar();
-            startTime += 1
+            startTime += 0.1;
             analitycs_calculate();
 
         });
@@ -635,30 +649,22 @@ const gameScene = (params) => {
     }
     const wmp_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.10),
-        k.text("WPM: " + actual_wpm, {
-            size: 20,
+        k.pos(k.width() * 0.30, k.height() * 0.05),
+        k.text(actual_wpm.toString(), {
+            size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(21),
+        k.z(28),
     ]);
-    const lpm_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.15),
-        k.text("LPM: " + actual_lpm, {
-            size: 20,
-        }),
-        k.color(k.YELLOW),
-        k.z(21),
-    ]);
+
     const time_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.9, k.height() * 0.05),
+        k.pos(k.width() * 0.45, k.height() * 0.05),
         k.text("time: ", {
-            size: 20,
+            size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(21),
+        k.z(28),
     ]);
     /* const char_text = k.add([
          k.anchor("top"),
@@ -673,16 +679,16 @@ const gameScene = (params) => {
     function analitycs_calculate() {
         if (startTime > 0) {
             if (startTime > 0) {
-                time_text.text = "Time: " + startTime.toFixed(2);
-                actual_wpm = (totalCorrectChars && startTime > 0) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
-                actual_lpm = (totalCorrectlines && startTime > 0) ? (totalCorrectlines) / (startTime / 60) : 0;
+                time_text.text = "" + startTime.toFixed(1);
+                actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
+                actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
                 actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
 
                 if (isNaN(actual_acc)) {
                     actual_acc = 100;
                 }
-                wmp_text.text = "WPM: " + (actual_wpm || 0).toFixed(2);
-                lpm_text.text = "LPM: " + (actual_lpm || 0).toFixed(2);
+                wmp_text.text = "" + (Math.round(actual_wpm) || 0);
+               // lpm_text.text = "LPM: " + (actual_lpm || 0);
                 //char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
             }
         }

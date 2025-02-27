@@ -26,6 +26,7 @@ k.loadSprite("BG_analitycs5", "/sprites/BG_analitycs5.png");
 k.loadSprite("BG_analitycs6", "/sprites/BG_analitycs6.png");
 k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
 k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
+k.loadSprite("BG_analitycs9", "/sprites/BG_AWPM_IN_GAME.png");
 k.loadSprite("muteON", "/sprites/muteON.png");
 k.loadSprite("muteOff", "/sprites/muteOFF.png");
 k.loadSprite("retry", "/sprites/retry.png");

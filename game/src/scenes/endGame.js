@@ -6,9 +6,7 @@ import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 
 k.scene("endgame", () => {
-    const music = k.play("endgame");
-    music.volume = 0.3;
-    music.loop = true;
+
     let mute_state = mute_enable;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
@@ -34,59 +32,27 @@ k.scene("endgame", () => {
         acc: acc,
     };
 
-    const btn_mute = k.add([
-        k.rect(60, 50, { radius: 8 }),
-        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
-        k.area(),
-        k.scale(1),
-        k.anchor("center"),
-        k.color(255, 255, 255),
-        k.z(21),
-        k.opacity(0),
-    ]);
-    const button_muteON = k.add([
-        k.sprite("muteON"),
-        k.pos(k.width() * 0.02, k.height() * 0.01),
-        k.opacity(1),
-        k.animate(),
-        k.z(19),
-    ]);
-    const button_muteOFF = k.add([
-        k.sprite("muteOff"),
-        k.pos(k.width() * 0.02, k.height() * 0.01),
-        k.opacity(0),
-        k.animate(),
-        k.z(18),
-    ]);
+    k.volume(1);
+    const music = k.play("endgame");
+    music.volume = 0.0;
+    music.loop = true;
+    let currentVolume = music.volume;
+    const maxVolume = 0.3;
+    const volumeStep = 0.01; 
+    const intervalTime = 100; 
 
-    btn_mute.onClick(() => {
-        if (mute_state) {
-            button_muteON.opacity = 0;
-            button_muteOFF.opacity = 1;
-            mute_state = false;
-            k.volume(0);
+    const volumeIncrease = setInterval(() => {
+        if (currentVolume < maxVolume) {
+            currentVolume += volumeStep;
+            music.volume = Math.min(currentVolume, maxVolume);
+        } else {
+            clearInterval(volumeIncrease);
         }
-        else {
-            button_muteON.opacity = 1;
-            button_muteOFF.opacity = 0;
-            mute_state = true;
-            k.volume(0.5);
-        }
-
-    });
-    if(mute_state)
-        {
-            button_muteON.opacity = 1;
-            button_muteOFF.opacity = 0;
-        }
-        else{
-            button_muteON.opacity = 0;
-            button_muteOFF.opacity = 1;
-        }
-
+    }, intervalTime);
+    
     const background = k.add([
         k.sprite("bg3"),
-        resizablePos(() => k.vec2(k.width() - 0.1, k.height())) * 0.1,
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height())) * 0.1,
         k.anchor("left"),
         k.z(17),
     ]);
@@ -98,19 +64,19 @@ k.scene("endgame", () => {
     ]);
     k.add([
         k.text(lpm.toFixed(2), { size: 48, }),
-        resizablePos(() => k.vec2(k.width() * 0.255, k.height() * 0.34)),
+        resizablePos(() => k.vec2(k.width() * 0.27, k.height() * 0.34)),
         k.opacity(1),
         k.z(19),
     ]),
         k.add([
             k.text(wpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.465, k.height() * 0.34)),
+            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.34)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.64, k.height() * 0.34)),
+            resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.34)),
             k.opacity(1),
             k.z(19),
         ]),
@@ -133,37 +99,37 @@ k.scene("endgame", () => {
 
     k.add([
         k.sprite("BG_analitycs1"),
-        resizablePos(() => k.vec2(k.width() * 0.28, k.height() * 0.36)),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.36)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs2"),
-        resizablePos(() => k.vec2(k.width() * 0.49, k.height() * 0.36)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.36)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs3"),
-        resizablePos(() => k.vec2(k.width() * 0.68, k.height() * 0.36)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.36)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs4"),
-        resizablePos(() => k.vec2(k.width() * 0.28, k.height() * 0.60)),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs5"),
-        resizablePos(() => k.vec2(k.width() * 0.49, k.height() * 0.60)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs6"),
-        resizablePos(() => k.vec2(k.width() * 0.68, k.height() * 0.60)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -193,19 +159,19 @@ k.scene("endgame", () => {
 
     k.add([
         k.text(best_lpm.toFixed(2), { size: 48, }),
-        resizablePos(() => k.vec2(k.width() * 0.255, k.height() * 0.58)),
+        resizablePos(() => k.vec2(k.width() * 0.27, k.height() * 0.58)),
         k.opacity(1),
         k.z(19),
     ]),
         k.add([
             k.text(best_wpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.465, k.height() * 0.58)),
+            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.58)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.64, k.height() * 0.58)),
+            resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.58)),
             k.opacity(1),
             k.z(19),
         ]);
@@ -216,13 +182,13 @@ k.scene("endgame", () => {
 
     k.add([
         k.text("Press", { size: 32 }),
-        k.pos(k.center().x - 120, k.center().y + 270),
+        k.pos(k.center().x - 120, k.center().y + 300),
         k.anchor("center"),
         k.z(19),
     ]);
     const textC = k.add([
         k.text("ENTER", { size: 32 }),
-        k.pos(k.center().x - 20, k.center().y + 265),
+        k.pos(k.center().x - 20, k.center().y + 295),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.animate(),
@@ -242,7 +208,7 @@ k.scene("endgame", () => {
         ]);
         k.add([
             k.text("New record", { size: 28 }),
-            resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.25)),
+            resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.20)),
             k.anchor("center"),
             k.z(20),
         ]);
@@ -287,7 +253,7 @@ k.scene("endgame", () => {
     }
     k.add([
         k.text("to retry", { size: 32 }),
-        k.pos(k.center().x + 110, k.center().y +270),
+        k.pos(k.center().x + 110, k.center().y + 300),
         k.anchor("center"),
         k.z(19),
     ]);
@@ -299,9 +265,62 @@ k.scene("endgame", () => {
 
     });
 
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(1),
+        k.animate(),
+        k.z(29),
+    ]);
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(0),
+        k.animate(),
+        k.z(28),
+    ]);
+    const btn_mute = k.add([
+        k.rect(60, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
+        k.area(),
+        k.scale(1),
+        k.anchor("center"),
+        k.color(255, 255, 255),
+        k.z(30),
+        k.opacity(0),
+    ]);
+
+    btn_mute.onClick(() => {
+        if (mute_state) {
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            mute_state = false;
+            k.volume(0);
+        }
+        else {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            mute_state = true;
+            k.volume(0.3);
+        }
+
+    });
+    if(mute_state)
+        {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            k.volume(0.3);
+        }
+        else{
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            k.volume(0);
+        }
+
+
     onKeyPress("enter", () => {
         music.stop();
-        k.go("name_selection");        
+        k.go("name_selection");
     });
 
 });

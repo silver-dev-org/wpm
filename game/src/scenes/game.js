@@ -27,11 +27,13 @@ let completedBlocks = 0;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
+export let actual_awpm = 0;
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = -1;
 export let totalCorrectlines = 0;
 export let goal_wpm = actual_wpm;
+export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
 export let mute_enable = true;
@@ -39,7 +41,7 @@ let fontSize = 28;
 let fontWidth = 13.9;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
-
+let keyPressTimestamps = [];
 
 /**
  * Text taken from the dialogs.json file
@@ -72,10 +74,26 @@ const gameScene = (params) => {
     };
     // Music
 
+    let maxVolume = 0.4;
+    let volumeStep = 0.01; 
+    let intervalTime = 100; 
+
     k.volume(1);
     const music = k.play("videogame");
-    music.volume = 0.4;
+    music.volume = 0;
     music.loop = true;
+    music.speed = 1;
+    let currentVolume = music.volume;
+
+    const volumeIncrease = setInterval(() => {
+        if (currentVolume < maxVolume) {
+            currentVolume += volumeStep;
+            music.volume = Math.min(currentVolume, maxVolume);
+        } else {
+            clearInterval(volumeIncrease);
+        }
+    }, intervalTime);
+
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
@@ -183,8 +201,8 @@ const gameScene = (params) => {
 
 
     function StatsforAnalitics() {
-        console.log("wpm" + goal_wpm);
         goal_wpm = actual_wpm;
+        goal_awpm = actual_awpm;
         goal_lpm = actual_lpm;
         goal_acc = actual_acc;
     }
@@ -192,6 +210,7 @@ const gameScene = (params) => {
     function resetGameStats() {
         completedBlocks = 0;
         actual_wpm = 0;
+        actual_awpm = 0;
         actual_lpm = 0;
         actual_acc = 0;
         totalCorrectChars = 0;
@@ -202,8 +221,7 @@ const gameScene = (params) => {
         errorCharsReplaces = {};
     }
     function animateBackground() {
-        offsetX += BG_SPEED_X;
-
+      offsetX += BG_SPEED_X;
         offsetY += BG_SPEED_Y;
         document.body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
 
@@ -228,13 +246,19 @@ const gameScene = (params) => {
     ]);
     k.add([
         k.sprite("BG_analitycs7"),
-        k.pos(k.width() *0.3, k.height() * 0.06),
+        k.pos(k.width() * 0.3, k.height() * 0.075),
+        k.anchor("center"),
+        k.z(25),
+    ]);
+    k.add([
+        k.sprite("BG_analitycs9"),
+        k.pos(k.width() * 0.5, k.height() * 0.075),
         k.anchor("center"),
         k.z(25),
     ]);
     k.add([
         k.sprite("BG_analitycs8"),
-        k.pos(k.width() * 0.45, k.height() * 0.06), 
+        k.pos(k.width() * 0.7, k.height() * 0.075),
         k.anchor("center"),
         k.z(25),
     ]);
@@ -251,7 +275,7 @@ const gameScene = (params) => {
     const texts = [
         { text: "Challenges", size: 20 },
         { text: "isUnique.js", size: 20 },
-        { text: "removeDups.js", size: 21 },
+        { text: "removeDups.js", size: 20 },
         { text: "routeBetweenNodes.js", size: 20 },
         { text: "insertion.js", size: 20 },
         { text: "getPermutations.js", size: 20 },
@@ -287,13 +311,7 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
-    /*   const button_retry = k.add([
-           k.sprite("retry"),
-           k.pos(k.width() * 0.01, k.height() * 0.01),
-           k.opacity(1),
-           k.animate(),
-           k.z(18),
-       ]);*/
+
     const btn_mute = k.add([
         k.rect(60, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
@@ -320,7 +338,6 @@ const gameScene = (params) => {
         }
 
     });
-
     const button_muteON = k.add([
         k.sprite("muteON"),
         k.pos(k.width() * 0.02, k.height() * 0.01),
@@ -338,6 +355,7 @@ const gameScene = (params) => {
 
     k.onKeyPress(["escape"], () => {
         music.stop();
+        StatsforAnalitics();
         resetGameStats();
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
@@ -374,23 +392,22 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(310, 0);
+            return k.vec2(323, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
     };
 
-    const textPadding = k.vec2(70, 180);
+    const textPadding = k.vec2(100, 200);
 
     k.volume(0.5);
 
     const textbox = k.add([
-        // resizableRect(textboxSize),
+
         resizablePos(textboxPos),
         k.sprite("bg2"),
         k.anchor("topleft"),
-        // k.color(23, 9, 39),
-        k.opacity(0.9),
+        k.opacity(1),
     ]);
     const textboxBack = k.add([
         resizablePos(textboxPos),
@@ -399,7 +416,7 @@ const gameScene = (params) => {
         k.opacity(1),
         k.z(24),
     ]);
-    
+
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -509,6 +526,10 @@ const gameScene = (params) => {
         currentBlockIndex++;
         completedBlocks++;
         rivalSpeed -= 0.02;
+        if(music.speed < 1.3 &&completedBlocks > 4)
+        {
+          music.speed +=0.1;
+        }
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -636,7 +657,7 @@ const gameScene = (params) => {
     function startTimer() {
         k.loop(0.1, () => {
             updateProgressBar();
-            startTime += 0.1;
+            startTime  += 0.1;
             analitycs_calculate();
 
         });
@@ -645,57 +666,81 @@ const gameScene = (params) => {
             if (rivalState.curLineCount < curBlockData.lineCount - 1) {
                 rivalWrite();
             }
+            else {
+                music.stop();
+                k.go("endgame", {
+                    rivalSpeed: EASY_RIVAL_SPEED,
+                });
+            }
         });
     }
     const wmp_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.30, k.height() * 0.05),
-        k.text(actual_wpm.toString(), {
+        k.pos(k.width() * 0.3, k.height() * 0.065),
+        k.text("WPM: ", {
             size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(28),
+        k.z(26),
+    ]);
+    const awmp_text = k.add([
+        k.anchor("top"),
+        k.pos(k.width() * 0.5, k.height() * 0.065),
+        k.text("AWPM: ", {
+            size: 32,
+        }),
+        k.color(k.YELLOW),
+        k.z(26),
     ]);
 
     const time_text = k.add([
         k.anchor("top"),
-        k.pos(k.width() * 0.45, k.height() * 0.05),
+        k.pos(k.width() * 0.7, k.height() * 0.065),
         k.text("time: ", {
             size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(28),
+        k.z(26),
     ]);
-    /* const char_text = k.add([
-         k.anchor("top"),
-         k.pos(k.width() * 0.9, k.height() * 0.20),
-         k.text("TTC: " + totalTypedCharacters + " TCC: " + totalCorrectChars, {
-             size: 20,
-         }),
-         k.color(k.YELLOW),
-         k.z(21),
-     ]);*/
+
 
     function analitycs_calculate() {
+        const TIME_NOW = performance.now();
+        keyPressTimestamps = keyPressTimestamps.filter(t => TIME_NOW - t <= 60000);
+        console.log("last 60s imputs:", keyPressTimestamps);
         if (startTime > 0) {
             if (startTime > 0) {
                 time_text.text = "" + startTime.toFixed(1);
                 actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
                 actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
                 actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
-
+                actual_awpm = keyPressTimestamps.length > 0 ? (keyPressTimestamps.length / 5) : 0;
                 if (isNaN(actual_acc)) {
                     actual_acc = 100;
                 }
-                wmp_text.text = "" + (Math.round(actual_wpm) || 0);
-               // lpm_text.text = "LPM: " + (actual_lpm || 0);
-                //char_text.text = "TTC: " + totalTypedCharacters.toFixed(0) + " TCC: " + totalCorrectChars.toFixed(2);
+                wmp_text.text = Math.round(actual_wpm || 0).toString();
+                awmp_text.text = Math.round(actual_awpm || 0).toString();
+            
             }
         }
     }
 
     k.onKeyPress((keyPressed) => {
-
+        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
+            if (mute_enable) {
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
+                mute_enable = false;
+                k.volume(0);
+            }
+            else {
+                button_muteON.opacity = 1;
+                button_muteOFF.opacity = 0;
+                mute_enable = true;
+                k.volume(0.5);
+            }
+            return;
+        }
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -729,7 +774,7 @@ const gameScene = (params) => {
         if (isCorrect) {
             k.play("code_sound");
             totalCorrectChars++;
-
+            keyPressTimestamps.push(performance.now());
             nextChar();
         } else {
             errorCharsIndexes.push(playerState.cursorPos);

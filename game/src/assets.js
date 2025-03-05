@@ -3,16 +3,16 @@
 import { k } from "./kaplay.js";
 
 k.loadFont("monogram", "/fonts/monogram.ttf", {
-    outline: 4,
+    outline: 6,
     filter: "nearest",
 });
 k.loadMusic("videogame", "/sounds/videogame.mp3");
 k.loadMusic("endgame", "/sounds/endgame.mp3");
 k.loadSound("code_sound", "/sounds/code_sound.mp3");
 k.loadSound("wrong_typing", "/sounds/wrong typing.mp3");
-k.loadSprite("bgpng", "/sprites/bgpng.png");
-k.loadSprite("github_icon", "/sprites/github_icon.png");
-k.loadSprite("about_icon", "/sprites/about_icon.png");
+//k.loadSprite("bgpng", "/sprites/bgpng.png");
+//k.loadSprite("github_icon", "/sprites/github_icon.png");
+//k.loadSprite("about_icon", "/sprites/about_icon.png");
 k.loadSprite("bg4", "/sprites/bg4.png");
 k.loadSprite("bg3", "/sprites/bg3.png");
 k.loadSprite("bg2", "/sprites/bg2.png");

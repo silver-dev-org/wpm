@@ -52,9 +52,9 @@ k.scene("endgame", () => {
     
     const background = k.add([
         k.sprite("bg3"),
-        resizablePos(() => k.vec2(k.width() * 0.1, k.height())) * 0.1,
-        k.anchor("left"),
-        k.z(17),
+        k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(18),
     ]);
     const title = k.add([
         k.sprite("WPM"),
@@ -290,21 +290,24 @@ k.scene("endgame", () => {
         k.opacity(0),
     ]);
 
-    btn_mute.onClick(() => {
-        if (mute_state) {
-            button_muteON.opacity = 0;
-            button_muteOFF.opacity = 1;
-            mute_state = false;
-            k.volume(0);
+    k.onKeyPress((keyPressed) => { 
+        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
+            if (mute_state) {
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
+                mute_state = false;
+                k.volume(0);
+            }
+            else {
+                button_muteON.opacity = 1;
+                button_muteOFF.opacity = 0;
+                mute_state = true;
+                k.volume(0.5);
+            }
+            return;
         }
-        else {
-            button_muteON.opacity = 1;
-            button_muteOFF.opacity = 0;
-            mute_state = true;
-            k.volume(0.3);
-        }
-
     });
+
     if(mute_state)
         {
             button_muteON.opacity = 1;
@@ -316,7 +319,6 @@ k.scene("endgame", () => {
             button_muteOFF.opacity = 1;
             k.volume(0);
         }
-
 
     onKeyPress("enter", () => {
         music.stop();

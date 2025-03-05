@@ -17,9 +17,9 @@ import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 
-const titles = dialogsData.map((item) => item.title);
+let titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#544c4c");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#7a7878");
 let COLOR_TEXT_RIVAL = k.Color.fromHex("#e3cf5b");
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 
@@ -38,10 +38,10 @@ export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
 export let mute_enable = true;
 let fontSize = 28;
-let fontWidth = 13.9;
+let fontWidth = 15.8;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
-let keyPressTimestamps = [];
+
 
 /**
  * Text taken from the dialogs.json file
@@ -74,16 +74,14 @@ const gameScene = (params) => {
     };
     // Music
 
-    let maxVolume = 0.4;
-    let volumeStep = 0.01; 
-    let intervalTime = 100; 
-
     k.volume(1);
     const music = k.play("videogame");
-    music.volume = 0;
+    music.volume = 0.0;
     music.loop = true;
-    music.speed = 1;
     let currentVolume = music.volume;
+    const maxVolume = 0.3;
+    const volumeStep = 0.01; 
+    const intervalTime = 100; 
 
     const volumeIncrease = setInterval(() => {
         if (currentVolume < maxVolume) {
@@ -94,6 +92,8 @@ const gameScene = (params) => {
         }
     }, intervalTime);
 
+    titles = shuffle(dialogsData);
+    
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
@@ -143,7 +143,7 @@ const gameScene = (params) => {
 
     // #endregion
 
-    animateBackground();
+    //animateBackground();
 
     /**
      * @param {number} i
@@ -220,13 +220,7 @@ const gameScene = (params) => {
         errorCharsIndexes = [];
         errorCharsReplaces = {};
     }
-    function animateBackground() {
-      offsetX += BG_SPEED_X;
-        offsetY += BG_SPEED_Y;
-        document.body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
 
-        requestAnimationFrame(animateBackground);
-    }
     // background
     // Files & Folders
     const filesFoldersSize = () => {
@@ -240,29 +234,29 @@ const gameScene = (params) => {
 
     k.add([
         resizablePos(filesFoldersPos),
-        k.sprite("bg3"),
+        k.sprite("bg2"),
         k.anchor("topleft"),
         k.opacity(1),
     ]);
     k.add([
-        k.sprite("BG_analitycs7"),
-        k.pos(k.width() * 0.3, k.height() * 0.075),
+        k.sprite("BG_analitycs9"),
+        k.pos(k.width() * 0.26, k.height() * 0.023),
         k.anchor("center"),
-        k.z(25),
+        k.z(51),
     ]);
     k.add([
-        k.sprite("BG_analitycs9"),
-        k.pos(k.width() * 0.5, k.height() * 0.075),
+        k.sprite("BG_analitycs7"),
+        k.pos(k.width() * 0.46, k.height() * 0.023),
         k.anchor("center"),
-        k.z(25),
-    ]);
+        k.z(51),
+    ]);    
     k.add([
         k.sprite("BG_analitycs8"),
-        k.pos(k.width() * 0.7, k.height() * 0.075),
+        k.pos(k.width() * 0.66, k.height() * 0.023),
         k.anchor("center"),
-        k.z(25),
+        k.z(51),
     ]);
-    const icons = [
+  /*  const icons = [
         { sprite: "icon_03" },
         { sprite: "icon_03" },
         { sprite: "icon_03" },
@@ -270,35 +264,32 @@ const gameScene = (params) => {
         { sprite: "icon_03" },
         { sprite: "icon_03" },
         { sprite: "icon_03" },
-    ];
+    ];*/
 
-    const texts = [
+    const texts = dialogsData.map(item => ({
+        text: item.title,
+        size: 24
+      }));
+    const textsChallenges = [
         { text: "Challenges", size: 20 },
-        { text: "isUnique.js", size: 20 },
-        { text: "removeDups.js", size: 20 },
-        { text: "routeBetweenNodes.js", size: 20 },
-        { text: "insertion.js", size: 20 },
-        { text: "getPermutations.js", size: 20 },
-        { text: "sortedMerge.js", size: 20 },
-        { text: "rotateMatrix.js", size: 20 },
     ];
 
-    icons.forEach((icon, index) => {
+    /*icons.forEach((icon, index) => {
         k.add([
             k.sprite(icon.sprite),
             resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (ICON_START_Y + SPACING * index))),
             k.opacity(1),
         ]);
-    });
+    });*/
 
     texts.forEach((text, index) => {
         k.add([
-            k.text(text.text, { size: text.size }),
-            resizablePos(() => k.vec2(k.width() * 0.055, k.height() * (TEXT_START_Y + SPACING * index))),
-            k.color(k.WHITE),
-            k.opacity(1),
+          k.text(text.text, { size:24 }),
+          resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (TEXT_START_Y + SPACING * index))),
+          k.color(k.WHITE),
+          k.opacity(1),
         ]);
-    });
+      });
 
     const iconChallenge = k.add([
         k.sprite("icon_02"),
@@ -355,7 +346,6 @@ const gameScene = (params) => {
 
     k.onKeyPress(["escape"], () => {
         music.stop();
-        StatsforAnalitics();
         resetGameStats();
         k.go("game", {
             rivalSpeed: EASY_RIVAL_SPEED,
@@ -377,7 +367,7 @@ const gameScene = (params) => {
         k.animate(),
     ]);
 
-    let currentIndex = 0;
+    let currentIndex = -1;
     let arrow_ypos = arrow.pos.y;
 
     function moveArrow() {
@@ -398,25 +388,24 @@ const gameScene = (params) => {
         return k.vec2(k.width() * 0.3, 0);
     };
 
-    const textPadding = k.vec2(100, 200);
+    const textPadding = k.vec2(30, 100);
 
     k.volume(0.5);
 
     const textbox = k.add([
 
         resizablePos(textboxPos),
-        k.sprite("bg2"),
+        k.sprite("bg"),
         k.anchor("topleft"),
-        k.opacity(1),
+        k.opacity(0.4),
     ]);
     const textboxBack = k.add([
-        resizablePos(textboxPos),
         k.sprite("bg4"),
         k.anchor("topleft"),
         k.opacity(1),
-        k.z(24),
+        k.z(50),
     ]);
-
+    
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -526,10 +515,6 @@ const gameScene = (params) => {
         currentBlockIndex++;
         completedBlocks++;
         rivalSpeed -= 0.02;
-        if(music.speed < 1.3 &&completedBlocks > 4)
-        {
-          music.speed +=0.1;
-        }
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -657,7 +642,7 @@ const gameScene = (params) => {
     function startTimer() {
         k.loop(0.1, () => {
             updateProgressBar();
-            startTime  += 0.1;
+            startTime += 0.1;
             analitycs_calculate();
 
         });
@@ -666,7 +651,7 @@ const gameScene = (params) => {
             if (rivalState.curLineCount < curBlockData.lineCount - 1) {
                 rivalWrite();
             }
-            else {
+            else{
                 music.stop();
                 k.go("endgame", {
                     rivalSpeed: EASY_RIVAL_SPEED,
@@ -674,56 +659,83 @@ const gameScene = (params) => {
             }
         });
     }
-    const wmp_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.3, k.height() * 0.065),
-        k.text("WPM: ", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(26),
-    ]);
+    
     const awmp_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.5, k.height() * 0.065),
+        k.anchor("center"),
+        k.pos(k.width() * 0.30, k.height() * 0.02),
         k.text("AWPM: ", {
             size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(26),
+        k.z(50),
     ]);
-
+    const wmp_text = k.add([
+        k.anchor("center"),
+        k.pos(k.width() * 0.50, k.height() * 0.02),
+        k.text("WPM: ", {
+            size: 32,
+        }),
+        k.color(k.YELLOW),
+        k.z(50),
+    ]);
     const time_text = k.add([
-        k.anchor("top"),
-        k.pos(k.width() * 0.7, k.height() * 0.065),
+        k.anchor("center"),
+        k.pos(k.width() * 0.70, k.height() * 0.02),
         k.text("time: ", {
             size: 32,
         }),
         k.color(k.YELLOW),
-        k.z(26),
+        k.z(50),
     ]);
 
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
 
     function analitycs_calculate() {
-        const TIME_NOW = performance.now();
-        keyPressTimestamps = keyPressTimestamps.filter(t => TIME_NOW - t <= 60000);
-        console.log("last 60s imputs:", keyPressTimestamps);
         if (startTime > 0) {
-            if (startTime > 0) {
-                time_text.text = "" + startTime.toFixed(1);
-                actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
-                actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
-                actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
-                actual_awpm = keyPressTimestamps.length > 0 ? (keyPressTimestamps.length / 5) : 0;
-                if (isNaN(actual_acc)) {
-                    actual_acc = 100;
-                }
-                wmp_text.text = Math.round(actual_wpm || 0).toString();
-                awmp_text.text = Math.round(actual_awpm || 0).toString();
-            
+            time_text.text = "" + startTime.toFixed(1);
+            actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
+            actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
+            actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;       
+
+            if (isNaN(actual_acc)) {
+                actual_acc = 100;
             }
+    
+            wmp_text.text = Math.round(actual_wpm || 0).toString();
+
         }
     }
+
+    const BUFFER_SIZE = 60;
+    let eventBuffer = new Array(BUFFER_SIZE).fill(0); 
+    let lastSecond = Math.floor( k.time());
+
+    function addCorrectEvent() {
+        let currentSec = Math.floor( k.time());
+        if (currentSec !== lastSecond) {
+            for (let sec = lastSecond + 1; sec <= currentSec; sec++) {
+                let index = sec % BUFFER_SIZE;
+                eventBuffer[index] = 0;
+            }
+            lastSecond = currentSec;
+        }
+        let idx = currentSec % BUFFER_SIZE;
+        eventBuffer[idx]++;
+    }
+    
+    k.onUpdate(() => {
+       //let currentTime =  k.time();
+        let totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
+        let awpm = totalEventsLast60 / 5;
+        
+        awmp_text.text = Math.floor(awpm).toString();
+    });
 
     k.onKeyPress((keyPressed) => {
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
@@ -741,6 +753,7 @@ const gameScene = (params) => {
             }
             return;
         }
+        
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -774,7 +787,7 @@ const gameScene = (params) => {
         if (isCorrect) {
             k.play("code_sound");
             totalCorrectChars++;
-            keyPressTimestamps.push(performance.now());
+            addCorrectEvent();
             nextChar();
         } else {
             errorCharsIndexes.push(playerState.cursorPos);

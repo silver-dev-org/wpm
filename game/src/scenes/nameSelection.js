@@ -18,18 +18,6 @@ k.scene("name_selection", () => {
         k.onHover,
     ]);
 
-    /*btn_githublink.onClick(() => {
-        window.open("https://github.com/conanbatt/wpm", "_blank");
-    });
-    btn_githublink.onHover(() => {
-        gitText.color = k.rgb(255, 215, 0);
-    });
-    btn_githublink.onHoverEnd(() => {
-        gitText.color = k.rgb(255, 255, 255);
-        console.log("exit");
-    });*/
-
-    // Botón About
     const btn_aboutlink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.90)),
@@ -41,30 +29,27 @@ k.scene("name_selection", () => {
         k.opacity(0),
         k.onHover,
     ]);
-
-    /*btn_aboutlink.onHover(() => {
-        aboutText.color = k.rgb(255, 215, 0);
-    });
-    btn_aboutlink.onHoverEnd(() => {
-        aboutText.color = k.rgb(255, 255, 255);
-        console.log("exit");
-    });*/
-
+    const StartText = k.add([
+        k.anchor("top"),
+        k.text("Start", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.85)),
+        k.opacity(1),
+        k.z(21),
+    ]);
     const gitText = k.add([
         k.anchor("top"),
-        k.text("github", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.85)),
+        k.text("Github", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.85)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("top"),
-        k.text("about", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.44, k.height() * 0.85)),
+        k.text("About", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.85)),
         k.opacity(1),
         k.z(21),
     ]);
-
     k.add([
         k.anchor("center"),
         k.pos(k.width() / 2, k.height() / 2.2),
@@ -76,7 +61,7 @@ k.scene("name_selection", () => {
     ]);
 
     const background = k.add([
-        k.sprite("bg3"),
+        k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),
@@ -89,17 +74,18 @@ k.scene("name_selection", () => {
     ]);
     const subTitle = k.add([
         k.sprite("SilverDev"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.1)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.15)),
         k.anchor("center"),
         k.z(18),
     ]);
 
     let targetText = "START";
     let maxLength = targetText.length;
-    const letterSpacing = 48;
+    const letterSpacing = 64;
     let startX = k.width() / 2 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
+
 
     function createLetterObjects() {
         letterObjects.forEach(obj => k.destroy(obj));
@@ -132,6 +118,25 @@ k.scene("name_selection", () => {
 
     createLetterObjects();
 
+    function updateTextColors() {
+        const targetLower = targetText.toLowerCase();
+        const blink = Math.abs(Math.sin(k.time() * 2)); 
+    
+        function setColor(textObj, matchWord) {
+            if (targetLower === matchWord) {
+                textObj.color = k.rgb(255, 255, 0);
+                textObj.opacity = blink;
+            } else {
+                textObj.color = k.rgb(255, 255, 255);
+                textObj.opacity = 1; 
+            }
+        }
+    
+        setColor(StartText, "start");
+        setColor(gitText, "github");
+        setColor(aboutText, "about");
+    }
+
     const name = k.add([
         k.text("", { size: 36 }),
         k.textInput(true, 20),
@@ -154,6 +159,7 @@ k.scene("name_selection", () => {
                 newTarget = "Github";
             }
         }
+
         if (newTarget !== targetText) {
             targetText = newTarget;
             maxLength = targetText.length;
@@ -174,7 +180,17 @@ k.scene("name_selection", () => {
                 letterObjects[i].color = k.rgb(128, 128, 128);
             }
         }
+        for (let i = 0; i < underscoreObjects.length; i++) {
+            if (i === input.length) {
+                underscoreObjects[i].color = k.rgb(255, 255, 0);
 
+                let blink = Math.abs(Math.sin(k.time() * 5));
+                underscoreObjects[i].opacity = blink;
+            } else {
+                underscoreObjects[i].color = k.MAGENTA;
+                underscoreObjects[i].opacity = 1;
+            }
+        }
         if (input.toLowerCase() === "Start".toLowerCase()) {
             const playData = { userName: input };
             savePlay(playData);
@@ -186,6 +202,7 @@ k.scene("name_selection", () => {
         if (input.toLowerCase() === "About".toLowerCase()) {
 
         }
+        updateTextColors();
     });
 
     k.onKeyPress((keyPressed) => {

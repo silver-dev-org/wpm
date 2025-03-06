@@ -11,6 +11,7 @@ import {
     TEXT_START_Y,
     SPACING,
 } from "../constants.js";
+import { mute_enable } from "./nameSelection.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
@@ -36,7 +37,7 @@ export let goal_wpm = actual_wpm;
 export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
-export let mute_enable = true;
+export let mute_enableScene2 = mute_enable;
 let fontSize = 28;
 let fontWidth = 15.8;
 let errorCharsIndexes = [];
@@ -284,10 +285,12 @@ const gameScene = (params) => {
 
     texts.forEach((text, index) => {
         k.add([
-          k.text(text.text, { size:24 }),
+          k.text(text.text, { size: 24 }),
           resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (TEXT_START_Y + SPACING * index))),
           k.color(k.WHITE),
           k.opacity(1),
+          "menuItem",         
+          { menuIndex: index }
         ]);
       });
 
@@ -295,6 +298,13 @@ const gameScene = (params) => {
         k.sprite("icon_02"),
         resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.1)),
         k.opacity(1),
+    ]);
+    k.add([
+        k.sprite("icon_03"),
+        resizablePos(() => k.vec2(k.width() * 0.07, k.height() * 0.14)),
+        k.anchor("center"),
+        k.opacity(1),
+        k.z(10),
     ]);
     const rest_text = k.add([
         k.text("Press ESC to reset", { size: 28 }),
@@ -315,34 +325,46 @@ const gameScene = (params) => {
     ]);
 
     btn_mute.onClick(() => {
-        if (mute_enable) {
+        if (mute_enableScene2) {
             button_muteON.opacity = 0;
             button_muteOFF.opacity = 1;
-            mute_enable = false;
+            mute_enableScene2 = false;
             k.volume(0);
         }
         else {
             button_muteON.opacity = 1;
             button_muteOFF.opacity = 0;
-            mute_enable = true;
+            mute_enableScene2 = true;
             k.volume(0.5);
         }
 
-    });
+    });  
     const button_muteON = k.add([
         k.sprite("muteON"),
         k.pos(k.width() * 0.02, k.height() * 0.01),
         k.opacity(1),
         k.animate(),
-        k.z(18),
+        k.z(60),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
         k.pos(k.width() * 0.02, k.height() * 0.01),
-        k.opacity(0),
+        k.opacity(1),
         k.animate(),
-        k.z(17),
+        k.z(60),
     ]);
+
+    if(mute_enableScene2)
+        {
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            k.volume(0.3);
+        }
+        else{
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            k.volume(0);
+        }
 
     k.onKeyPress(["escape"], () => {
         music.stop();
@@ -377,7 +399,15 @@ const gameScene = (params) => {
             duration: 0.5,
             direction: "ping-pong",
         });
-    }
+        
+        k.get("menuItem").forEach((item) => {
+          if (item.menuIndex === currentIndex) {
+            item.color = k.YELLOW; 
+          } else {
+            item.color = k.WHITE;
+          }
+        });
+      }
 
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
@@ -653,9 +683,11 @@ const gameScene = (params) => {
             }
             else{
                 music.stop();
-                k.go("endgame", {
+                k.go("endgame", {     
                     rivalSpeed: EASY_RIVAL_SPEED,
                 });
+                StatsforAnalitics();
+                resetGameStats();
             }
         });
     }
@@ -733,22 +765,22 @@ const gameScene = (params) => {
        //let currentTime =  k.time();
         let totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         let awpm = totalEventsLast60 / 5;
-        
+        actual_awpm = awpm;
         awmp_text.text = Math.floor(awpm).toString();
     });
 
     k.onKeyPress((keyPressed) => {
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-            if (mute_enable) {
+            if (mute_enableScene2) {
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
-                mute_enable = false;
+                mute_enableScene2 = false;
                 k.volume(0);
             }
             else {
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
-                mute_enable = true;
+                mute_enableScene2 = true;
                 k.volume(0.5);
             }
             return;

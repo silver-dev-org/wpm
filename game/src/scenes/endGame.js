@@ -1,5 +1,5 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, mute_enable } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, mute_enableScene2 } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname } from "./nameSelection.js";
 import { resizablePos } from "../components/resizablePos.js";
@@ -7,15 +7,18 @@ import "../types.js";
 
 k.scene("endgame", () => {
 
-    let mute_state = mute_enable;
+    let mute_enableScene3 = mute_enableScene2;
+    let awpm = goal_awpm;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
     let acc = goal_acc;
 
+    let prev_awpm = 0;
     let prev_wpm = 0;
     let prev_lpm = 0;
     let prev_acc = 0;
 
+    let best_awpm = awpm;
     let best_wpm = wpm;
     let best_lpm = lpm;
     let best_acc = acc;
@@ -28,6 +31,7 @@ k.scene("endgame", () => {
 
     const currentResults = {
         wpm: wpm,
+        awpm: awpm,
         lpm: lpm,
         acc: acc,
     };
@@ -38,8 +42,8 @@ k.scene("endgame", () => {
     music.loop = true;
     let currentVolume = music.volume;
     const maxVolume = 0.3;
-    const volumeStep = 0.01; 
-    const intervalTime = 100; 
+    const volumeStep = 0.01;
+    const intervalTime = 100;
 
     const volumeIncrease = setInterval(() => {
         if (currentVolume < maxVolume) {
@@ -49,39 +53,49 @@ k.scene("endgame", () => {
             clearInterval(volumeIncrease);
         }
     }, intervalTime);
-    
+
     const background = k.add([
-        k.sprite("bg3"),
+        k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),
     ]);
     const title = k.add([
         k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.1)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    const subTitle = k.add([
+        k.sprite("SilverDev"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.15)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.text(lpm.toFixed(2), { size: 48, }),
-        resizablePos(() => k.vec2(k.width() * 0.27, k.height() * 0.34)),
+        resizablePos(() => k.vec2(k.width() * 0.17, k.height() * 0.44)),
         k.opacity(1),
         k.z(19),
     ]),
         k.add([
             k.text(wpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.34)),
+            resizablePos(() => k.vec2(k.width() * 0.37, k.height() * 0.44)),
+            k.opacity(1),
+            k.z(19),
+        ]),
+        k.add([
+            k.text(awpm.toFixed(2), { size: 48, }),
+            resizablePos(() => k.vec2(k.width() * 0.57, k.height() * 0.44)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.34)),
+            resizablePos(() => k.vec2(k.width() * 0.75, k.height() * 0.44)),
             k.opacity(1),
             k.z(19),
         ]),
-
-
         k.add([
             k.sprite("icon_0"),
             resizablePos(() => k.vec2(k.width() * 0.77, k.height() * 0.38)),
@@ -89,47 +103,52 @@ k.scene("endgame", () => {
             k.opacity(0),
             k.z(18),
         ]);
-    k.add([
-        k.sprite("bg_analitycs"),
-        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.40)),
-        k.anchor("center"),
-        k.opacity(0),
-        k.z(18),
-    ]);
 
     k.add([
         k.sprite("BG_analitycs1"),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.36)),
+        resizablePos(() => k.vec2(k.width() * 0.2, k.height() * 0.46)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs2"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.36)),
+        resizablePos(() => k.vec2(k.width() * 0.4, k.height() * 0.46)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
-        k.sprite("BG_analitycs3"),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.36)),
+        k.sprite("BG_analitycsACC"),
+        resizablePos(() => k.vec2(k.width() * 0.8, k.height() * 0.46)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs4"),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.60)),
+        resizablePos(() => k.vec2(k.width() * 0.2, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycs5"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.60)),
+        resizablePos(() => k.vec2(k.width() * 0.4, k.height() * 0.60)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
-        k.sprite("BG_analitycs6"),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.60)),
+        k.sprite("BG_analitycsACC_B"),
+        resizablePos(() => k.vec2(k.width() * 0.8, k.height() * 0.60)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycsAWPM_B"),
+        resizablePos(() => k.vec2(k.width() * 0.6, k.height() * 0.60)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycsAWPM"),
+        resizablePos(() => k.vec2(k.width() * 0.6, k.height() * 0.46)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -142,16 +161,19 @@ k.scene("endgame", () => {
         reciveprevdata = retrievedData;
         console.log(prevdata);
         prevdata = JSON.parse(reciveprevdata);
+        prev_awpm = parseFloat(prevdata.awpm) || 0;
         prev_wpm = parseFloat(prevdata.wpm) || 0;
         prev_lpm = parseFloat(prevdata.lpm) || 0;
         prev_acc = parseFloat(prevdata.acc) || 0;
 
+        best_awpm = Math.max(prevdata.awpm || 0, wpm);
         best_wpm = Math.max(prevdata.wpm || 0, wpm);
         best_lpm = Math.max(prevdata.lpm || 0, lpm);
         best_acc = Math.max(prevdata.acc || 0, acc);
 
     } else {
         console.log("Empty load, load default data.");
+        best_awpm = awpm;
         best_wpm = wpm;
         best_lpm = lpm;
         best_acc = acc;
@@ -159,25 +181,31 @@ k.scene("endgame", () => {
 
     k.add([
         k.text(best_lpm.toFixed(2), { size: 48, }),
-        resizablePos(() => k.vec2(k.width() * 0.27, k.height() * 0.58)),
+        resizablePos(() => k.vec2(k.width() * 0.17, k.height() * 0.58)),
         k.opacity(1),
         k.z(19),
     ]),
         k.add([
             k.text(best_wpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.58)),
+            resizablePos(() => k.vec2(k.width() * 0.37, k.height() * 0.58)),
+            k.opacity(1),
+            k.z(19),
+        ]),
+        k.add([
+            k.text(best_awpm.toFixed(2), { size: 48, }),
+            resizablePos(() => k.vec2(k.width() * 0.57, k.height() * 0.58)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(best_acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.58)),
+            resizablePos(() => k.vec2(k.width() * 0.75, k.height() * 0.58)),
             k.opacity(1),
             k.z(19),
         ]);
 
-    console.log(best_wpm, best_lpm, best_acc);
-    console.log(prev_wpm, prev_lpm, prev_acc);
+    //console.log(best_awpm, best_wpm, best_lpm, best_acc);
+    //console.log(prev_awpm, prev_wpm, prev_lpm, prev_acc);
 
 
     k.add([
@@ -199,7 +227,7 @@ k.scene("endgame", () => {
     const isNewBestLpm = lpm > prev_lpm;
     const isNewBestAcc = acc > prev_acc;
 
-    if (isNewBestLpm) {
+   /* if (isNewBestLpm) {
         k.add([
             k.sprite("icon_0"),
             resizablePos(() => k.vec2(k.width() * 0.21, k.height() * 0.25)),
@@ -232,17 +260,17 @@ k.scene("endgame", () => {
     if (isNewBestAcc) {
         k.add([
             k.sprite("icon_0"),
-            resizablePos(() => k.vec2(k.width() * 0.615, k.height() * 0.25)),
+            resizablePos(() => k.vec2(k.width() * 0.715, k.height() * 0.25)),
             k.anchor("center"),
             k.z(20),
         ]);
         k.add([
             k.text("New record", { size: 28 }),
-            resizablePos(() => k.vec2(k.width() * 0.695, k.height() * 0.25)),
+            resizablePos(() => k.vec2(k.width() * 0.795, k.height() * 0.25)),
             k.anchor("center"),
             k.z(20),
         ]);
-    }
+    }*/
 
     moveText();
     function moveText() {
@@ -290,35 +318,34 @@ k.scene("endgame", () => {
         k.opacity(0),
     ]);
 
-    k.onKeyPress((keyPressed) => { 
+    k.onKeyPress((keyPressed) => {
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-            if (mute_state) {
+            if (mute_enableScene3) {
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
-                mute_state = false;
+                mute_enableScene3 = false;
                 k.volume(0);
             }
             else {
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
-                mute_state = true;
+                mute_enableScene3 = true;
                 k.volume(0.5);
             }
             return;
         }
     });
 
-    if(mute_state)
-        {
-            button_muteON.opacity = 1;
-            button_muteOFF.opacity = 0;
-            k.volume(0.3);
-        }
-        else{
-            button_muteON.opacity = 0;
-            button_muteOFF.opacity = 1;
-            k.volume(0);
-        }
+    if (mute_enableScene3) {
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
+        k.volume(0.3);
+    }
+    else {
+        button_muteON.opacity = 0;
+        button_muteOFF.opacity = 1;
+        k.volume(0);
+    }
 
     onKeyPress("enter", () => {
         music.stop();

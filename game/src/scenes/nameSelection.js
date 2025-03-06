@@ -4,7 +4,7 @@ import { savePlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export let actualname;
-
+export let mute_enable = true;
 k.scene("name_selection", () => {
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
@@ -78,7 +78,46 @@ k.scene("name_selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-
+    const btn_mute = k.add([
+        k.rect(60, 50, { radius: 8 }),
+        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
+        k.area(),
+        k.scale(1),
+        k.anchor("center"),
+        k.color(255, 255, 255),
+        k.z(21),
+        k.opacity(0),
+    ]);
+     btn_mute.onClick(() => {
+            if (mute_enable) {
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
+                mute_enable = false;
+                k.volume(0);
+            }
+            else {
+                button_muteON.opacity = 1;
+                button_muteOFF.opacity = 0;
+                mute_enable = true;
+                k.volume(0.5);
+            }
+    
+        });
+        const button_muteON = k.add([
+            k.sprite("muteON"),
+            k.pos(k.width() * 0.02, k.height() * 0.01),
+            k.opacity(1),
+            k.animate(),
+            k.z(18),
+        ]);
+        const button_muteOFF = k.add([
+            k.sprite("muteOff"),
+            k.pos(k.width() * 0.02, k.height() * 0.01),
+            k.opacity(0),
+            k.animate(),
+            k.z(18),
+        ]);
+        
     let targetText = "START";
     let maxLength = targetText.length;
     const letterSpacing = 64;
@@ -109,7 +148,7 @@ k.scene("name_selection", () => {
                 k.text("_", { size: 40 }),
                 k.pos(startX + i * letterSpacing, k.height() / 1.6),
                 k.anchor("center"),
-                k.color(k.MAGENTA),
+                k.color(k.WHITE),
                 k.z(20),
             ]);
             underscoreObjects.push(underscore);
@@ -148,8 +187,12 @@ k.scene("name_selection", () => {
     ]);
 
     name.onUpdate(() => {
+        if (k.isKeyDown("tab") && k.isKeyDown("m")) {
+            name.text = ""; 
+            return;
+        }
+        
         const input = name.text;
-
         let newTarget = "Start";
         if (input.length > 0) {
             const firstChar = input[0].toLowerCase();
@@ -159,13 +202,13 @@ k.scene("name_selection", () => {
                 newTarget = "Github";
             }
         }
-
+    
         if (newTarget !== targetText) {
             targetText = newTarget;
             maxLength = targetText.length;
             createLetterObjects();
         }
-
+    
         for (let i = 0; i < maxLength; i++) {
             if (input[i]) {
                 if (input[i].toLowerCase() === targetText[i].toLowerCase()) {
@@ -180,15 +223,15 @@ k.scene("name_selection", () => {
                 letterObjects[i].color = k.rgb(128, 128, 128);
             }
         }
+    
         for (let i = 0; i < underscoreObjects.length; i++) {
             if (i === input.length) {
                 underscoreObjects[i].color = k.rgb(255, 255, 0);
-
                 let blink = Math.abs(Math.sin(k.time() * 5));
                 underscoreObjects[i].opacity = blink;
             } else {
-                underscoreObjects[i].color = k.MAGENTA;
-                underscoreObjects[i].opacity = 1;
+                underscoreObjects[i].color = k.WHITE;
+                underscoreObjects[i].opacity = 0.3;
             }
         }
         if (input.toLowerCase() === "Start".toLowerCase()) {
@@ -200,14 +243,34 @@ k.scene("name_selection", () => {
             window.open("https://github.com/conanbatt/wpm", "_blank");
         }
         if (input.toLowerCase() === "About".toLowerCase()) {
-
+ 
         }
         updateTextColors();
     });
+    
 
     k.onKeyPress((keyPressed) => {
         if (keyPressed != "backspace") {
             k.play("code_sound");
+        }
+    });
+
+    k.onKeyPress((keyPressed) => { 
+        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
+            
+            if (mute_enable) {
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
+                mute_enable = false;
+                k.volume(0);
+            }
+            else {
+                button_muteON.opacity = 1;
+                button_muteOFF.opacity = 0;
+                mute_enable = true;
+                k.volume(0.5);
+            }
+            return;
         }
     });
 });

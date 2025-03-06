@@ -5,6 +5,19 @@
     "language": "js",
     "blocks": [
       "var twoSum = function(nums, target) {\n",
+      "    let map = new Map();",
+      "\n",
+      "    for (let i = 0; i < nums.length; i++) {\n",
+      "        let complement = target - nums[i];\n",
+      "\n",
+      "        if (map.has(complement)) {\n",
+      "            return [map.get(complement), i];\n",
+      "        }\n",
+      "\n",
+      "        map.set(nums[i], i);\n",
+      "    }\n",
+      "\n",
+      "    return [];\n",
       "};\n"
     ]
   },

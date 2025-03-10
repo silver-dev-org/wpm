@@ -247,7 +247,7 @@ k.scene("name_selection", () => {
             else {
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
-                msettings.mute = true;
+                settings.mute = true;
                 k.volume(0.5);
             }
             return;

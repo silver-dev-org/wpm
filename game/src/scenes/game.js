@@ -66,8 +66,6 @@ const gameScene = (params) => {
         lineCount: 0,
     };
     // Music
-
-
     const music = k.play("videogame");
     music.loop = true;
     music.volume = 0;
@@ -676,7 +674,7 @@ const gameScene = (params) => {
 
     const awmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.30, k.height() * 0.02),
+        k.pos(k.width() * 0.32, k.height() * 0.02),
         k.text("AWPM: ", {
             size: 32,
         }),
@@ -685,7 +683,7 @@ const gameScene = (params) => {
     ]);
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.50, k.height() * 0.02),
+        k.pos(k.width() * 0.52, k.height() * 0.02),
         k.text("WPM: ", {
             size: 32,
         }),
@@ -694,7 +692,7 @@ const gameScene = (params) => {
     ]);
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.70, k.height() * 0.02),
+        k.pos(k.width() * 0.72, k.height() * 0.02),
         k.text("time: ", {
             size: 32,
         }),
@@ -743,7 +741,14 @@ const gameScene = (params) => {
         eventBuffer[idx]++;
     }
 
-    k.onKeyPress((keyPressed) => {
+    k.onKeyPress((keyPressed) => { 
+        const curChar = fixedText[playerState.cursorPos];
+        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : ''; 
+ 
+        if (prevChar === "\n") {
+            return;
+        }
+    
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
             if (settings.mute) {
                 button_muteON.opacity = 0;

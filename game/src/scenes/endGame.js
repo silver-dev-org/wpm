@@ -37,9 +37,9 @@ k.scene("endgame", () => {
 
     k.volume(1);
     const music = k.play("endgame");
-    music.volume = 0;
     music.loop = true;
-    const maxVolume = 0.3;
+    music.volume = 0;
+    const maxVolume = 0.05;
     const volumeStep = 0.01;
     const intervalTime = 100;
     let volumeIncrease;
@@ -61,6 +61,7 @@ k.scene("endgame", () => {
             }, intervalTime);
         }
     }
+    
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -297,7 +298,6 @@ k.scene("endgame", () => {
         wpm: currentResults.wpm,
         lpm: currentResults.lpm,
         acc: currentResults.acc,
-        // mute:mute_enable,
     });
     const button_muteON = k.add([
         k.sprite("muteON"),
@@ -319,13 +319,13 @@ k.scene("endgame", () => {
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
                 settings.mute = false;
-                k.volume(0);
+                updateMusicVolume();
             }
             else {
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
                 settings.mute = true;
-                k.volume(0.5);
+                updateMusicVolume();
             }
             return;
         }
@@ -334,12 +334,12 @@ k.scene("endgame", () => {
     if (settings.mute) {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
-        k.volume(0.3);
+        updateMusicVolume();
     }
     else {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
-        k.volume(0);
+        updateMusicVolume();
     }
 
     onKeyPress("enter", () => {

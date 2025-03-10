@@ -96,7 +96,6 @@ const gameScene = (params) => {
     
     titles = shuffle(dialogsData);
     const username = actualname;
-    const retrievedData = getPlay(username);
 
     // #region PLAYER  & RIVAL VARIABLES
 

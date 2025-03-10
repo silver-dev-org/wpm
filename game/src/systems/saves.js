@@ -10,6 +10,7 @@ import { k } from "../kaplay";
  * @property {number} lpm
  * @property {number} wpm
  * @property {number} acc
+ * @property {number} mute
  */
 
 /**

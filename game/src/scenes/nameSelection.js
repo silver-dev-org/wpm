@@ -4,7 +4,10 @@ import { savePlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export let actualname;
-export let mute_enable = true;
+
+export const settings = {
+    mute: true
+};
 k.scene("name_selection", () => {
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
@@ -78,31 +81,6 @@ k.scene("name_selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-    const btn_mute = k.add([
-        k.rect(60, 50, { radius: 8 }),
-        resizablePos(() => k.vec2(k.width() * 0.025, k.height() * 0.025)),
-        k.area(),
-        k.scale(1),
-        k.anchor("center"),
-        k.color(255, 255, 255),
-        k.z(21),
-        k.opacity(0),
-    ]);
-     btn_mute.onClick(() => {
-            if (mute_enable) {
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                mute_enable = false;
-                k.volume(0);
-            }
-            else {
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                mute_enable = true;
-                k.volume(0.5);
-            }
-    
-        });
         const button_muteON = k.add([
             k.sprite("muteON"),
             k.pos(k.width() * 0.02, k.height() * 0.01),
@@ -235,15 +213,17 @@ k.scene("name_selection", () => {
             }
         }
         if (input.toLowerCase() === "Start".toLowerCase()) {
-            const playData = { userName: input };
+            const playData = { userName: input,};
             savePlay(playData);
-            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
+            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input,});
+           
         }
         if (input.toLowerCase() === "Github".toLowerCase()) {
             window.open("https://github.com/conanbatt/wpm", "_blank");
+            name.text = "";
         }
         if (input.toLowerCase() === "About".toLowerCase()) {
- 
+            name.text = "";
         }
         updateTextColors();
     });
@@ -258,19 +238,30 @@ k.scene("name_selection", () => {
     k.onKeyPress((keyPressed) => { 
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
             
-            if (mute_enable) {
+            if (settings.mute) {
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
-                mute_enable = false;
+                settings.mute = false;
                 k.volume(0);
             }
             else {
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
-                mute_enable = true;
+                msettings.mute = true;
                 k.volume(0.5);
             }
             return;
         }
     });
+    
+    if (settings.mute) {
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
+        k.volume(0.3);
+    }
+    else {
+        button_muteON.opacity = 0;
+        button_muteOFF.opacity = 1;
+        k.volume(0);
+    }
 });

@@ -5,7 +5,7 @@
     "language": "js",
     "blocks": [
       "var twoSum = function(nums, target) {\n",
-      "    let map = new Map();",
+      "    let map = new Map();\n",
       "\n",
       "    for (let i = 0; i < nums.length; i++) {\n",
       "        let complement = target - nums[i];\n",
@@ -29,14 +29,14 @@
       "function lengthOfLongestSubstring(s) {\n",
       "    let charIndexMap = new Map();\n",
       "    let maxLen = 0;\n",
-      "    let start = 0; /\n",
+      "    let start = 0;\n",
       "\n",
-      "    for (let end = 0; end < s.length; end++) { \n",
+      "    for (let end = 0; end < s.length; end++) {\n",
       "        if (charIndexMap.has(s[end]) && charIndexMap.get(s[end]) >= start) {\n",
       "            start = charIndexMap.get(s[end]) + 1;\n",
       "        }\n",
       "\n",
-      "        charIndexMap.set(s[end], end)\n",
+      "        charIndexMap.set(s[end], end);\n",
       "\n",
       "        maxLen = Math.max(maxLen, end - start + 1);\n",
       "    }\n",
@@ -46,7 +46,7 @@
     ]
   },
   {
-    "id": 3,
+   "id": 3,
     "title": "MedianSortedArrays.js",
     "language": "js",
     "blocks": [
@@ -87,12 +87,12 @@
   },
 
   {
-    "id": 4,
+   "id": 4,
     "title": "longestPalindrome.js",
     "language": "js",
     "blocks": [
       "function longestPalindrome(s) {\n",
-      "    if (s.length === 0) return  \"\";\n",
+      "    if (s.length === 0) return \"\";\n",
       "\n",
       "    function expandAroundCenter(left, right) {\n",
       "        while (left >= 0 && right < s.length && s[left] === s[right]) {\n",
@@ -102,7 +102,7 @@
       "        return s.slice(left + 1, right);\n",
       "    }\n",
       "\n",
-      "    let longest =  \"\";\n",
+      "    let longest = \"\";\n",
       "    for (let i = 0; i < s.length; i++) {\n",
       "        let palindrome1 = expandAroundCenter(i, i);\n",
       "        if (palindrome1.length > longest.length) {\n",
@@ -115,7 +115,7 @@
       "    }\n",
       "\n",
       "    return longest;\n",
-      "\n"
+      "};\n"
     ]
   },
 

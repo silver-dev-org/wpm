@@ -3,7 +3,7 @@
     "id": 1,
     "title": "twoSum.js",
     "language": "js",
-    "blocks": [
+   "blocks": [
       "var twoSum = function(nums, target) {\n",
       "    let map = new Map();\n",
       "\n",
@@ -42,7 +42,7 @@
       "    }\n",
       "\n",
       "    return maxLen;\n",
-      "};\n"
+      "}\n"
     ]
   },
   {
@@ -82,6 +82,8 @@
       "            left = partition1 + 1;\n",
       "        }\n",
       "    }\n",
+      "\n",
+      "    return null;\n",
       "}\n"
     ]
   },
@@ -115,7 +117,7 @@
       "    }\n",
       "\n",
       "    return longest;\n",
-      "};\n"
+      "}\n"
     ]
   },
 
@@ -186,7 +188,7 @@
       "    }\n",
       "\n",
       "    return maxArea;\n",
-      "\n"
+      "}\n"
     ]
   }
 

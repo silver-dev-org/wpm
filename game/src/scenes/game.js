@@ -234,7 +234,7 @@ const gameScene = (params) => {
         totalIcorrectCorrectChars = 0;
         totalTypedCharacters = -1;
         totalCorrectlines = 0;
-        actual_rivalSpeed = 0;
+        actual_rivalSpeed = EASY_RIVAL_SPEED;
         errorCharsIndexes = [];
         errorCharsReplaces = {};
     }

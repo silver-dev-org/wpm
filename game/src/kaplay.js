@@ -7,4 +7,6 @@ export const k = kaplay({
     font: "monogram",
     maxFPS: 60,
     backgroundAudio: false,
+    width: 1920,
+    height: 1080,
 });

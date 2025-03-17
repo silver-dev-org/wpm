@@ -11,7 +11,7 @@ export const settings = {
 k.scene("name_selection", () => {
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.90)),
+        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.70)),
         area(),
         scale(1),
         anchor("center"),
@@ -23,7 +23,7 @@ k.scene("name_selection", () => {
 
     const btn_aboutlink = add([
         rect(80, 50, { radius: 8 }),
-        resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.90)),
+        resizablePos(() => k.vec2(k.width() * 0.45, k.height() * 0.70)),
         area(),
         scale(1),
         anchor("center"),
@@ -35,21 +35,21 @@ k.scene("name_selection", () => {
     const StartText = k.add([
         k.anchor("top"),
         k.text("Start", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.85)),
+        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.75)),
         k.opacity(1),
         k.z(21),
     ]);
     const gitText = k.add([
         k.anchor("top"),
         k.text("Github", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.85)),
+        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.75)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("top"),
         k.text("About", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.85)),
+        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.75)),
         k.opacity(1),
         k.z(21),
     ]);
@@ -231,7 +231,10 @@ k.scene("name_selection", () => {
 
     k.onKeyPress((keyPressed) => {
         if (keyPressed != "backspace") {
-            k.play("code_sound");
+            if(settings.mute)
+            {
+                k.play("code_sound");
+            }
         }
     });
 

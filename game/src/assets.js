@@ -32,7 +32,6 @@ k.loadSprite("retry", "/sprites/retry.png");
 k.loadSprite("WPM", "/sprites/WPM.png");
 k.loadSprite("SilverDev", "/sprites/SilverDevs.png");
 k.loadSprite("icon_0", "/sprites/icon_0.png");
-k.loadSprite("icon_01", "/sprites/icon_01.png");
 k.loadSprite("icon_02", "/sprites/icon_02.png");
 k.loadSprite("icon_03", "/sprites/icon_03.png");
 k.loadSprite("icon_04", "/sprites/icon_04.png");

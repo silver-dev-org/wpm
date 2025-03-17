@@ -83,13 +83,13 @@ k.scene("endgame", () => {
     
         k.add([
             k.text(awpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.44)),
+            resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.44)),
             k.opacity(1),
             k.z(19),
         ]),
         k.add([
             k.text(acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.44)),
+            resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.44)),
             k.opacity(1),
             k.z(19),
         ]),
@@ -103,25 +103,19 @@ k.scene("endgame", () => {
 
     k.add([
         k.sprite("BG_analitycsACC"),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.40)),
+        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.40)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycsAWPM"),
-        resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.40)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    k.add([
-        k.sprite("BG_analitycsACC_B"),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.55)),
+        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.40)),
         k.anchor("center"),
         k.z(18),
     ]);
     k.add([
         k.sprite("BG_analitycsAWPM_B"),
-        resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.55)),
+        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.40)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -154,16 +148,10 @@ k.scene("endgame", () => {
     }
         k.add([
             k.text(best_awpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.60)),
+            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.44)),
             k.opacity(1),
             k.z(19),
         ]),
-        k.add([
-            k.text(best_acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.60)),
-            k.opacity(1),
-            k.z(19),
-        ]);
 
     k.add([
         k.text("Press", { size: 32 }),

@@ -172,12 +172,24 @@ k.scene("name_selection", () => {
         
         const input = name.text;
         let newTarget = "Start";
+        
         if (input.length > 0) {
             const firstChar = input[0].toLowerCase();
-            if (firstChar === "a") {
-                newTarget = "About";
-            } else if (firstChar === "g") {
-                newTarget = "Github";
+            switch (firstChar) {
+                case "a":
+                    newTarget = "About";
+                    break;
+                case "g":
+                    newTarget = "Github";
+                    break;
+                case "m":
+                    newTarget = "mute";
+                    break;
+                case "u":
+                    newTarget = "unmute";
+                    break;
+                default:
+                    newTarget = "Start";
             }
         }
     
@@ -225,6 +237,26 @@ k.scene("name_selection", () => {
         if (input.toLowerCase() === "About".toLowerCase()) {
             name.text = "";
         }
+
+        if (input.toLowerCase() === "Mute".toLowerCase()) {
+            if (settings.mute) {
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
+                settings.mute = false;
+                k.volume(0);
+            }
+            name.text = "";
+        }
+        if (input.toLowerCase() === "UnMute".toLowerCase()) {
+            if (!settings.mute) {
+                button_muteON.opacity = 1;
+                button_muteOFF.opacity = 0;
+                settings.mute = true;
+                k.volume(0.5);
+            }
+            name.text = "";
+        }
+
         updateTextColors();
     });
     

@@ -151,61 +151,67 @@ const gameScene = (params) => {
     /**
      * @param {number} i
      */
-    const matchColorToken = (i, ch) => {
-        const themeTokens = theme.tokens;
-        const themeAssociations = theme.associations;
+/**
+ * @param {number} i
+ */
+const matchColorToken = (i, ch) => {
+    const themeTokens = theme.tokens;
+    const themeAssociations = theme.associations;
 
-        if (ch === " ") return COLOR_TEXT_DEFAULT;
-        if (playerState.cursorPos - 1 < i) {
-            if (rivalState.cursorPos + 1 > i) {
-                return COLOR_TEXT_RIVAL;
-            }
-            return COLOR_TEXT_DEFAULT;
+    if (ch === " ") return COLOR_TEXT_DEFAULT;
+    if (playerState.cursorPos - 1 < i) {
+        if (rivalState.cursorPos + 1 > i) {
+            return COLOR_TEXT_RIVAL;
         }
+        return COLOR_TEXT_DEFAULT;
+    }
 
-        let charColor = COLOR_TEXT_DEFAULT;
+    // Si el carácter es error, se retorna COLOR_TEXT_INCORRECT sin aplicar highlight
+    if (errorCharsIndexes.includes(i)) {
+        return COLOR_TEXT_INCORRECT;
+    }
 
-        const words = originalText.split(" ");
-        let wordCharsIndex = 0;
-        const word =
-            words.find((w) => {
-                const found = w.length + wordCharsIndex >= i;
-                wordCharsIndex += w.length + 1;
-                return found;
-            }) || "";
+    let charColor = COLOR_TEXT_DEFAULT;
+    const words = originalText.split(" ");
+    let wordCharsIndex = 0;
+    const word =
+        words.find((w) => {
+            const found = w.length + wordCharsIndex >= i;
+            wordCharsIndex += w.length + 1;
+            return found;
+        }) || "";
 
-        if (errorCharsIndexes.includes(i)) {
-            charColor = COLOR_TEXT_INCORRECT;
-        } else if (ch.match(themeAssociations.brackets)) {
-            charColor = k.Color.fromHex(themeTokens.brackets);
-        } else if (ch.match(themeAssociations.punctuation)) {
-            charColor = k.Color.fromHex(themeTokens.punctuation);
-        } else if (word.match(themeAssociations.classes)) {
-            charColor = k.Color.fromHex(themeTokens.classes);
-        } else if (word.match(themeAssociations.functions)) {
-            charColor = k.Color.fromHex(themeTokens.functions);
-        } else if (word.match(themeAssociations.keywords)) {
-            charColor = k.Color.fromHex(themeTokens.keywords);
-        } else if (word.match(themeAssociations.strings)) {
-            charColor = k.Color.fromHex(themeTokens.strings);
-        } else {
-            charColor = k.Color.fromHex(themeTokens.text);
-        }
+    if (ch.match(themeAssociations.brackets)) {
+        charColor = k.Color.fromHex(themeTokens.brackets);
+    } else if (ch.match(themeAssociations.punctuation)) {
+        charColor = k.Color.fromHex(themeTokens.punctuation);
+    } else if (word.match(themeAssociations.classes)) {
+        charColor = k.Color.fromHex(themeTokens.classes);
+    } else if (word.match(themeAssociations.functions)) {
+        charColor = k.Color.fromHex(themeTokens.functions);
+    } else if (word.match(themeAssociations.keywords)) {
+        charColor = k.Color.fromHex(themeTokens.keywords);
+    } else if (word.match(themeAssociations.strings)) {
+        charColor = k.Color.fromHex(themeTokens.strings);
+    } else {
+        charColor = k.Color.fromHex(themeTokens.text);
+    }
 
-        if (
-            rivalState.cursorPos < playerState.cursorPos &&
-            rivalState.cursorPos > i
-        ) {
+    // Aplicar highlight del rival solo si corresponde
+    if (
+        rivalState.cursorPos < playerState.cursorPos &&
+        rivalState.cursorPos > i
+    ) {
         return COLOR_TEXT_RIVAL_LIGHTING;
-        }
-        if (
-            rivalState.cursorPos > playerState.cursorPos &&
-            rivalState.cursorPos > i
-        ) {
-            return charColor.lighten(80);
-        }
-        return charColor;
-    };
+    }
+    if (
+        rivalState.cursorPos > playerState.cursorPos &&
+        rivalState.cursorPos > i
+    ) {
+        return charColor.lighten(80);
+    }
+    return charColor;
+};
 
 
     k.onUpdate(() => {
@@ -315,7 +321,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("Press ESC to reset", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.8)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);

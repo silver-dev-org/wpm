@@ -9,7 +9,7 @@
     "fmt": "prettier --write ."
   },
   "dependencies": {
-    "kaplay": "^3001.0.2"
+    "kaplay": "^4000.0.0-alpha.17"
   },
   "devDependencies": {
     "prettier": "^3.4.1",

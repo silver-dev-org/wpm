@@ -8,6 +8,7 @@ export let actualname;
 export const settings = {
     mute: true
 };
+
 k.scene("name_selection", () => {
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
@@ -18,7 +19,6 @@ k.scene("name_selection", () => {
         color(255, 255, 255),
         k.z(21),
         k.opacity(0),
-        k.onHover,
     ]);
 
     const btn_aboutlink = add([
@@ -30,7 +30,6 @@ k.scene("name_selection", () => {
         color(255, 255, 255),
         k.z(21),
         k.opacity(0),
-        k.onHover,
     ]);
     const StartText = k.add([
         k.anchor("top"),
@@ -81,21 +80,21 @@ k.scene("name_selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-        const button_muteON = k.add([
-            k.sprite("muteON"),
-            k.pos(k.width() * 0.02, k.height() * 0.01),
-            k.opacity(1),
-            k.animate(),
-            k.z(18),
-        ]);
-        const button_muteOFF = k.add([
-            k.sprite("muteOff"),
-            k.pos(k.width() * 0.02, k.height() * 0.01),
-            k.opacity(0),
-            k.animate(),
-            k.z(18),
-        ]);
-        
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(1),
+        k.animate(),
+        k.z(18),
+    ]);
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.02, k.height() * 0.01),
+        k.opacity(0),
+        k.animate(),
+        k.z(18),
+    ]);
+
     let targetText = "START";
     let maxLength = targetText.length;
     const letterSpacing = 64;
@@ -137,18 +136,18 @@ k.scene("name_selection", () => {
 
     function updateTextColors() {
         const targetLower = targetText.toLowerCase();
-        const blink = Math.abs(Math.sin(k.time() * 2)); 
-    
+        const blink = Math.abs(Math.sin(k.time() * 2));
+
         function setColor(textObj, matchWord) {
             if (targetLower === matchWord) {
                 textObj.color = k.rgb(255, 255, 0);
                 textObj.opacity = blink;
             } else {
                 textObj.color = k.rgb(255, 255, 255);
-                textObj.opacity = 1; 
+                textObj.opacity = 1;
             }
         }
-    
+
         setColor(StartText, "start");
         setColor(gitText, "github");
         setColor(aboutText, "about");
@@ -166,13 +165,13 @@ k.scene("name_selection", () => {
 
     name.onUpdate(() => {
         if (k.isKeyDown("tab") && k.isKeyDown("m")) {
-            name.text = ""; 
+            name.text = "";
             return;
         }
-        
+
         const input = name.text;
         let newTarget = "Start";
-        
+
         if (input.length > 0) {
             const firstChar = input[0].toLowerCase();
             switch (firstChar) {
@@ -192,13 +191,13 @@ k.scene("name_selection", () => {
                     newTarget = "Start";
             }
         }
-    
+
         if (newTarget !== targetText) {
             targetText = newTarget;
             maxLength = targetText.length;
             createLetterObjects();
         }
-    
+
         for (let i = 0; i < maxLength; i++) {
             if (input[i]) {
                 if (input[i].toLowerCase() === targetText[i].toLowerCase()) {
@@ -213,7 +212,7 @@ k.scene("name_selection", () => {
                 letterObjects[i].color = k.rgb(128, 128, 128);
             }
         }
-    
+
         for (let i = 0; i < underscoreObjects.length; i++) {
             if (i === input.length) {
                 underscoreObjects[i].color = k.rgb(255, 255, 0);
@@ -225,10 +224,10 @@ k.scene("name_selection", () => {
             }
         }
         if (input.toLowerCase() === "Start".toLowerCase()) {
-            const playData = { userName: input,};
+            const playData = { userName: input, };
             savePlay(playData);
-            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input,});
-           
+            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input, });
+
         }
         if (input.toLowerCase() === "Github".toLowerCase()) {
             window.open("https://github.com/conanbatt/wpm", "_blank");
@@ -259,20 +258,19 @@ k.scene("name_selection", () => {
 
         updateTextColors();
     });
-    
+
 
     k.onKeyPress((keyPressed) => {
         if (keyPressed != "backspace") {
-            if(settings.mute)
-            {
+            if (settings.mute) {
                 k.play("code_sound");
             }
         }
     });
 
-    k.onKeyPress((keyPressed) => { 
+    k.onKeyPress((keyPressed) => {
         if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-            
+
             if (settings.mute) {
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
@@ -288,7 +286,7 @@ k.scene("name_selection", () => {
             return;
         }
     });
-    
+
     if (settings.mute) {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;

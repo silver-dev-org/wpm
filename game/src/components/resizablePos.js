@@ -22,7 +22,7 @@ export const resizablePos = (sizeFunc) => ({
      * @type { GameObj<PosComp> } this
      */
     updatePos() {
-        this.pos = this.sizeFunc();
+        // this.pos = this.sizeFunc();
     },
     destroy() {
         gameState.resizableObjects = gameState.resizableObjects.filter(

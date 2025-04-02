@@ -11,7 +11,7 @@ export const startmoveline = 3;
 export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
 export const ICON_START_Y = 0.18;
-export const TEXT_START_Y = 0.20;
+export const TEXT_START_Y = 0.30;
 export const SPACING = 0.05;
 export const MAX_BLOCKS = 5;
 /**

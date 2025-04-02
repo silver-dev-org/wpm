@@ -4,9 +4,93 @@ import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname, settings } from "./nameSelection.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
-
+k.loadMusic("endgame", "/sounds/endgame.mp3");
 k.scene("endgame", () => {
-
+    //CSS
+    const style = document.createElement("style");
+    style.innerHTML = `
+      :root {
+          --bg:hsl(0, 0.00%, 0.00%);
+          --gray1:#0a080a;
+          --gray2:#110b11;
+      }
+      
+      body {
+          margin: 0;
+          background: var(--bg);
+          background-color: var(--gray2);
+          background-image: 
+              linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
+              linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
+              linear-gradient(-45deg, transparent 75%, var(--gray1) 75%);
+          background-size: 15px 15px;
+          background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+          overflow: hidden;
+      }
+ 
+ 
+ .editor {
+     background: rgba(10, 10, 27, 0.8);
+     width: 1280px;
+     height: 640px;
+     border: 4px solid var(--neon2);
+     box-shadow: 0 0 10px var(--neon2);
+     display: flex;
+     flex-direction: column;
+     position: relative;
+ }
+ 
+ .backtextbox {
+     position: absolute;
+     width: 71vw;
+     height: 73vh;
+     top: 60px;
+     border-radius: 1px;
+     border: 8px solid white;
+     background-color: rgb(32, 12, 54);
+     opacity: 0.6;
+     filter: blur(9px);
+     pointer-events: none;
+ }
+ 
+ .innerRect {
+     position: absolute;
+     top: 8px;
+     left: 8px;
+     width: calc(100%);
+     height: calc(100%);
+     border-radius: 1px;
+     background-color: transparent;
+ }
+ body::after {
+     content: "";
+     position: absolute;
+     top: 0%;
+     left: 5%;
+     width: 90%;
+     height: 100%;
+     background: rgba(32, 30, 31, 0.4);
+     pointer-events: none;
+       z-index: -1;
+ }
+ body::before {
+     content: "";
+     position: absolute;
+     top: 0%;
+     left: 0%;
+     width: 0%;
+     height: 0%;
+     background: rgba(56, 50, 53, 0.2);
+     pointer-events: none;
+       z-index: -1;
+ }
+ `;
+    document.head.appendChild(style);
     let awpm = goal_awpm;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
@@ -62,63 +146,21 @@ k.scene("endgame", () => {
         }
     }
 
-    const background = k.add([
-        k.sprite("bg2"),
-        k.pos(k.width() / 2, k.height() / 2),
-        k.anchor("center"),
-        k.z(18),
-    ]);
     const title = k.add([
         k.sprite("WPM"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
         k.anchor("center"),
         k.z(18),
     ]);
-    const subTitle = k.add([
-        k.sprite("SilverDev"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.15)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    
-        k.add([
-            k.text(awpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.44)),
-            k.opacity(1),
-            k.z(19),
-        ]),
-        k.add([
-            k.text(acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.44)),
-            k.opacity(1),
-            k.z(19),
-        ]),
-        k.add([
-            k.sprite("icon_0"),
-            resizablePos(() => k.vec2(k.width() * 0.77, k.height() * 0.38)),
-            k.anchor("center"),
-            k.opacity(0),
-            k.z(18),
-        ]);
 
     k.add([
-        k.sprite("BG_analitycsACC"),
-        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.40)),
+        k.sprite("icon_0"),
+        resizablePos(() => k.vec2(k.width() * 0.77, k.height() * 0.38)),
         k.anchor("center"),
+        k.opacity(0),
         k.z(18),
     ]);
-    k.add([
-        k.sprite("BG_analitycsAWPM"),
-        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.40)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    k.add([
-        k.sprite("BG_analitycsAWPM_B"),
-        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.40)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
+
 
     const username = actualname;
     const retrievedData = getPlay(username);
@@ -146,36 +188,56 @@ k.scene("endgame", () => {
         best_lpm = lpm;
         best_acc = acc;
     }
+
+    k.add([
+        k.sprite("BG_analitycsAWPM"),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.5)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycsACC"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.5)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.sprite("BG_analitycsAWPM_B"),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.5)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(awpm.toFixed(2), { size: 48, }),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.55)),
+        k.opacity(1),
+        k.z(19),
+    ]),
         k.add([
-            k.text(best_awpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.47, k.height() * 0.44)),
+            k.text(acc.toFixed(2) + "%", { size: 48, }),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.55)),
             k.opacity(1),
             k.z(19),
         ]),
+        k.add([
+            k.text(best_awpm.toFixed(2), { size: 48, }),
+            resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.55)),
+            k.opacity(1),
+            k.z(19),
+        ]);
 
-    k.add([
-        k.text("Press", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.44, k.height() * 0.75)),
-        k.anchor("center"),
-        k.z(19),
-    ]);
-    const textC = k.add([
-        k.text("ENTER", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.75)),
+    const textPressEnd = k.add([
+        k.text("Press ENTER to retry", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.animate(),
         k.z(19),
     ]);
-    k.add([
-        k.text("to retry", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.57, k.height() * 0.75)),
-        k.anchor("center"),
-        k.z(19),
-    ]);
+
     moveText();
     function moveText() {
-        textC.animate("pos", [k.vec2(textC.pos.x, textC.pos.y + 5), k.vec2(textC.pos.x, textC.pos.y - 5)], {
+        textPressEnd.animate("pos", [k.vec2(textPressEnd.pos.x, textPressEnd.pos.y + 5), k.vec2(textPressEnd.pos.x, textPressEnd.pos.y - 5)], {
             duration: 0.5,
             direction: "ping-pong",
         });

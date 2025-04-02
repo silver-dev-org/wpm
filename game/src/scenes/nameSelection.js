@@ -4,12 +4,86 @@ import { savePlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export let actualname;
-
 export const settings = {
-    mute: true
+    mute: false
 };
 
 k.scene("name_selection", () => {
+    //CSS
+    const style = document.createElement("style");
+    style.innerHTML = `
+       :root {
+         --bg:hsl(0, 0.00%, 0.00%);
+         --gray1:#0a080a;
+         --gray2:#110b11;
+     }
+     
+     body {
+         margin: 0;
+         background: var(--bg);
+         background-color: var(--gray2);
+         background-image: 
+             linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
+             linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
+             linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
+             linear-gradient(-45deg, transparent 75%, var(--gray1) 75%);
+         background-size: 15px 15px;
+         background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+         overflow: hidden;
+     }
+
+
+.editor {
+    background: rgba(10, 10, 27, 0.8);
+    width: 1280px;
+    height: 640px;
+    border: 4px solid var(--neon2);
+    box-shadow: 0 0 10px var(--neon2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.backtextbox {
+    position: absolute;
+    width: 71vw;
+    height: 73vh;
+    top: 60px;
+    border-radius: 1px;
+    border: 8px solid white;
+    background-color: rgb(32, 12, 54);
+    opacity: 0.6;
+    filter: blur(9px);
+    pointer-events: none;
+}
+
+.innerRect {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: calc(100%);
+    height: calc(100%);
+    border-radius: 1px;
+    background-color: transparent;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 5%;
+    width: 90%;
+    height: 100%;
+    background: rgba(56, 50, 53, 0.2);
+    pointer-events: none;
+      z-index: -1;
+}
+`;
+    document.head.appendChild(style);
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.70)),
@@ -31,52 +105,48 @@ k.scene("name_selection", () => {
         k.z(21),
         k.opacity(0),
     ]);
+    const ComandText = k.add([
+        k.anchor("top"),
+        k.text("Start + Command", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.9)),
+        k.opacity(1),
+        k.z(21),
+    ]);
     const StartText = k.add([
         k.anchor("top"),
         k.text("Start", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.9)),
         k.opacity(1),
         k.z(21),
+
     ]);
     const gitText = k.add([
         k.anchor("top"),
         k.text("Github", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.50, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.8, k.height() * 0.9)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("top"),
         k.text("About", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.65, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.9, k.height() * 0.9)),
         k.opacity(1),
         k.z(21),
     ]);
     k.add([
         k.anchor("center"),
-        k.pos(k.width() / 2, k.height() / 2.2),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.65)),
         k.text("Get faster and better at technical interviewing by practicing typing code.", {
-            size: 28,
+            size: 36,
         }),
         k.color(k.WHITE),
         k.z(21),
     ]);
 
-    const background = k.add([
-        k.sprite("bg2"),
-        k.pos(k.width() / 2, k.height() / 2),
-        k.anchor("center"),
-        k.z(18),
-    ]);
     const title = k.add([
         k.sprite("WPM"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    const subTitle = k.add([
-        k.sprite("SilverDev"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.15)),
         k.anchor("center"),
         k.z(18),
     ]);
@@ -95,13 +165,12 @@ k.scene("name_selection", () => {
         k.z(18),
     ]);
 
-    let targetText = "START";
+    let targetText = "Start unmute";
     let maxLength = targetText.length;
-    const letterSpacing = 64;
+    const letterSpacing = 18;
     let startX = k.width() / 2 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
-
 
     function createLetterObjects() {
         letterObjects.forEach(obj => k.destroy(obj));
@@ -109,11 +178,10 @@ k.scene("name_selection", () => {
         letterObjects = [];
         underscoreObjects = [];
         startX = k.width() / 2 - ((maxLength - 1) * letterSpacing) / 2;
-
         for (let i = 0; i < maxLength; i++) {
             const letter = k.add([
-                k.text(targetText[i], { size: 36 }),
-                k.pos(startX + i * letterSpacing, k.height() / 1.7),
+                k.text(targetText[i], { size: 32 }),
+                k.pos(startX + i * letterSpacing, k.height() / 2),
                 k.anchor("center"),
                 k.color(k.rgb(128, 128, 128)),
                 k.z(22),
@@ -122,8 +190,8 @@ k.scene("name_selection", () => {
             letterObjects.push(letter);
 
             const underscore = k.add([
-                k.text("_", { size: 40 }),
-                k.pos(startX + i * letterSpacing, k.height() / 1.6),
+                k.text("_", { size: 36 }),
+                k.pos(startX + i * letterSpacing, k.height() / 1.9),
                 k.anchor("center"),
                 k.color(k.WHITE),
                 k.z(20),
@@ -148,7 +216,7 @@ k.scene("name_selection", () => {
             }
         }
 
-        setColor(StartText, "start");
+        setColor(StartText, "Start unmute");
         setColor(gitText, "github");
         setColor(aboutText, "about");
     }
@@ -163,16 +231,21 @@ k.scene("name_selection", () => {
         k.z(21),
     ]);
 
+    let previousInput = "";
     name.onUpdate(() => {
-        if (k.isKeyDown("tab") && k.isKeyDown("m")) {
+        if (k.isKeyDown("escape")) {
             name.text = "";
+            previousInput = "";
             return;
         }
-
         const input = name.text;
-        let newTarget = "Start";
+        let newTarget = "Start unmute";
 
-        if (input.length > 0) {
+        if (input.toLowerCase().startsWith("start m")) {
+            newTarget = "Start mute";
+        } else if (input.toLowerCase().startsWith("start u")) {
+            newTarget = "Start unmute";
+        } else if (input.length > 0) {
             const firstChar = input[0].toLowerCase();
             switch (firstChar) {
                 case "a":
@@ -181,14 +254,8 @@ k.scene("name_selection", () => {
                 case "g":
                     newTarget = "Github";
                     break;
-                case "m":
-                    newTarget = "mute";
-                    break;
-                case "u":
-                    newTarget = "unmute";
-                    break;
                 default:
-                    newTarget = "Start";
+                    newTarget = "Start unmute";
             }
         }
 
@@ -198,9 +265,28 @@ k.scene("name_selection", () => {
             createLetterObjects();
         }
 
+        let localErrorCount = 0;
+        for (let i = 0; i < maxLength; i++) {
+            if (input[i]) {
+                if (input[i].toLowerCase() !== targetText[i].toLowerCase()) {
+                    localErrorCount++;
+                }
+            }
+        }
+
+        if (localErrorCount > 2 && input.length > previousInput.length) {
+            name.text = previousInput;
+            k.play("wrong_typing");
+            preventError();
+            return;
+        } else {
+            previousInput = name.text;
+        }
+
         for (let i = 0; i < maxLength; i++) {
             if (input[i]) {
                 if (input[i].toLowerCase() === targetText[i].toLowerCase()) {
+                    letterObjects[i].text = input[i];
                     letterObjects[i].text = input[i];
                     letterObjects[i].color = k.rgb(255, 255, 0);
                 } else {
@@ -220,70 +306,47 @@ k.scene("name_selection", () => {
                 underscoreObjects[i].opacity = blink;
             } else {
                 underscoreObjects[i].color = k.WHITE;
-                underscoreObjects[i].opacity = 0.3;
+                underscoreObjects[i].opacity = 0;
             }
         }
-        if (input.toLowerCase() === "Start".toLowerCase()) {
-            const playData = { userName: input, };
-            savePlay(playData);
-            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input, });
-
-        }
-        if (input.toLowerCase() === "Github".toLowerCase()) {
+        if (input.toLowerCase() === "github") {
             window.open("https://github.com/conanbatt/wpm", "_blank");
             name.text = "";
         }
-        if (input.toLowerCase() === "About".toLowerCase()) {
+        if (input.toLowerCase() === "about") {
             name.text = "";
         }
+        if (input.toLowerCase() === "start mute") {
+            settings.mute = false;
+            k.volume(0);
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
+            const playData = { userName: input };
+            savePlay(playData);
+            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
 
-        if (input.toLowerCase() === "Mute".toLowerCase()) {
-            if (settings.mute) {
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                settings.mute = false;
-                k.volume(0);
-            }
-            name.text = "";
-        }
-        if (input.toLowerCase() === "UnMute".toLowerCase()) {
-            if (!settings.mute) {
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                settings.mute = true;
-                k.volume(0.5);
-            }
-            name.text = "";
+        } else if (input.toLowerCase() === "start unmute") {
+            settings.mute = true;
+            k.volume(0.5);
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
+            const playData = { userName: input };
+            savePlay(playData);
+            k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
         }
 
         updateTextColors();
     });
 
-
+    function preventError() {
+        k.shake(2);
+    }
     k.onKeyPress((keyPressed) => {
+
         if (keyPressed != "backspace") {
             if (settings.mute) {
                 k.play("code_sound");
             }
-        }
-    });
-
-    k.onKeyPress((keyPressed) => {
-        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-
-            if (settings.mute) {
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                settings.mute = false;
-                k.volume(0);
-            }
-            else {
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                settings.mute = true;
-                k.volume(0.5);
-            }
-            return;
         }
     });
 

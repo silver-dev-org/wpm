@@ -18,11 +18,11 @@ import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./nameSelection.js";
+k.loadMusic("videogame", "/sounds/videogame.mp3");
 let titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#7a7878");
-let COLOR_TEXT_RIVAL = k.Color.fromHex("#e3cf5b");
-let COLOR_TEXT_RIVAL_LIGHTING = k.Color.fromHex("#FFFF00");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#a3a0a0");
+let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let actual_rivalSpeed = EASY_RIVAL_SPEED;
 let completedBlocks = 0;
@@ -38,8 +38,8 @@ export let goal_wpm = actual_wpm;
 export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
-let fontSize = 24;
-let fontWidth = 13.5;
+let fontSize = 28;
+let fontWidth = 15.5;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -68,6 +68,93 @@ const gameScene = (params) => {
     let curBlockData = {
         lineCount: 0,
     };
+
+    //CSS
+    const style = document.createElement("style");
+    style.innerHTML = `
+     :root {
+         --bg:hsl(0, 0.00%, 0.00%);
+         --gray1:#0a080a;
+         --gray2:#110b11;
+     }
+     
+     body {
+         margin: 0;
+         background: var(--bg);
+         background-color: var(--gray2);
+         background-image: 
+             linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
+             linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
+             linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
+             linear-gradient(-45deg, transparent 75%, var(--gray1) 75%);
+         background-size: 15px 15px;
+         background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         min-height: 100vh;
+         overflow: hidden;
+     }
+
+
+.editor {
+    background: rgba(10, 10, 27, 0.8);
+    width: 1280px;
+    height: 640px;
+    border: 4px solid var(--neon2);
+    box-shadow: 0 0 10px var(--neon2);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.backtextbox {
+    position: absolute;
+    width: 71vw;
+    height: 73vh;
+    top: 60px;
+    border-radius: 1px;
+    border: 8px solid white;
+    background-color: rgb(32, 12, 54);
+    opacity: 0.6;
+    filter: blur(9px);
+    pointer-events: none;
+}
+
+.innerRect {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: calc(100%);
+    height: calc(100%);
+    border-radius: 1px;
+    background-color: transparent;
+}
+body::after {
+    content: "";
+    position: absolute;
+    top: 6%;
+    left: 22%;
+    width: 78%;
+    height: 100%;
+    background: rgba(32, 30, 31, 0.4);
+    pointer-events: none;
+      z-index: -1;
+}
+body::before {
+    content: "";
+    position: absolute;
+    top: 6%;
+    left: 5%;
+    width: 90%;
+    height: 100%;
+    background: rgba(56, 50, 53, 0.2);
+    pointer-events: none;
+      z-index: -1;
+}
+`;
+    document.head.appendChild(style);
+
     // Music
     const music = k.play("videogame");
     music.loop = true;
@@ -146,8 +233,6 @@ const gameScene = (params) => {
 
     // #endregion
 
-    //animateBackground();
-
     /**
      * @param {number} i
      */
@@ -166,12 +251,8 @@ const gameScene = (params) => {
             return COLOR_TEXT_DEFAULT;
         }
 
-        // Si el carácter es error, se retorna COLOR_TEXT_INCORRECT sin aplicar highlight
-        if (errorCharsIndexes.includes(i)) {
-            return COLOR_TEXT_INCORRECT;
-        }
-
         let charColor = COLOR_TEXT_DEFAULT;
+
         const words = originalText.split(" ");
         let wordCharsIndex = 0;
         const word =
@@ -181,7 +262,9 @@ const gameScene = (params) => {
                 return found;
             }) || "";
 
-        if (ch.match(themeAssociations.brackets)) {
+        if (errorCharsIndexes.includes(i)) {
+            charColor = COLOR_TEXT_INCORRECT;
+        } else if (ch.match(themeAssociations.brackets)) {
             charColor = k.Color.fromHex(themeTokens.brackets);
         } else if (ch.match(themeAssociations.punctuation)) {
             charColor = k.Color.fromHex(themeTokens.punctuation);
@@ -197,19 +280,13 @@ const gameScene = (params) => {
             charColor = k.Color.fromHex(themeTokens.text);
         }
 
-        // Aplicar highlight del rival solo si corresponde
         if (
             rivalState.cursorPos < playerState.cursorPos &&
             rivalState.cursorPos > i
         ) {
-            return COLOR_TEXT_RIVAL_LIGHTING;
+            return charColor
         }
-        if (
-            rivalState.cursorPos > playerState.cursorPos &&
-            rivalState.cursorPos > i
-        ) {
-            return charColor.lighten(80);
-        }
+
         return charColor;
     };
 
@@ -257,49 +334,34 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
 
     k.add([
-        resizablePos(filesFoldersPos),
-        k.sprite("bg2"),
-        k.anchor("topleft"),
-        k.opacity(1),
-    ]);
-    k.add([
         k.sprite("BG_analitycs9"),
-        k.pos(k.width() * 0.26, k.height() * 0.023),
+        k.pos(k.width() * 0.3, k.height() * 0.023),
         k.anchor("center"),
         k.z(51),
     ]);
     k.add([
         k.sprite("BG_analitycs7"),
-        k.pos(k.width() * 0.46, k.height() * 0.023),
+        k.pos(k.width() * 0.5, k.height() * 0.023),
         k.anchor("center"),
         k.z(51),
     ]);
     k.add([
         k.sprite("BG_analitycs8"),
-        k.pos(k.width() * 0.66, k.height() * 0.023),
+        k.pos(k.width() * 0.7, k.height() * 0.023),
         k.anchor("center"),
         k.z(51),
     ]);
 
     const texts = dialogsData.map(item => ({
         text: item.title,
-        size: 24
     }));
     const textsChallenges = [
-        { text: "Challenges", size: 20 },
+        { text: "Challenges" },
     ];
-
-    /*icons.forEach((icon, index) => {
-        k.add([
-            k.sprite(icon.sprite),
-            resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (ICON_START_Y + SPACING * index))),
-            k.opacity(1),
-        ]);
-    });*/
 
     texts.slice(0, MAX_BLOCKS).forEach((text, index) => {
         k.add([
-            k.text(text.text, { size: 24 }),
+            k.text(text.text, { size: 28 }),
             resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (TEXT_START_Y + SPACING * index))),
             k.color(k.WHITE),
             k.opacity(1),
@@ -310,18 +372,18 @@ const gameScene = (params) => {
 
     const icon_challenge = k.add([
         k.sprite("icon_02"),
-        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.1)),
+        resizablePos(() => k.vec2(k.width() * 0, k.height() * 0.2)),
         k.opacity(1),
     ]);
     const text_challenge = k.add([
-        k.text("Challenges", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.06, k.height() * 0.12)),
+        k.text("Challenges", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0, k.height() * 0.25)),
         k.color(k.WHITE),
         k.opacity(1),
     ]);
     const rest_text = k.add([
-        k.text("Press ESC to reset", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.01, k.height() * 0.8)),
+        k.text("ESC to reset", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.02, k.height() * 0.9)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
@@ -371,7 +433,7 @@ const gameScene = (params) => {
 
     const arrow = k.add([
         k.sprite("arrow_yellow"),
-        k.pos(k.width() * 0.001, k.height() * (TEXT_START_Y - SPACING * 0.5)),
+        k.pos(k.width() * 0, k.height() * (TEXT_START_Y - SPACING * 0.5)),
         k.opacity(1),
         k.animate(),
     ]);
@@ -399,7 +461,7 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(380, 0);
+            return k.vec2(348, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
@@ -408,20 +470,6 @@ const gameScene = (params) => {
     const textPadding = k.vec2(40, 150);
 
     k.volume(0.5);
-
-    const textbox = k.add([
-
-        resizablePos(textboxPos),
-        k.sprite("bg"),
-        k.anchor("topleft"),
-        k.opacity(0.4),
-    ]);
-    const textboxBack = k.add([
-        k.sprite("bg4"),
-        k.anchor("topleft"),
-        k.opacity(1),
-        k.z(50),
-    ]);
 
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
@@ -464,18 +512,18 @@ const gameScene = (params) => {
     };
 
     const cursorPointer = k.add([
-        k.text("_", { size: 24 }),
+        k.text("_", { size: 28 }),
         resizablePos(() => cursorPos()),
-        k.opacity(0.6),
+        k.opacity(1),
         k.anchor("left"),
         k.color(255, 255, 255),
         k.z(10),
     ]);
 
     const rivalPointer = k.add([
-        k.text("_", { size: 24 }),
+        k.text("_", { size: 28 }),
         resizablePos(() => cursorPos(true)),
-        k.opacity(0.6),
+        k.opacity(1),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
     ]);
@@ -485,7 +533,7 @@ const gameScene = (params) => {
 
     function makeBlink(entity) {
         k.loop(0.5, () => {
-            entity.opacity = entity.opacity === 0 ? 0.3 : 0;
+            entity.opacity = entity.opacity === 0 ? 0.8 : 0;
         });
     }
     playerState.cursorPointer = cursorPointer;
@@ -674,7 +722,7 @@ const gameScene = (params) => {
 
     const awmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.32, k.height() * 0.02),
+        k.pos(k.width() * 0.4, k.height() * 0.02),
         k.text("AWPM: ", {
             size: 32,
         }),
@@ -684,7 +732,7 @@ const gameScene = (params) => {
 
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.52, k.height() * 0.02),
+        k.pos(k.width() * 0.6, k.height() * 0.02),
         k.text("0", {
             size: 32,
         }),
@@ -694,7 +742,7 @@ const gameScene = (params) => {
 
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.72, k.height() * 0.02),
+        k.pos(k.width() * 0.8, k.height() * 0.02),
         k.text("time: ", {
             size: 32,
         }),

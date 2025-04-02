@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "title": "twoSum.js",
+    "title": "twoSum",
     "language": "js",
     "blocks": [
       "var twoSum = function(nums, target) {\n",
@@ -23,7 +23,7 @@
   },
   {
     "id": 2,
-    "title": "isPalindrome.js",
+    "title": "isPalindrome",
     "language": "js",
     "blocks": [
       "var isPalindrome = function(x) {\n",
@@ -45,7 +45,7 @@
   },
   {
     "id": 3,
-    "title": "romanToInt.js",
+    "title": "romanToInt",
     "language": "js",
     "blocks": [
       "var romanToInt = function(s) {\n",
@@ -74,7 +74,7 @@
   },
   {
     "id": 4,
-    "title": "longestCommonPrefix.js",
+    "title": "longestCommonPrefix",
     "language": "js",
     "blocks": [
       "var longestCommonPrefix = function(strs) {\n",
@@ -88,7 +88,7 @@
   },
   {
     "id": 5,
-    "title": "isValid.js",
+    "title": "isValid",
     "language": "js",
     "blocks": [
       "var isValid = function(s) {\n",
@@ -115,7 +115,7 @@
   },
   {
     "id": 6,
-    "title": "mergeTwoLists.js",
+    "title": "mergeTwoLists",
     "language": "js",
     "blocks": [
       "var mergeTwoLists = function(list1, list2) {\n",
@@ -141,7 +141,7 @@
   },
   {
     "id": 7,
-    "title": "removeDuplicates.js",
+    "title": "removeDuplicates",
     "language": "js",
     "blocks": [
       "var removeDuplicates = function(nums) {\n",
@@ -160,7 +160,7 @@
   },
   {
     "id": 8,
-    "title": "strStr.js",
+    "title": "strStr",
     "language": "js",
     "blocks": [
       "var strStr = function(haystack, needle) {\n",
@@ -180,7 +180,7 @@
   },
   {
     "id": 9,
-    "title": "searchInsert.js",
+    "title": "searchInsert",
     "language": "js",
     "blocks": [
       "var searchInsert = function(nums, target) {\n",
@@ -205,7 +205,7 @@
   },
   {
     "id": 10,
-    "title": "lengthOfLastWord.js",
+    "title": "lengthOfLastWord",
     "language": "js",
     "blocks": [
       "var lengthOfLastWord = function(s) {\n",
@@ -224,7 +224,7 @@
   },
   {
     "id": 11,
-    "title": "plusOne.js",
+    "title": "plusOne",
     "language": "js",
     "blocks": [
       "var plusOne = function(digits) {\n",
@@ -244,7 +244,7 @@
   },
   {
     "id": 12,
-    "title": "addBinary.js",
+    "title": "addBinary",
     "language": "js",
     "blocks": [
       "var addBinary = function(a, b) {\n",
@@ -271,7 +271,7 @@
   },
   {
     "id": 13,
-    "title": "mySqrt.js",
+    "title": "mySqrt",
     "language": "js",
     "blocks": [
       "var mySqrt = function(x) {\n",
@@ -297,7 +297,7 @@
   },
   {
     "id": 14,
-    "title": "climbStairs.js",
+    "title": "climbStairs",
     "language": "js",
     "blocks": [
       "var climbStairs = function(n) {\n",
@@ -319,7 +319,7 @@
   },
   {
     "id": 15,
-    "title": "deleteDuplicates.js",
+    "title": "deleteDuplicates",
     "language": "js",
     "blocks": [
       "var deleteDuplicates = function(head) {\n",
@@ -339,7 +339,7 @@
   },
   {
     "id": 16,
-    "title": "mergeSortedArray.js",
+    "title": "mergeSortedArray",
     "language": "js",
     "blocks": [
       "var merge = function(nums1, m, nums2, n) {\n",
@@ -352,7 +352,7 @@
   },
   {
     "id": 17,
-    "title": "inorderTraversal.js",
+    "title": "inorderTraversal",
     "language": "js",
     "blocks": [
       "var inorderTraversal = function(root) {\n",
@@ -374,7 +374,7 @@
   },
   {
     "id": 18,
-    "title": "isSameTree.js",
+    "title": "isSameTree",
     "language": "js",
     "blocks": [
       "var isSameTree = function(p, q) {\n",
@@ -392,7 +392,7 @@
   },
   {
     "id": 19,
-    "title": "isSymmetric.js",
+    "title": "isSymmetric",
     "language": "js",
     "blocks": [
       "var isSymmetric = function(root) {\n",

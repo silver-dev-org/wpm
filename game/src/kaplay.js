@@ -3,7 +3,7 @@
 import kaplay from "kaplay";
 
 export const k = kaplay({
-    background: [10, 10, 27, 0],
+   background: [0, 0, 0, 0],
     font: "monogram",
     maxFPS: 120,
     backgroundAudio: false,
@@ -12,5 +12,6 @@ export const k = kaplay({
     letterbox: true,
     pixelDensity: 3,
     crisp: false,
-    texFilter: "linear",
+    texFilter: "nearest",
+    
 });

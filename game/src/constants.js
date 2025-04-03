@@ -1,7 +1,7 @@
 // @ts-check
 
 import dialogs from "./data/dialogs.json";
-export const EASY_RIVAL_SPEED = 0.8;
+export const EASY_RIVAL_SPEED = 0.4;
 export const MAX_TIME = 60;
 export const goalBlocks = 6;
 export const maxMistakes = 1;

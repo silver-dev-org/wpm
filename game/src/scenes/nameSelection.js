@@ -48,6 +48,7 @@ k.scene("name_selection", () => {
     document.head.appendChild(style);
 
     loadMute();
+    
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -222,6 +223,12 @@ k.scene("name_selection", () => {
     let previousInput = "";
     let lastErrorCount = 0;
     name.onUpdate(() => {
+
+        if (name.text.length > maxLength && !k.isKeyDown("backspace")) {
+            name.text = name.text.substring(0, maxLength);
+            return;
+        }
+
         if (k.isKeyDown("escape")) {
             name.text = "";
             previousInput = "";
@@ -313,8 +320,8 @@ k.scene("name_selection", () => {
         if (input.toLowerCase() === "start mute") {
             settings.mute = true;
             k.volume(0);
-            button_muteON.opacity = 1;
-            button_muteOFF.opacity = 0;
+            button_muteON.opacity = 0;
+            button_muteOFF.opacity = 1;
             const playData = { userName: input };
             savePlay(playData);
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
@@ -322,8 +329,8 @@ k.scene("name_selection", () => {
         } else if (input.toLowerCase() === "start unmute") {
             settings.mute = false;
             k.volume(0.5);
-            button_muteON.opacity = 0;
-            button_muteOFF.opacity = 1;
+            button_muteON.opacity = 1;
+            button_muteOFF.opacity = 0;
             const playData = { userName: input };
             savePlay(playData);
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
@@ -332,6 +339,15 @@ k.scene("name_selection", () => {
         updateTextColors();
     });
 
+    if (settings.mute) {
+        button_muteON.opacity = 0;
+        button_muteOFF.opacity = 1;
+    }
+    else {
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
+    }
+    
     function preventError() {
         k.shake(2);
         if (!settings.mute) {
@@ -347,15 +363,4 @@ k.scene("name_selection", () => {
             }
         }
     });
-
-    if (!settings.mute) {
-        button_muteON.opacity = 1;
-        button_muteOFF.opacity = 0;
-        k.volume(0.3);
-    }
-    else {
-        button_muteON.opacity = 0;
-        button_muteOFF.opacity = 1;
-        k.volume(0);
-    }
 });

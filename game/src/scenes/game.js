@@ -21,7 +21,7 @@ import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./nameSelection.js";
 let titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#a3a0a0");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#5c5a5a");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let actual_rivalSpeed = EASY_RIVAL_SPEED;
@@ -341,8 +341,17 @@ const gameScene = (params) => {
 
     texts.slice(0, MAX_BLOCKS).forEach((text, index) => {
         k.add([
+            k.sprite("icon_02"),
+            resizablePos(() => k.vec2(k.width() * 0.02, k.height() * (TEXT_START_Y + SPACING * index))),
+            k.opacity(1),
+            k.z(55),
+            "challengeIcon",
+
+        ]);
+    
+        k.add([
             k.text(text.text, { size: 28 }),
-            resizablePos(() => k.vec2(k.width() * 0.03, k.height() * (TEXT_START_Y + SPACING * index))),
+            resizablePos(() => k.vec2(k.width() * 0.05, k.height() * (TEXT_START_Y + SPACING * index))),
             k.color(k.WHITE),
             k.opacity(1),
             "menuItem",
@@ -350,11 +359,6 @@ const gameScene = (params) => {
         ]);
     });
 
-    const icon_challenge = k.add([
-        k.sprite("icon_02"),
-        resizablePos(() => k.vec2(k.width(), k.height() * 0.2)),
-        k.opacity(1),
-    ]);
     const text_challenge = k.add([
         k.text("Challenges", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.03, k.height() * 0.25)),
@@ -363,7 +367,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("ESC to reset", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.03, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.9)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
@@ -441,7 +445,7 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(380, 0);
+            return k.vec2(400, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);

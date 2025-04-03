@@ -204,14 +204,14 @@ k.scene("endgame", () => {
     }
 
     const chartBaseY = k.height() * 0.7;
-    const maxBarHeight = k.height() * 0.2;
-    const minBarHeight = 20;
+    const maxBarHeight = k.height() * 0.1;
+    const minBarHeight = 10;
     
-    const scaleBar = (value, maxValue) => {
-        return value === 0 ? minBarHeight : (value / maxValue) * maxBarHeight;
+    const expectedMaxStat = 30;
+    
+    const scaleBar = (value) => {
+        return value === 0 ? minBarHeight : (value / expectedMaxStat) * maxBarHeight;
     };
-    
-    const maxStat = Math.max(wpm, best_wpm, awpm, best_awpm, 1);
     
     const bars = [
         { label: "WPM", value: wpm, x: 0.35, color: k.rgb(255, 100, 100) },
@@ -221,7 +221,7 @@ k.scene("endgame", () => {
     ];
     
     bars.forEach(({ label, value, x, color }) => {
-        const barHeight = scaleBar(value, maxStat);
+        const barHeight = scaleBar(value);
     
         k.add([
             k.rect(30, barHeight),
@@ -241,12 +241,43 @@ k.scene("endgame", () => {
     
         k.add([
             k.text(label, { size: 28 }),
-            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 50)),
+            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 70)),
             k.color(k.rgb(250, 250, 250)),
             k.anchor("center"),
             k.z(21),
         ]);
     });
+    
+    const boxWidth = k.width() * 0.4;
+    const boxHeight = 300;
+    const boxX = k.width() * 0.3;
+    const boxY = chartBaseY - 250;
+    
+    k.add([
+        k.rect(boxWidth, boxHeight),
+        k.pos(boxX, boxY),
+        k.color(k.rgb(157, 82, 228)),
+        k.anchor("topleft"),
+        k.z(20),
+        k.opacity(0.03),
+    ]);
+    
+    k.add([
+        k.rect(5, boxHeight),
+        k.pos(boxX, boxY),
+        k.color(k.rgb(255, 255, 0)),
+        k.anchor("topleft"),
+        k.z(51),
+    ]);
+    
+    k.add([
+        k.rect(boxWidth, 5),
+        k.pos(boxX, boxY + boxHeight - 5),
+        k.color(k.rgb(255, 255, 0)),
+        k.anchor("topleft"),
+        k.z(51),
+    ]);
+    
     onKeyPress("enter", () => {
         music.stop();
         k.go("name_selection");

@@ -7,8 +7,8 @@ export let actualname;
 export const settings = {
     mute: false
 };
-k.scene("name_selection", () => {
 
+k.scene("name_selection", () => {
     //CSS
     const style = document.createElement("style");
     style.innerHTML = `
@@ -47,6 +47,7 @@ k.scene("name_selection", () => {
     `;
     document.head.appendChild(style);
 
+    k.volume(0.5);
     loadMute();
     
     const background = k.add([

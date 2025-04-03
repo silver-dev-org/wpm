@@ -15,6 +15,5 @@ k.loadSound("wrong_typing", "/sounds/wrong typing.mp3");
 k.loadSprite("muteON", "/sprites/muteON.png");
 k.loadSprite("muteOff", "/sprites/muteOFF.png");
 k.loadSprite("WPM", "/sprites/WPM.png");
-k.loadSprite("icon_0", "/sprites/icon_0.png");
 k.loadSprite("icon_02", "/sprites/icon_03.png");
 k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");

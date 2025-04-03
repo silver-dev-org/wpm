@@ -1,13 +1,12 @@
 import { k } from "../kaplay";
 import { EASY_RIVAL_SPEED } from "../constants";
-import { savePlay } from "../systems/saves.js";
+import { savePlay, getPlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export let actualname;
 export const settings = {
     mute: false
 };
-
 k.scene("name_selection", () => {
 
     //CSS
@@ -47,6 +46,8 @@ k.scene("name_selection", () => {
       }
     `;
     document.head.appendChild(style);
+
+    loadMute();
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -106,13 +107,21 @@ k.scene("name_selection", () => {
     k.add([
         k.anchor("center"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.65)),
-        k.text("Get faster and better at technical interviewing by practicing typing code.", {
+        k.text("Get faster and better at technical interviewing ", {
             size: 32,
         }),
         k.color(k.WHITE),
         k.z(21),
     ]);
-
+    k.add([
+        k.anchor("center"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
+        k.text("by practicing typing code.", {
+            size: 32,
+        }),
+        k.color(k.WHITE),
+        k.z(21),
+    ]);
     const title = k.add([
         k.sprite("WPM"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
@@ -122,19 +131,19 @@ k.scene("name_selection", () => {
 
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height()*0),
+        k.pos(k.width() * 0.9, k.height() * 0),
         k.opacity(1),
         k.animate(),
         k.z(50),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height()*0),
+        k.pos(k.width() * 0.9, k.height() * 0),
         k.opacity(0),
         k.animate(),
         k.z(50),
     ]);
-    
+
     let targetText = "Start unmute";
     let maxLength = targetText.length;
     const letterSpacing = 18;
@@ -191,6 +200,15 @@ k.scene("name_selection", () => {
         setColor(aboutText, "about");
     }
 
+    function loadMute()
+    {
+        const playDataString = getPlay(actualname);
+        if (playDataString) {
+            const playData = JSON.parse(playDataString);
+            const mute = playData.mute;
+        }
+    }
+  
     const name = k.add([
         k.text("", { size: 36 }),
         k.textInput(true, 20),
@@ -202,31 +220,33 @@ k.scene("name_selection", () => {
     ]);
 
     let previousInput = "";
+    let lastErrorCount = 0;
     name.onUpdate(() => {
         if (k.isKeyDown("escape")) {
             name.text = "";
             previousInput = "";
+            errorTriggered = false;
             return;
         }
         const input = name.text;
         let newTarget = "Start unmute";
-
-        if (input.toLowerCase().startsWith("start m")) {
-            newTarget = "Start mute";
-        } else if (input.toLowerCase().startsWith("start u")) {
-            newTarget = "Start unmute";
-        } else if (input.length > 0) {
-            const firstChar = input[0].toLowerCase();
-            switch (firstChar) {
-                case "a":
-                    newTarget = "About";
-                    break;
-                case "g":
-                    newTarget = "Github";
-                    break;
-                default:
-                    newTarget = "Start unmute";
-            }
+        const lower = input.toLowerCase();
+    
+        switch (true) {
+            case lower.startsWith("start m"):
+                newTarget = "Start mute";
+                break;
+            case lower.startsWith("start u"):
+                newTarget = "Start unmute";
+                break;
+            case lower.startsWith("start a"):
+                newTarget = "Start about";
+                break;
+            case lower.startsWith("start g"):
+                newTarget = "Start github";
+                break;
+            default:
+                newTarget = "Start unmute";
         }
 
         if (newTarget !== targetText) {
@@ -243,10 +263,14 @@ k.scene("name_selection", () => {
                 }
             }
         }
+        
+        if (localErrorCount > lastErrorCount) {
+            preventError();
+        }
+        lastErrorCount = localErrorCount;
 
         if (localErrorCount > 2 && input.length > previousInput.length) {
             name.text = previousInput;
-            k.play("wrong_typing");
             preventError();
             return;
         } else {
@@ -279,7 +303,7 @@ k.scene("name_selection", () => {
                 underscoreObjects[i].opacity = 0;
             }
         }
-        if (input.toLowerCase() === "github") {
+        if (input.toLowerCase() === "start github") {
             window.open("https://github.com/conanbatt/wpm", "_blank");
             name.text = "";
         }
@@ -287,7 +311,7 @@ k.scene("name_selection", () => {
             name.text = "";
         }
         if (input.toLowerCase() === "start mute") {
-            settings.mute = false;
+            settings.mute = true;
             k.volume(0);
             button_muteON.opacity = 1;
             button_muteOFF.opacity = 0;
@@ -296,7 +320,7 @@ k.scene("name_selection", () => {
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
 
         } else if (input.toLowerCase() === "start unmute") {
-            settings.mute = true;
+            settings.mute = false;
             k.volume(0.5);
             button_muteON.opacity = 0;
             button_muteOFF.opacity = 1;
@@ -310,17 +334,21 @@ k.scene("name_selection", () => {
 
     function preventError() {
         k.shake(2);
+        if (!settings.mute) {
+            k.play("wrong_typing");
+        }
     }
+    
     k.onKeyPress((keyPressed) => {
 
         if (keyPressed != "backspace") {
-            if (settings.mute) {
+            if (!settings.mute) {
                 k.play("code_sound");
             }
         }
     });
 
-    if (settings.mute) {
+    if (!settings.mute) {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
         k.volume(0.3);

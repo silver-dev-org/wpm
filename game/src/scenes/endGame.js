@@ -6,9 +6,6 @@ import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 k.scene("endgame", () => {
     k.loadMusic("endgame", "/sounds/endgame.mp3");
-    k.loadSprite("BG_analitycsACC", "/sprites/BG_analitycsACC.png");
-    k.loadSprite("BG_analitycsAWPM", "/sprites/BG_analitycsAWPM.png");
-    k.loadSprite("BG_analitycsAWPM_B", "/sprites/BG_analitycsAWPM_B.png");
     //CSS
     const style = document.createElement("style");
     style.innerHTML = `
@@ -92,7 +89,7 @@ k.scene("endgame", () => {
     function updateMusicVolume() {
         clearInterval(volumeIncrease);
 
-        if (!settings.mute) {
+        if (settings.mute) {
             music.volume = 0.0;
         } else {
             let currentVolume = 0.0;
@@ -113,15 +110,6 @@ k.scene("endgame", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-
-    k.add([
-        k.sprite("icon_0"),
-        resizablePos(() => k.vec2(k.width() * 0.77, k.height() * 0.38)),
-        k.anchor("center"),
-        k.opacity(0),
-        k.z(18),
-    ]);
-
 
     const username = actualname;
     const retrievedData = getPlay(username);
@@ -149,44 +137,21 @@ k.scene("endgame", () => {
         best_lpm = lpm;
         best_acc = acc;
     }
-
     k.add([
-        k.sprite("BG_analitycsAWPM"),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.55)),
+        k.text("ACC", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.22, k.height() * 0.58)),
         k.anchor("center"),
+        k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
-        k.sprite("BG_analitycsACC"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.55)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    k.add([
-        k.sprite("BG_analitycsAWPM_B"),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.55)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(awpm.toFixed(2), { size: 48, }),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.6)),
+        k.text(acc.toFixed(2) + "%", { size: 36, }),
+        resizablePos(() => k.vec2(k.width() * 0.2, k.height() * 0.6)),
+        k.color(k.YELLOW),
         k.opacity(1),
         k.z(19),
-    ]),
-        k.add([
-            k.text(acc.toFixed(2) + "%", { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
-            k.opacity(1),
-            k.z(19),
-        ]),
-        k.add([
-            k.text(best_awpm.toFixed(2), { size: 48, }),
-            resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.6)),
-            k.opacity(1),
-            k.z(19),
-        ]);
-
+    ]);
+    
     const textPressEnd = k.add([
         k.text("Press ENTER to retry", { size: 36 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
@@ -209,52 +174,79 @@ k.scene("endgame", () => {
         wpm: currentResults.wpm,
         lpm: currentResults.lpm,
         acc: currentResults.acc,
+        mute: settings.mute,
     });
 
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height()*0),
+        k.pos(k.width() * 0.9, k.height() * 0),
         k.opacity(1),
         k.animate(),
         k.z(50),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height()*0),
+        k.pos(k.width() * 0.9, k.height() * 0),
         k.opacity(0),
         k.animate(),
         k.z(50),
     ]);
-    
-    k.onKeyPress((keyPressed) => {
-        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-            if (settings.mute) {
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                settings.mute = false;
-                updateMusicVolume();
-            }
-            else {
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                settings.mute = true;
-                updateMusicVolume();
-            }
-            return;
-        }
-    });
 
     if (settings.mute) {
-        button_muteON.opacity = 1;
-        button_muteOFF.opacity = 0;
-        updateMusicVolume();
-    }
-    else {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
         updateMusicVolume();
     }
+    else {
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
+        updateMusicVolume();
+    }
 
+    const chartBaseY = k.height() * 0.7;
+    const maxBarHeight = k.height() * 0.2;
+    const minBarHeight = 20;
+    
+    const scaleBar = (value, maxValue) => {
+        return value === 0 ? minBarHeight : (value / maxValue) * maxBarHeight;
+    };
+    
+    const maxStat = Math.max(wpm, best_wpm, awpm, best_awpm, 1);
+    
+    const bars = [
+        { label: "WPM", value: wpm, x: 0.35, color: k.rgb(255, 100, 100) },
+        { label: "Best WPM", value: best_wpm, x: 0.45, color: k.rgb(100, 255, 100) },
+        { label: "AWPM", value: awpm, x: 0.55, color: k.rgb(100, 100, 255) },
+        { label: "Best AWPM", value: best_awpm, x: 0.65, color: k.rgb(255, 255, 100) }
+    ];
+    
+    bars.forEach(({ label, value, x, color }) => {
+        const barHeight = scaleBar(value, maxStat);
+    
+        k.add([
+            k.rect(30, barHeight),
+            resizablePos(() => k.vec2(k.width() * x, chartBaseY - barHeight / 2)),
+            k.color(color),
+            k.anchor("center"),
+            k.z(20),
+        ]);
+    
+        k.add([
+            k.text(value.toFixed(2), { size: 32 }),
+            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 20)),
+            k.color(color),
+            k.anchor("center"),
+            k.z(21),
+        ]);
+    
+        k.add([
+            k.text(label, { size: 28 }),
+            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 50)),
+            k.color(k.rgb(250, 250, 250)),
+            k.anchor("center"),
+            k.z(21),
+        ]);
+    });
     onKeyPress("enter", () => {
         music.stop();
         k.go("name_selection");

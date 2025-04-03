@@ -10,7 +10,8 @@ import {
     TEXT_START_Y,
     SPACING,
     MAX_BLOCKS,
-    goalBlocks
+    goalBlocks,
+    maxMistakes
 } from "../constants.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
@@ -38,7 +39,7 @@ export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
 let fontSize = 28;
-let fontWidth = 15.5;
+let fontWidth = 15.8;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -124,7 +125,7 @@ const gameScene = (params) => {
     function updateMusicVolume() {
         clearInterval(volumeIncrease);
 
-        if (!settings.mute) {
+        if (settings.mute) {
             music.volume = 0.0;
         } else {
             let currentVolume = 0.0;
@@ -199,7 +200,11 @@ const gameScene = (params) => {
     const matchColorToken = (i, ch) => {
         const themeTokens = theme.tokens;
         const themeAssociations = theme.associations;
-
+        
+        if (i === rivalState.cursorPos) {
+            return COLOR_TEXT_RIVAL;
+       }
+   
         if (ch === " ") return COLOR_TEXT_DEFAULT;
         if (playerState.cursorPos - 1 < i) {
             if (rivalState.cursorPos + 1 > i) {
@@ -379,13 +384,13 @@ const gameScene = (params) => {
     ]);
 
     if (settings.mute) {
-        button_muteON.opacity = 1;
-        button_muteOFF.opacity = 0;
+        button_muteON.opacity = 0;
+        button_muteOFF.opacity = 1;
         updateMusicVolume();
     }
     else {
-        button_muteON.opacity = 0;
-        button_muteOFF.opacity = 1;
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
         updateMusicVolume();
     }
 
@@ -450,7 +455,7 @@ const gameScene = (params) => {
         resizablePos(textboxPos),
         k.sprite("bg"),
         k.anchor("topleft"),
-        k.opacity(0.4),
+        k.opacity(0.3),
     ]);
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
@@ -638,6 +643,7 @@ const gameScene = (params) => {
 
     function preventError() {
         k.shake(2);
+        k.play("wrong_typing");
     }
 
     function nextLine(isRival = false) {
@@ -772,58 +778,12 @@ const gameScene = (params) => {
         eventBuffer[idx]++;
     }
 
-    let sequence = "";
     k.onKeyPress((keyPressed) => {
 
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
 
         if (prevChar === "\n") {
-            return;
-        }
-
-        if (keyPressed.toLowerCase() === "m" && k.isKeyDown("tab")) {
-            if (settings.mute) {
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                settings.mute = false;
-                updateMusicVolume();
-            }
-            else {
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                settings.mute = true;
-                updateMusicVolume();
-            }
-            return;
-        }
-
-        if (k.isKeyDown("alt")) {
-            if (keyPressed === "1" || keyPressed === "2" || keyPressed === "4" || keyPressed === "6") {
-                if (sequence.length < 4) {
-                    sequence += keyPressed;
-
-                    if (sequence === "124") {
-                        insertSpecialCharacter("|");
-                    } else if (sequence === "126") {
-                        insertSpecialCharacter("~");
-                    } else {
-                        keyPressed = "";
-                        return;
-                    }
-                } else {
-                    sequence = "";
-                }
-            }
-        }
-
-        k.onKeyRelease("alt", () => {
-            sequence = "";
-        });
-
-        function insertSpecialCharacter(symbol) {
-            keyPressed = symbol;
-            sequence = "";
             return;
         }
 
@@ -840,7 +800,7 @@ const gameScene = (params) => {
             return;
         }
 
-        if (errorCharsIndexes.length > 1) {
+        if (errorCharsIndexes.length > maxMistakes) {
             return preventError();
         }
 
@@ -857,7 +817,7 @@ const gameScene = (params) => {
         isCorrect = key === correctChar;
 
         if (isCorrect) {
-            if (settings.mute) {
+            if (!settings.mute) {
                 k.play("code_sound");
             }
             totalCorrectChars++;
@@ -868,7 +828,7 @@ const gameScene = (params) => {
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
-            if (settings.mute) {
+            if (!settings.mute) {
                 k.play("wrong_typing");
             }
             totalIcorrectCorrectChars++;

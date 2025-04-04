@@ -86,7 +86,7 @@ k.scene("name_selection", () => {
     ]);
     const StartText = k.add([
         k.anchor("top"),
-        k.text("Start", { size: 36 }),
+        k.text("Mute", { size: 36 }),
         resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.9)),
         k.opacity(1),
         k.z(21),

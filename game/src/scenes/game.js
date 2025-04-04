@@ -647,7 +647,10 @@ const gameScene = (params) => {
 
     function preventError() {
         k.shake(2);
-        k.play("wrong_typing");
+        if(!settings.mute)
+        {
+            k.play("wrong_typing");
+        }
     }
 
     function nextLine(isRival = false) {

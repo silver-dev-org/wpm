@@ -270,6 +270,7 @@ k.scene("name_selection", () => {
                     localErrorCount++;
                 }
             }
+            
         }
         
         if (localErrorCount > lastErrorCount) {
@@ -286,19 +287,15 @@ k.scene("name_selection", () => {
         }
 
         for (let i = 0; i < maxLength; i++) {
-            if (input[i]) {
-                if (input[i].toLowerCase() === targetText[i].toLowerCase()) {
-                    letterObjects[i].text = input[i];
-                    letterObjects[i].text = input[i];
-                    letterObjects[i].color = k.rgb(255, 255, 0);
-                } else {
-                    letterObjects[i].text = input[i];
-                    letterObjects[i].color = k.rgb(255, 0, 0);
-                }
-            } else {
-                letterObjects[i].text = targetText[i];
-                letterObjects[i].color = k.rgb(128, 128, 128);
-            }
+            const char = input[i], correct = targetText[i];
+            const displayChar = !char ? correct : (char === " " ? (correct === " " ? " " : "_") : char);
+            const color = !char 
+                ? k.rgb(128, 128, 128) 
+                : (char === " " 
+                    ? (correct === " " ? k.rgb(255, 255, 0) : k.rgb(255, 0, 0)) 
+                    : (char.toLowerCase() === correct.toLowerCase() ? k.rgb(255, 255, 0) : k.rgb(255, 0, 0)));
+            letterObjects[i].text = displayChar;
+            letterObjects[i].color = color;
         }
 
         for (let i = 0; i < underscoreObjects.length; i++) {

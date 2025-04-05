@@ -9,7 +9,20 @@ export const settings = {
 };
 
 k.scene("name_selection", () => {
-    //CSS
+    const targetRules = [
+        { re: /^start m/i, target: "Start mute" },
+        { re: /^start u/i, target: "Start unmute" },
+        { re: /^start a/i, target: "Start about" },
+        { re: /^start g/i, target: "Start github" },
+        { re: /.*/,       target: "Start unmute" },
+    ];
+
+    function calcNewTarget(input) {
+        const rule = targetRules.find(r => r.re.test(input));
+        return rule.target;
+    }
+
+    // CSS
     const style = document.createElement("style");
     style.innerHTML = `
       :root {
@@ -90,7 +103,6 @@ k.scene("name_selection", () => {
         resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.9)),
         k.opacity(1),
         k.z(21),
-
     ]);
     const gitText = k.add([
         k.anchor("top"),
@@ -197,13 +209,12 @@ k.scene("name_selection", () => {
             }
         }
 
-        setColor(StartText, "Start unmute");
-        setColor(gitText, "github");
-        setColor(aboutText, "about");
+        setColor(StartText, "start unmute");
+        setColor(gitText, "start github");
+        setColor(aboutText, "start about");
     }
 
-    function loadMute()
-    {
+    function loadMute() {
         const playDataString = getPlay(actualname);
         if (playDataString) {
             const playData = JSON.parse(playDataString);
@@ -223,96 +234,103 @@ k.scene("name_selection", () => {
 
     let previousInput = "";
     let lastErrorCount = 0;
+
     name.onUpdate(() => {
-
-        if (name.text.length > maxLength && !k.isKeyDown("backspace")) {
-            name.text = name.text.substring(0, maxLength);
-            return;
-        }
-
         if (k.isKeyDown("escape")) {
             name.text = "";
             previousInput = "";
-            errorTriggered = false;
             return;
         }
-        const input = name.text;
-        let newTarget = "Start unmute";
-        const lower = input.toLowerCase();
     
-        switch (true) {
-            case lower.startsWith("start m"):
-                newTarget = "Start mute";
-                break;
-            case lower.startsWith("start u"):
-                newTarget = "Start unmute";
-                break;
-            case lower.startsWith("start a"):
-                newTarget = "Start about";
-                break;
-            case lower.startsWith("start g"):
-                newTarget = "Start github";
-                break;
-            default:
-                newTarget = "Start unmute";
+        const input = name.text;
+        if (input.length === maxLength) {
+            let anyError = false;
+            for (let i = 0; i < maxLength; i++) {
+                if (input[i].toLowerCase() !== targetText[i]?.toLowerCase()) {
+                    anyError = true;
+                    break;
+                }
+            }
+            if (anyError) {
+                name.text = input.substring(0, maxLength - 1);
+                preventError();
+                return;
+            }
         }
 
+        const newTarget = calcNewTarget(input.toLowerCase());
+        
         if (newTarget !== targetText) {
             targetText = newTarget;
             maxLength = targetText.length;
             createLetterObjects();
         }
-
-        let localErrorCount = 0;
-        for (let i = 0; i < maxLength; i++) {
-            if (input[i]) {
-                if (input[i].toLowerCase() !== targetText[i].toLowerCase()) {
-                    localErrorCount++;
-                }
-            }
-            
-        }
         
+        let localErrorCount = 0;
+        let lastErrorIndex = -1;
+    
+        for (let i = 0; i < input.length; i++) {
+            if (input[i].toLowerCase() !== targetText[i]?.toLowerCase()) {
+                localErrorCount++;
+                lastErrorIndex = i;
+            }
+        }
+    
         if (localErrorCount > lastErrorCount) {
             preventError();
         }
-        lastErrorCount = localErrorCount;
 
-        if (localErrorCount > 2 && input.length > previousInput.length) {
+        lastErrorCount = localErrorCount;
+        if (input.length > previousInput.length && localErrorCount >= 3) {
             name.text = previousInput;
             preventError();
             return;
-        } else {
-            previousInput = name.text;
         }
-
-        for (let i = 0; i < maxLength; i++) {
-            const char = input[i], correct = targetText[i];
-            const displayChar = !char ? correct : (char === " " ? (correct === " " ? " " : "_") : char);
-            const color = !char 
-                ? k.rgb(128, 128, 128) 
-                : (char === " " 
-                    ? (correct === " " ? k.rgb(255, 255, 0) : k.rgb(255, 0, 0)) 
-                    : (char.toLowerCase() === correct.toLowerCase() ? k.rgb(255, 255, 0) : k.rgb(255, 0, 0)));
-            letterObjects[i].text = displayChar;
-            letterObjects[i].color = color;
+    
+        if (localErrorCount >= 2 && input.length > lastErrorIndex + 1) {
+            name.text = input.slice(0, lastErrorIndex + 1);
+            preventError();
+            return;
         }
-
-        for (let i = 0; i < underscoreObjects.length; i++) {
-            if (i === input.length) {
-                underscoreObjects[i].color = k.rgb(255, 255, 0);
-                let blink = Math.abs(Math.sin(k.time() * 5));
-                underscoreObjects[i].opacity = blink;
-            } else {
-                underscoreObjects[i].color = k.WHITE;
-                underscoreObjects[i].opacity = 0;
+    
+        previousInput = name.text;
+    
+        letterObjects.forEach((letterObj, i) => {
+            let char = input[i];
+            const correct = targetText[i];
+            let displayChar = char;
+            
+            if (char === " " && correct !== " ") {
+                displayChar = "_";
+            } else if (!char) {
+                displayChar = correct;
             }
-        }
+            
+            const color = !char
+                ? k.rgb(128, 128, 128)
+                : ((char === " " && correct !== " ") || (char.toLowerCase() !== correct.toLowerCase())
+                    ? k.rgb(255, 0, 0)
+                    : k.rgb(255, 255, 0));
+                    
+            letterObj.text = displayChar;
+            letterObj.color = color;
+        });
+    
+        underscoreObjects.forEach((uObj, i) => {
+            if (i === input.length) {
+                uObj.color = k.rgb(255, 255, 0);
+                const blink = Math.abs(Math.sin(k.time() * 5));
+                uObj.opacity = blink;
+            } else {
+                uObj.opacity = 0;
+            }
+        });
+    
         if (input.toLowerCase() === "start github") {
             window.open("https://github.com/conanbatt/wpm", "_blank");
             name.text = "";
         }
-        if (input.toLowerCase() === "about") {
+        if (input.toLowerCase() === "start about") {
             name.text = "";
         }
         if (input.toLowerCase() === "start mute") {
@@ -320,37 +338,41 @@ k.scene("name_selection", () => {
             k.volume(0);
             button_muteON.opacity = 0;
             button_muteOFF.opacity = 1;
-            const playData = { userName: input };
-            savePlay(playData);
+            savePlay({ userName: input });
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
-
         } else if (input.toLowerCase() === "start unmute") {
             settings.mute = false;
             k.volume(0.5);
             button_muteON.opacity = 1;
             button_muteOFF.opacity = 0;
-            const playData = { userName: input };
-            savePlay(playData);
+            savePlay({ userName: input });
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
         }
-
+    
         updateTextColors();
     });
-
+    
     if (settings.mute) {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
-    }
-    else {
+    } else {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
     }
     
+    let isPreventingError = false;
+
     function preventError() {
+        if (isPreventingError) return;
+    
+        isPreventingError = true;
         k.shake(2);
         if (!settings.mute) {
             k.play("wrong_typing");
         }
+        k.wait(0.3, () => {
+            isPreventingError = false;
+        });
     }
     
     k.onKeyPress((keyPressed) => {

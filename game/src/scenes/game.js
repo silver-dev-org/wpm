@@ -32,7 +32,7 @@ export let actual_acc = 0;
 export let actual_awpm = 0;
 export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
-export let totalTypedCharacters = -1;
+export let totalTypedCharacters = 0;
 export let totalCorrectlines = 0;
 export let goal_wpm = actual_wpm;
 export let goal_awpm = actual_awpm;
@@ -278,7 +278,7 @@ const gameScene = (params) => {
         actual_acc = 0;
         totalCorrectChars = 0;
         totalIcorrectCorrectChars = 0;
-        totalTypedCharacters = -1;
+        totalTypedCharacters = 0;
         totalCorrectlines = 0;
         actual_rivalSpeed = EASY_RIVAL_SPEED;
         errorCharsIndexes = [];
@@ -712,7 +712,6 @@ const gameScene = (params) => {
         k.loop(0.1, () => {
             startTime += 0.1;
             analitycs_calculate();
-
         });
 
         k.loop(rivalSpeed, () => {
@@ -802,62 +801,46 @@ const gameScene = (params) => {
     }
 
     k.onKeyPress((keyPressed) => {
-
         const curChar = fixedText[playerState.cursorPos];
-        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
-
-        if (prevChar === "\n") {
-            return;
-        }
-
+        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos - 1] : '';
+    
+        if (prevChar === "\n") return;
+    
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
         let isCorrect = false;
-
-        if (keyPressed != "backspace") {
-            totalTypedCharacters++;
-        }
-        if (key == "enter" || key == "backspace") {
-            return;
-        }
-
-        if (errorCharsIndexes.length > maxMistakes) {
-            return preventError();
-        }
-
-        // Setting key
-        if (key.length == 1) {
+    
+        if (key === "backspace" || key === "enter" || key === "shift") return;
+    
+        if (key.length === 1) {
             key = shifting ? key.toUpperCase() : key;
-        } else if (key == "space") {
+        } else if (key === "space") {
             key = " ";
             errorKey = "_";
         } else {
             return;
         }
-
+        totalTypedCharacters++; 
         isCorrect = key === correctChar;
-
+    
         if (isCorrect) {
-            if (!settings.mute) {
-                k.play("code_sound");
-            }
+            if (!settings.mute) k.play("code_sound");
             totalCorrectChars++;
             addCorrectEvent();
             nextChar();
         } else {
+            if (errorCharsIndexes.length > maxMistakes) return preventError();
+    
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
-            if (!settings.mute) {
-                k.play("wrong_typing");
-            }
+            if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
         }
     });
-
     // Line jump
     k.onKeyPress("enter", () => {
         const correctChar = fixedText[playerState.cursorPos];

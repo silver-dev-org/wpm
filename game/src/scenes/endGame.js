@@ -149,7 +149,7 @@ k.scene("endgame", () => {
         k.opacity(1),
         k.z(19),
     ]);
-    
+
     const textPressEnd = k.add([
         k.text("Press ENTER to retry", { size: 36 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
@@ -202,25 +202,24 @@ k.scene("endgame", () => {
     }
 
     const chartBaseY = k.height() * 0.7;
-    const maxBarHeight = k.height() * 0.1;
-    const minBarHeight = 10;
-    
-    const expectedMaxStat = 30;
-    
+    const maxBarHeight = k.height() * 0.15;
+    const minBarHeight = 20;
+
+    const expectedMaxStat = 100;
+
     const scaleBar = (value) => {
-        return value === 0 ? minBarHeight : (value / expectedMaxStat) * maxBarHeight;
+        const v = Math.max(0, Math.min(value, expectedMaxStat));
+        return minBarHeight + (v / expectedMaxStat) * (maxBarHeight - minBarHeight);
     };
-    
     const bars = [
         { label: "WPM", value: wpm, x: 0.35, color: k.rgb(255, 100, 100) },
         { label: "Best WPM", value: best_wpm, x: 0.45, color: k.rgb(100, 255, 100) },
         { label: "AWPM", value: awpm, x: 0.55, color: k.rgb(100, 100, 255) },
         { label: "Best AWPM", value: best_awpm, x: 0.65, color: k.rgb(255, 255, 100) }
     ];
-    
+
     bars.forEach(({ label, value, x, color }) => {
         const barHeight = scaleBar(value);
-    
         k.add([
             k.rect(30, barHeight),
             resizablePos(() => k.vec2(k.width() * x, chartBaseY - barHeight / 2)),
@@ -228,7 +227,7 @@ k.scene("endgame", () => {
             k.anchor("center"),
             k.z(20),
         ]);
-    
+
         k.add([
             k.text(value.toFixed(2), { size: 32 }),
             resizablePos(() => k.vec2(k.width() * x, chartBaseY + 20)),
@@ -236,7 +235,7 @@ k.scene("endgame", () => {
             k.anchor("center"),
             k.z(21),
         ]);
-    
+
         k.add([
             k.text(label, { size: 28 }),
             resizablePos(() => k.vec2(k.width() * x, chartBaseY + 70)),
@@ -245,12 +244,12 @@ k.scene("endgame", () => {
             k.z(21),
         ]);
     });
-    
+
     const boxWidth = k.width() * 0.4;
     const boxHeight = 300;
     const boxX = k.width() * 0.3;
     const boxY = chartBaseY - 250;
-    
+
     k.add([
         k.rect(boxWidth, boxHeight),
         k.pos(boxX, boxY),
@@ -259,7 +258,7 @@ k.scene("endgame", () => {
         k.z(20),
         k.opacity(0.03),
     ]);
-    
+
     k.add([
         k.rect(5, boxHeight),
         k.pos(boxX, boxY),
@@ -267,7 +266,7 @@ k.scene("endgame", () => {
         k.anchor("topleft"),
         k.z(51),
     ]);
-    
+
     k.add([
         k.rect(boxWidth, 5),
         k.pos(boxX, boxY + boxHeight - 5),
@@ -275,7 +274,7 @@ k.scene("endgame", () => {
         k.anchor("topleft"),
         k.z(51),
     ]);
-    
+
     onKeyPress("enter", () => {
         music.stop();
         k.go("name_selection");

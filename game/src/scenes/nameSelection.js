@@ -9,12 +9,15 @@ export const settings = {
 };
 
 k.scene("name_selection", () => {
+    k.loadSprite("icon_02", "/sprites/icon_02.png");
+    k.loadSprite("icon_01", "/sprites/icon_01.png");
+    k.loadMusic("videogame", "/sounds/videogame.mp3");
     const targetRules = [
         { re: /^start m/i, target: "Start mute" },
         { re: /^start u/i, target: "Start unmute" },
         { re: /^start a/i, target: "Start about" },
         { re: /^start g/i, target: "Start github" },
-        { re: /.*/,       target: "Start unmute" },
+        { re: /.*/, target: "Start unmute" },
     ];
 
     function calcNewTarget(input) {
@@ -62,13 +65,14 @@ k.scene("name_selection", () => {
 
     k.volume(0.5);
     loadMute();
-    
+
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),
     ]);
+
     const btn_githublink = add([
         rect(80, 50, { radius: 8 }),
         resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.70)),
@@ -221,7 +225,7 @@ k.scene("name_selection", () => {
             const mute = playData.mute;
         }
     }
-  
+
     const name = k.add([
         k.text("", { size: 36 }),
         k.textInput(true, 20),
@@ -241,7 +245,7 @@ k.scene("name_selection", () => {
             previousInput = "";
             return;
         }
-    
+
         const input = name.text;
         if (input.length === maxLength) {
             let anyError = false;
@@ -259,23 +263,23 @@ k.scene("name_selection", () => {
         }
 
         const newTarget = calcNewTarget(input.toLowerCase());
-        
+
         if (newTarget !== targetText) {
             targetText = newTarget;
             maxLength = targetText.length;
             createLetterObjects();
         }
-        
+
         let localErrorCount = 0;
         let lastErrorIndex = -1;
-    
+
         for (let i = 0; i < input.length; i++) {
             if (input[i].toLowerCase() !== targetText[i]?.toLowerCase()) {
                 localErrorCount++;
                 lastErrorIndex = i;
             }
         }
-    
+
         if (localErrorCount > lastErrorCount) {
             preventError();
         }
@@ -286,36 +290,36 @@ k.scene("name_selection", () => {
             preventError();
             return;
         }
-    
+
         if (localErrorCount >= 2 && input.length > lastErrorIndex + 1) {
             name.text = input.slice(0, lastErrorIndex + 1);
             preventError();
             return;
         }
-    
+
         previousInput = name.text;
-    
+
         letterObjects.forEach((letterObj, i) => {
             let char = input[i];
             const correct = targetText[i];
             let displayChar = char;
-            
+
             if (char === " " && correct !== " ") {
                 displayChar = "_";
             } else if (!char) {
                 displayChar = correct;
             }
-            
+
             const color = !char
                 ? k.rgb(128, 128, 128)
                 : ((char === " " && correct !== " ") || (char.toLowerCase() !== correct.toLowerCase())
                     ? k.rgb(255, 0, 0)
                     : k.rgb(255, 255, 0));
-                    
+
             letterObj.text = displayChar;
             letterObj.color = color;
         });
-    
+
         underscoreObjects.forEach((uObj, i) => {
             if (i === input.length) {
                 uObj.color = k.rgb(255, 255, 0);
@@ -325,7 +329,7 @@ k.scene("name_selection", () => {
                 uObj.opacity = 0;
             }
         });
-    
+
         if (input.toLowerCase() === "start github") {
             window.open("https://github.com/conanbatt/wpm", "_blank");
             name.text = "";
@@ -348,10 +352,10 @@ k.scene("name_selection", () => {
             savePlay({ userName: input });
             k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
         }
-    
+
         updateTextColors();
     });
-    
+
     if (settings.mute) {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
@@ -359,12 +363,12 @@ k.scene("name_selection", () => {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
     }
-    
+
     let isPreventingError = false;
 
     function preventError() {
         if (isPreventingError) return;
-    
+
         isPreventingError = true;
         k.shake(2);
         if (!settings.mute) {
@@ -374,7 +378,7 @@ k.scene("name_selection", () => {
             isPreventingError = false;
         });
     }
-    
+
     k.onKeyPress((keyPressed) => {
 
         if (keyPressed != "backspace") {

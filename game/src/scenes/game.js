@@ -61,11 +61,12 @@ let fixedText = "";
  */
 const gameScene = (params) => {
     k.loadMusic("endgame", "/sounds/endgame.mp3");
+    k.loadSprite("bg4", "/sprites/bg4.png");
+    k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
+    k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
     k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
     k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
     k.loadSprite("BG_analitycs9", "/sprites/BG_AWPM_IN_GAME.png");
-    k.loadSprite("bg4", "/sprites/bg4.png");
-    k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     let startTime = 0;
     let jumpCount = 0;
     let theme = themes[0];
@@ -328,11 +329,16 @@ const gameScene = (params) => {
         k.z(51),
     ]);
     const textboxBack = k.add([
-        k.sprite("bg4"),
-        k.anchor("topleft"),
-        k.opacity(1),
-        k.z(50),
+        k.pos(1000, 0),
+        k.sprite("bg4", {
+            tiled: true,
+            width: 2000,
+            height: 54,
+        }),
+        k.anchor("top"),
+        k.z(10),
     ]);
+
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
@@ -468,12 +474,14 @@ const gameScene = (params) => {
     const textPadding = k.vec2(70, 200);
 
     k.volume(0.5);
-    const textbox = k.add([
 
+    const textbox = k.add([
+        k.rect(1920, 1080, { radius: 8 }),
+        k.color(k.rgb(19, 49, 58)),
         resizablePos(textboxPos),
-        k.sprite("bg"),
         k.anchor("topleft"),
-        k.opacity(0.3),
+        k.opacity(0.2),
+        k.z(0),
     ]);
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
@@ -803,17 +811,17 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos - 1] : '';
-    
+
         if (prevChar === "\n") return;
-    
+
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
         let isCorrect = false;
-    
+
         if (key === "backspace" || key === "enter" || key === "shift") return;
-    
+
         if (key.length === 1) {
             key = shifting ? key.toUpperCase() : key;
         } else if (key === "space") {
@@ -822,9 +830,9 @@ const gameScene = (params) => {
         } else {
             return;
         }
-        totalTypedCharacters++; 
+        totalTypedCharacters++;
         isCorrect = key === correctChar;
-    
+
         if (isCorrect) {
             if (!settings.mute) k.play("code_sound");
             totalCorrectChars++;
@@ -832,7 +840,7 @@ const gameScene = (params) => {
             nextChar();
         } else {
             if (errorCharsIndexes.length > maxMistakes) return preventError();
-    
+
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();

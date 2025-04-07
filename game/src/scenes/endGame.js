@@ -5,7 +5,6 @@ import { actualname, settings } from "./nameSelection.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 k.scene("endgame", () => {
-    k.loadMusic("endgame", "/sounds/endgame.mp3");
     //CSS
     const style = document.createElement("style");
     style.innerHTML = `
@@ -118,7 +117,6 @@ k.scene("endgame", () => {
 
         console.log("Load data:", retrievedData);
         reciveprevdata = retrievedData;
-        console.log(prevdata);
         prevdata = JSON.parse(reciveprevdata);
         prev_awpm = parseFloat(prevdata.awpm) || 0;
         prev_wpm = parseFloat(prevdata.wpm) || 0;

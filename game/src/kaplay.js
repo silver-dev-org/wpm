@@ -15,3 +15,5 @@ export const k = kaplay({
     crisp: false,
     texFilter: "nearest",
 });
+k.onLoading((progress) => {
+});

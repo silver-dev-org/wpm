@@ -818,7 +818,7 @@ const gameScene = (params) => {
 
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
-        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos - 1] : '';
+        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
 
         if (prevChar === "\n") return;
 

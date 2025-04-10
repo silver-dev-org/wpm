@@ -11,7 +11,8 @@ import {
     SPACING,
     MAX_BLOCKS,
     goalBlocks,
-    maxMistakes
+    maxMistakes,
+    ICON_START_Y
 } from "../constants.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
@@ -61,7 +62,6 @@ let fixedText = "";
  */
 const gameScene = (params) => {
     k.loadMusic("endgame", "/sounds/endgame.mp3");
-    k.loadSprite("bg4", "/sprites/bg4.png");
     k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
     k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
@@ -254,15 +254,31 @@ const gameScene = (params) => {
         return charColor;
     };
 
+    let rivalTimer = 0;
 
     k.onUpdate(() => {
-        //let currentTime =  k.time();
-        let totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
-        let awpm = totalEventsLast60 / 5;
+        startTime += k.dt();
+        analitycs_calculate();
+
+        rivalTimer += k.dt();
+        if (rivalTimer >= rivalSpeed) {
+            rivalTimer -= rivalSpeed;
+            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                rivalWrite();
+            } else {
+                music.stop();
+                k.go("endgame", { rivalSpeed: actual_rivalSpeed });
+                StatsforAnalitics();
+                resetGameStats();
+            }
+        }
+
+        const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
+        const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
         awmp_text.text = Math.floor(awpm).toString();
-    });
 
+    });
 
     function StatsforAnalitics() {
         goal_wpm = actual_wpm;
@@ -344,27 +360,39 @@ const gameScene = (params) => {
         ts: "icon_01",
         default: "icon_02",
     };
-
+    
     const texts = dialogsData.map(item => ({
         title: item.title,
         language: item.language || "default",
     }));
+    
     texts.slice(0, MAX_BLOCKS).forEach(({ title, language }, index) => {
         const spriteKey = languageIconMap[language] ?? languageIconMap.default;
-
+    
+        const spriteAsset = k.getSprite(spriteKey);
+        let scaleFactor = 1;
+        const desiredWidth = k.width() * 0.025;
+    
+        if (spriteAsset?.data?.width) {
+            scaleFactor = desiredWidth / spriteAsset.data.width;
+        } else {
+            console.warn(`Sprite "${spriteKey}" undefined assets`);
+        }
+    
         k.add([
             k.sprite(spriteKey),
+            k.scale(scaleFactor),
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.02,
-                    k.height() * (TEXT_START_Y + SPACING * index)
+                    k.height() * (ICON_START_Y + SPACING * index)
                 )
             ),
             k.opacity(1),
             k.z(55),
             "challengeIcon",
         ]);
-
+    
         k.add([
             k.text(title, { size: 28 }),
             resizablePos(() =>
@@ -379,6 +407,7 @@ const gameScene = (params) => {
             { menuIndex: index },
         ]);
     });
+    
     const text_challenge = k.add([
         k.text("Challenges", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.03, k.height() * 0.25)),
@@ -716,27 +745,6 @@ const gameScene = (params) => {
         }
     }
 
-    function startTimer() {
-        k.loop(0.1, () => {
-            startTime += 0.1;
-            analitycs_calculate();
-        });
-
-        k.loop(rivalSpeed, () => {
-            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
-                rivalWrite();
-            }
-            else {
-                music.stop();
-                k.go("endgame", {
-                    rivalSpeed: actual_rivalSpeed,
-                });
-                StatsforAnalitics();
-                resetGameStats();
-            }
-        });
-    }
-
     const awmp_text = k.add([
         k.anchor("center"),
         k.pos(k.width() * 0.4, k.height() * 0.02),
@@ -776,7 +784,7 @@ const gameScene = (params) => {
     }
 
     function analitycs_calculate() {
-        time_text.text = "" + startTime.toFixed(1);
+        time_text.text = startTime.toFixed(1);
         if (startTime > 0 && totalCorrectChars > 5) {
             actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
             actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
@@ -895,7 +903,6 @@ const gameScene = (params) => {
         }
     });
 
-    startTimer();
     updateDialog();
 };
 

@@ -81,30 +81,30 @@ k.scene("selection", () => {
         k.opacity(1),
         k.z(21),
     ]);
-    const gitText = k.add([
-        k.anchor("left"),
-        k.text("Github", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.62)),
-        k.opacity(1),
-        k.z(21),
-    ]);
-    const aboutText = k.add([
-        k.anchor("left"),
-        k.text("About", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.64)),
-        k.opacity(1),
-        k.z(21),
-    ]);
     const muteText = k.add([
         k.anchor("left"),
         k.text("Mute", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.66)),
+        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.62)),
         k.opacity(1),
         k.z(21),
     ]);
     const unmuteText = k.add([
         k.anchor("left"),
         k.text("Unmute", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.64)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const gitText = k.add([
+        k.anchor("left"),
+        k.text("Github", { size: 24 }),
+        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.66)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const aboutText = k.add([
+        k.anchor("left"),
+        k.text("About", { size: 24 }),
         resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.68)),
         k.opacity(1),
         k.z(21),

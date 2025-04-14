@@ -19,7 +19,7 @@ import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
-import { settings } from "./nameSelection.js";
+import { settings } from "./selectionScene.js";
 let titles = dialogsData.map((item) => item.title);
 
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#5c5a5a");
@@ -360,25 +360,25 @@ const gameScene = (params) => {
         ts: "icon_01",
         default: "icon_02",
     };
-    
+
     const texts = dialogsData.map(item => ({
         title: item.title,
         language: item.language || "default",
     }));
-    
+
     texts.slice(0, MAX_BLOCKS).forEach(({ title, language }, index) => {
         const spriteKey = languageIconMap[language] ?? languageIconMap.default;
-    
+
         const spriteAsset = k.getSprite(spriteKey);
         let scaleFactor = 1;
         const desiredWidth = k.width() * 0.025;
-    
+
         if (spriteAsset?.data?.width) {
             scaleFactor = desiredWidth / spriteAsset.data.width;
         } else {
             console.warn(`Sprite "${spriteKey}" undefined assets`);
         }
-    
+
         k.add([
             k.sprite(spriteKey),
             k.scale(scaleFactor),
@@ -392,7 +392,7 @@ const gameScene = (params) => {
             k.z(55),
             "challengeIcon",
         ]);
-    
+
         k.add([
             k.text(title, { size: 28 }),
             resizablePos(() =>
@@ -407,10 +407,10 @@ const gameScene = (params) => {
             { menuIndex: index },
         ]);
     });
-    
+
     const text_challenge = k.add([
         k.text("Challenges", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.03, k.height() * 0.25)),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.15)),
         k.color(k.WHITE),
         k.opacity(1),
     ]);
@@ -494,13 +494,13 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(400, 0);
+            return k.vec2(420, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
     };
 
-    const textPadding = k.vec2(70, 200);
+    const textPadding = k.vec2(50, 100);
 
     k.volume(0.5);
 

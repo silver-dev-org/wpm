@@ -1,7 +1,7 @@
 import { k } from "../kaplay";
 import { goal_acc, goal_lpm, goal_wpm, goal_awpm } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
-import { actualname, settings } from "./nameSelection.js";
+import { actualname, settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 k.scene("endgame", () => {
@@ -277,7 +277,7 @@ k.scene("endgame", () => {
 
     onKeyPress("enter", () => {
         music.stop();
-        k.go("name_selection");
+        k.go("selection");
     });
 
 });

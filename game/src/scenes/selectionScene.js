@@ -12,12 +12,12 @@ k.scene("selection", () => {
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
-    const commands = ["mute", "unmute", "about", "github", "start"];
+    const commands = ["about", "github", "start with sound", "start without sound"];
 
     function calcNewTarget(input) {
-        if (input === "") return "start";
+        if (input === "") return "start with sound";
         const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
-        return found ? found : "start";
+        return found ? found : "start with sound";
     }
 
     // CSS
@@ -67,52 +67,46 @@ k.scene("selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-    const outerBox = k.add([
-        k.rect(240, 240, { radius: 12 }),
-        k.pos(k.width() * 0.30 - 10, k.height() * 0.5),
-        k.color(0, 0, 0),
+    const outsideBox = k.add([
+        k.rect(800, 260, { radius: 2 }),
+        k.pos(k.width() * 0.30 - 10, k.height() * 0.50),
+        k.color(150, 150, 150),
         k.z(20),
         k.opacity(0.3),
     ]);
+    
+    const outerBox = k.add([
+        k.rect(790, 230, { radius: 1 }),
+        k.pos(k.width() * 0.30-5, k.height() * 0.52),
+        k.color(0, 0, 0),
+        k.z(20),
+        k.opacity(1),
+    ]);
     const StartText = k.add([
         k.anchor("left"),
-        k.text("Start", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.6)),
+        k.text("/Start with sound", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.55+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const muteText = k.add([
         k.anchor("left"),
-        k.text("Mute", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.62)),
-        k.opacity(1),
-        k.z(21),
-    ]);
-    const unmuteText = k.add([
-        k.anchor("left"),
-        k.text("Unmute", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.64)),
+        k.text("/Start without sound", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.6+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const gitText = k.add([
         k.anchor("left"),
-        k.text("Github", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.66)),
+        k.text("/Github", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.55+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("left"),
-        k.text("About", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.68)),
-        k.opacity(1),
-        k.z(21),
-    ]);
-    const comandText = k.add([
-        k.anchor("left"),
-        k.text("Comand text", { size: 24 }),
-        resizablePos(() => k.vec2(k.width() * 0.31, k.height() * 0.54)),
+        k.text("/About", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.6+20)),
         k.opacity(1),
         k.z(21),
     ]);
@@ -156,33 +150,32 @@ k.scene("selection", () => {
         k.z(50),
     ]);
 
-    let targetText = "start";
+    let targetText = "start with sound";
     let maxLength = targetText.length;
-    const letterSpacing = 18;
-    let startX = k.width() / 2 - ((maxLength - 1) * letterSpacing) / 2;
+    const letterSpacing = 14;
+    const fixedStartX = k.width() / 2.55 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
-  
+
     function createLetterObjects() {
         letterObjects.forEach(obj => k.destroy(obj));
         underscoreObjects.forEach(obj => k.destroy(obj));
         letterObjects = [];
         underscoreObjects = [];
-        startX = k.width() / 2 - ((maxLength - 1) * letterSpacing) / 2;
         for (let i = 0; i < maxLength; i++) {
             const letter = k.add([
-                k.text(targetText[i], { size: 32 }),
-                k.pos(startX + i * letterSpacing, k.height() / 1.8),
+                k.text(targetText[i], { size: 28 }),
+                k.pos(fixedStartX + i * letterSpacing, k.height() / 1.48),
                 k.anchor("center"),
                 k.color(k.rgb(128, 128, 128)),
                 k.z(22),
                 k.animate(),
             ]);
             letterObjects.push(letter);
-  
+
             const underscore = k.add([
-                k.text("_", { size: 36 }),
-                k.pos(startX + i * letterSpacing, k.height() / 1.7),
+                k.text("_", { size: 32 }),
+                k.pos(fixedStartX + i * letterSpacing, k.height() / 1.45),
                 k.anchor("center"),
                 k.color(k.WHITE),
                 k.z(20),
@@ -195,21 +188,20 @@ k.scene("selection", () => {
     function updateTextColors() {
         const targetLower = targetText.toLowerCase();
         const blink = Math.abs(Math.sin(k.time() * 2));
-  
+
         function setColor(textObj, matchWord) {
             if (targetLower === matchWord.toLowerCase()) {
-                textObj.color = k.rgb(255, 255, 0);
+                textObj.color = k.rgb(0, 153, 255);
                 textObj.opacity = blink;
             } else {
                 textObj.color = k.rgb(255, 255, 255);
                 textObj.opacity = 1;
             }
-        }      
-        setColor(StartText, "start");
+        }
+        setColor(StartText, "start with sound");
         setColor(gitText, "github");
+        setColor(muteText, "start without sound");
         setColor(aboutText, "about");
-        setColor(muteText, "mute");
-        setColor(unmuteText, "unmute");
     }
 
     function loadMute() {
@@ -220,16 +212,22 @@ k.scene("selection", () => {
         }
     }
 
- const name = k.add([
+    const name = k.add([
         k.text("", { size: 36 }),
         k.textInput(true, 20),
-        k.pos(k.width() / 2, k.height() / 1.7),
+        k.pos(fixedStartX, k.height() / 1.48), 
         k.anchor("center"),
         k.color(k.YELLOW),
         k.opacity(0),
         k.z(21),
     ]);
-
+    const slashChar = k.add([
+        k.text("/", { size: 28 }),
+        k.pos(name.pos.x-20, name.pos.y),
+        k.anchor("left"),
+        k.color(k.rgb(0, 153, 255)),
+        k.z(21),
+    ]);
     let previousInput = "";
     let lastErrorCount = 0;
 
@@ -239,8 +237,8 @@ k.scene("selection", () => {
             previousInput = "";
             return;
         }
-
         const input = name.text;
+
         if (input.length === maxLength) {
             let anyError = false;
             for (let i = 0; i < maxLength; i++) {
@@ -264,7 +262,7 @@ k.scene("selection", () => {
                 createLetterObjects();
             }
         }
-        
+
         let localErrorCount = 0;
         let lastErrorIndex = -1;
         for (let i = 0; i < input.length; i++) {
@@ -289,7 +287,7 @@ k.scene("selection", () => {
         }
 
         previousInput = name.text;
-  
+
         letterObjects.forEach((letterObj, i) => {
             let char = input[i];
             const correct = targetText[i];
@@ -303,58 +301,52 @@ k.scene("selection", () => {
                 ? k.rgb(128, 128, 128)
                 : ((char === " " && correct !== " ") || (char.toLowerCase() !== correct.toLowerCase())
                     ? k.rgb(255, 0, 0)
-                    : k.rgb(255, 255, 0));
+                    : k.rgb(0, 153, 255));
             letterObj.text = displayChar;
             letterObj.color = color;
         });
-  
+
         underscoreObjects.forEach((uObj, i) => {
             if (i === input.length) {
-                uObj.color = k.rgb(255, 255, 0);
+                uObj.color = k.rgb(0, 153, 255);
                 const blink = Math.abs(Math.sin(k.time() * 5));
                 uObj.opacity = blink;
             } else {
                 uObj.opacity = 0;
             }
         });
-  
+
         switch (input.toLowerCase()) {
             case "github":
                 window.open("https://github.com/conanbatt/wpm", "_blank");
                 name.text = "";
                 break;
-        
             case "about":
                 name.text = "";
                 break;
-        
-            case "mute":
-                settings.mute = true;
-                k.volume(0);
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                savePlay({ userName: input });
-                name.text = "";
-                break;
-        
-            case "unmute":
+            case "start with sound":
                 settings.mute = false;
                 k.volume(0.5);
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
                 savePlay({ userName: input });
                 name.text = "";
+                k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
                 break;
-        
-            case "start":
+            case "start without sound":
+                settings.mute = true;
+                k.volume(0);
+                button_muteON.opacity = 0;
+                button_muteOFF.opacity = 1;
                 savePlay({ userName: input });
+                name.text = "";
                 k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
                 break;
         }
-  
+
         updateTextColors();
     });
-  
+
     if (settings.mute) {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
@@ -362,7 +354,7 @@ k.scene("selection", () => {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
     }
-  
+
     let isPreventingError = false;
     function preventError() {
         if (isPreventingError) return;
@@ -375,7 +367,7 @@ k.scene("selection", () => {
             isPreventingError = false;
         });
     }
-  
+
     k.onKeyPress((keyPressed) => {
         if (keyPressed !== "backspace") {
             if (!settings.mute) {

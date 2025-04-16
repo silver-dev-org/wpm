@@ -1,9 +1,10 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname, settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
+import { MAX_BLOCKS } from "../constants.js";
 k.scene("endgame", () => {
     //CSS
     const style = document.createElement("style");
@@ -48,6 +49,9 @@ k.scene("endgame", () => {
         k.anchor("center"),
         k.z(18),
     ]);
+
+    let record_blocks = goalCompletedBlocks;
+
     let awpm = goal_awpm;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
@@ -137,14 +141,35 @@ k.scene("endgame", () => {
     }
     k.add([
         k.text("ACC", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.22, k.height() * 0.58)),
+        resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.55)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
+        k.text("CHALLENGES COMPLETED " + record_blocks, { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.8)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("WPM", { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.55)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(wpm.toFixed(2) + "%", { size: 36, }),
+        resizablePos(() => k.vec2(k.width() * 0.48, k.height() * 0.6)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+        k.z(19),
+    ]);
+    k.add([
         k.text(acc.toFixed(2) + "%", { size: 36, }),
-        resizablePos(() => k.vec2(k.width() * 0.2, k.height() * 0.6)),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.6)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.z(19),
@@ -152,7 +177,7 @@ k.scene("endgame", () => {
 
     const textPressEnd = k.add([
         k.text("Press ENTER to retry", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.animate(),
@@ -201,55 +226,70 @@ k.scene("endgame", () => {
         updateMusicVolume();
     }
 
-    const chartBaseY = k.height() * 0.7;
-    const maxBarHeight = k.height() * 0.15;
-    const minBarHeight = 20;
+    const chartScale = 0.6;
+
+    const chartBaseY = k.height() * 0.65;
+    const maxBarHeight = k.height() * 0.15 * chartScale;
+    const minBarHeight = 20 * chartScale;
+    const barWidth = 30 * chartScale;
 
     const expectedMaxStat = 100;
 
     const scaleBar = (value) => {
         const v = Math.max(0, Math.min(value, expectedMaxStat));
-        return minBarHeight + (v / expectedMaxStat) * (maxBarHeight - minBarHeight);
+        const rawHeight = minBarHeight + (v / expectedMaxStat) * (maxBarHeight - minBarHeight);
+        return rawHeight;
     };
+
     const bars = [
-        { label: "WPM", value: wpm, x: 0.35, color: k.rgb(255, 100, 100) },
-        { label: "Best WPM", value: best_wpm, x: 0.45, color: k.rgb(100, 255, 100) },
-        { label: "AWPM", value: awpm, x: 0.55, color: k.rgb(100, 100, 255) },
-        { label: "Best AWPM", value: best_awpm, x: 0.65, color: k.rgb(255, 255, 100) }
+        { label: "WPM", value: wpm, x: 0.62, color: k.rgb(255, 100, 100) },
+        { label: "Best WPM", value: best_wpm, x: 0.67, color: k.rgb(100, 255, 100) },
+        { label: "AWPM", value: awpm, x: 0.72, color: k.rgb(100, 100, 255) },
+        { label: "Best AWPM", value: best_awpm, x: 0.77, color: k.rgb(255, 255, 100) }
     ];
 
     bars.forEach(({ label, value, x, color }) => {
         const barHeight = scaleBar(value);
+
         k.add([
-            k.rect(30, barHeight),
-            resizablePos(() => k.vec2(k.width() * x, chartBaseY - barHeight / 2)),
+            k.rect(barWidth, barHeight),
+            resizablePos(() => k.vec2(
+                k.width() * x,
+                chartBaseY - barHeight / 2
+            )),
             k.color(color),
             k.anchor("center"),
             k.z(20),
         ]);
 
         k.add([
-            k.text(value.toFixed(2), { size: 32 }),
-            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 20)),
+            k.text(value.toFixed(2), { size: 32 * chartScale }),
+            resizablePos(() => k.vec2(
+                k.width() * x,
+                chartBaseY + 20 * chartScale
+            )),
             k.color(color),
             k.anchor("center"),
             k.z(21),
         ]);
 
         k.add([
-            k.text(label, { size: 28 }),
-            resizablePos(() => k.vec2(k.width() * x, chartBaseY + 70)),
+            k.text(label, { size: 24 }),
+            resizablePos(() => k.vec2(
+                k.width() * x,
+                chartBaseY + 70 * chartScale
+            )),
             k.color(k.rgb(250, 250, 250)),
             k.anchor("center"),
             k.z(21),
         ]);
     });
 
-    const boxWidth = k.width() * 0.4;
-    const boxHeight = 300;
-    const boxX = k.width() * 0.3;
-    const boxY = chartBaseY - 250;
-
+    const boxWidth = k.width() * 0.4 * chartScale;
+    const boxHeight = 300 * chartScale;
+    const boxX = k.width() * 0.59;
+    const boxY = chartBaseY - 250 * chartScale;
+    
     k.add([
         k.rect(boxWidth, boxHeight),
         k.pos(boxX, boxY),
@@ -260,7 +300,7 @@ k.scene("endgame", () => {
     ]);
 
     k.add([
-        k.rect(5, boxHeight),
+        k.rect(5 * chartScale, boxHeight),
         k.pos(boxX, boxY),
         k.color(k.rgb(255, 255, 0)),
         k.anchor("topleft"),
@@ -268,14 +308,14 @@ k.scene("endgame", () => {
     ]);
 
     k.add([
-        k.rect(boxWidth, 5),
-        k.pos(boxX, boxY + boxHeight - 5),
+        k.rect(boxWidth, 5 * chartScale),
+        k.pos(boxX, boxY + boxHeight - 5 * chartScale),
         k.color(k.rgb(255, 255, 0)),
         k.anchor("topleft"),
         k.z(51),
     ]);
-
     onKeyPress("enter", () => {
+        record_blocks = 0;
         music.stop();
         k.go("selection");
     });

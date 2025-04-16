@@ -26,7 +26,7 @@ let COLOR_TEXT_DEFAULT = k.Color.fromHex("#5c5a5a");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let actual_rivalSpeed = EASY_RIVAL_SPEED;
-let completedBlocks = 0;
+let completedBlocks = -1;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -39,6 +39,7 @@ export let goal_wpm = actual_wpm;
 export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
+export let goalCompletedBlocks = completedBlocks;
 let fontSize = 28;
 let fontWidth = 15.8;
 let errorCharsIndexes = [];
@@ -285,10 +286,11 @@ const gameScene = (params) => {
         goal_awpm = actual_awpm;
         goal_lpm = actual_lpm;
         goal_acc = actual_acc;
+        goalCompletedBlocks = completedBlocks;
     }
 
     function resetGameStats() {
-        completedBlocks = 0;
+        completedBlocks = -1;
         actual_wpm = 0;
         actual_awpm = 0;
         actual_lpm = 0;
@@ -312,6 +314,34 @@ const gameScene = (params) => {
         }
     };
     const filesFoldersPos = () => k.vec2(0, 0);
+
+    const awmp_text = k.add([
+        k.anchor("center"),
+        k.pos(k.width() * 0.4, k.height() * 0.02),
+        k.text("AWPM: ", {
+            size: 32,
+        }),
+        k.color(k.YELLOW),
+        k.z(50),
+    ]);
+    const wmp_text = k.add([
+        k.anchor("center"),
+        k.pos(k.width() * 0.6, k.height() * 0.02),
+        k.text("0", {
+            size: 32,
+        }),
+        k.color(k.YELLOW),
+        k.z(50),
+    ]);
+    const time_text = k.add([
+        k.anchor("center"),
+        k.pos(k.width() * 0.8, k.height() * 0.02),
+        k.text("time: ", {
+            size: 32,
+        }),
+        k.color(k.YELLOW),
+        k.z(50),
+    ]);
 
     k.add([
         k.sprite("BG_analitycs9"),
@@ -354,7 +384,32 @@ const gameScene = (params) => {
         k.anchor("top"),
         k.z(10),
     ]);
-
+    const text_challenge = k.add([
+        k.text("Challenges", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.1)),
+        k.color(k.WHITE),
+        k.opacity(1),
+    ]);
+    const rest_text = k.add([
+        k.text("ESC to reset", { size: 28 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.9)),
+        k.color(k.YELLOW),
+        k.opacity(1),
+    ]);
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.9, k.height() * 0),
+        k.opacity(1),
+        k.animate(),
+        k.z(50),
+    ]);
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.9, k.height() * 0),
+        k.opacity(0),
+        k.animate(),
+        k.z(50),
+    ]);
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
@@ -407,34 +462,6 @@ const gameScene = (params) => {
             { menuIndex: index },
         ]);
     });
-
-    const text_challenge = k.add([
-        k.text("Challenges", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.15)),
-        k.color(k.WHITE),
-        k.opacity(1),
-    ]);
-    const rest_text = k.add([
-        k.text("ESC to reset", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.9)),
-        k.color(k.YELLOW),
-        k.opacity(1),
-    ]);
-
-    const button_muteON = k.add([
-        k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height() * 0),
-        k.opacity(1),
-        k.animate(),
-        k.z(50),
-    ]);
-    const button_muteOFF = k.add([
-        k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height() * 0),
-        k.opacity(0),
-        k.animate(),
-        k.z(50),
-    ]);
 
     if (settings.mute) {
         button_muteON.opacity = 0;
@@ -500,16 +527,16 @@ const gameScene = (params) => {
         return k.vec2(k.width() * 0.3, 0);
     };
 
-    const textPadding = k.vec2(50, 100);
+    const textPadding = k.vec2(50, 103);
 
     k.volume(0.5);
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
-        k.color(k.rgb(19, 49, 58)),
+        k.color(k.rgb(24, 24, 29)),
         resizablePos(textboxPos),
         k.anchor("topleft"),
-        k.opacity(0.2),
+        k.opacity(0.7),
         k.z(0),
     ]);
     const textboxBackParent = k.add([
@@ -610,7 +637,11 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
-        actual_rivalSpeed -= 0.05;
+        if (completedBlocks > 0 && completedBlocks <= 2) {
+            actual_rivalSpeed -= 0.05;
+        } else if (completedBlocks > 2) {
+            actual_rivalSpeed -= 0.06;
+        }
         musicRate += 0.05;
         updateMusic();
         if (completedBlocks === goalBlocks) {
@@ -745,35 +776,6 @@ const gameScene = (params) => {
         }
     }
 
-    const awmp_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.4, k.height() * 0.02),
-        k.text("AWPM: ", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(50),
-    ]);
-
-    const wmp_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.6, k.height() * 0.02),
-        k.text("0", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(50),
-    ]);
-
-    const time_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.8, k.height() * 0.02),
-        k.text("time: ", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(50),
-    ]);
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {

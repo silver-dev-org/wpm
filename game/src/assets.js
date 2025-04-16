@@ -1,6 +1,6 @@
 // @ts-check
 import { k } from "./kaplay.js";
-k.loadFont("m5x7", "/fonts/m5x7.ttf", {
+k.loadFont("monogram", "/fonts/monogram.ttf", {
     outline: {
         width: 6,
         color: k.rgb(0, 0, 0)

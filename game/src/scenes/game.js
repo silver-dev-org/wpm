@@ -344,12 +344,6 @@ const gameScene = (params) => {
         k.z(50),
     ]);
 
-   /* k.add([
-        k.sprite("BG_analitycs9"),
-        k.pos(k.width() * 0.3, k.height() * 0.023),
-        k.anchor("center"),
-        k.z(51),
-    ]);*/
     k.add([
         k.sprite("BG_analitycs7"),
         k.pos(k.width() * 0.3, k.height() * 0.023),

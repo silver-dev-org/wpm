@@ -17,3 +17,8 @@ export const k = kaplay({
 });
 k.onLoading((progress) => {
 });
+window.addEventListener("keydown", (e) => {
+    if (e.key === "/" || e.key === "?") {
+      e.preventDefault();
+    }
+  });

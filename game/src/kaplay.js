@@ -11,7 +11,7 @@ export const k = kaplay({
     width: 1920,
     height: 1080,
     letterbox: true,
-    pixelDensity: 5,
+    pixelDensity: 3,
     crisp: false,
     texFilter: "nearest",
 });

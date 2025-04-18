@@ -9,7 +9,7 @@ export const settings = {
 };
 
 k.scene("selection", () => {
-    
+
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
@@ -37,10 +37,10 @@ k.scene("selection", () => {
         k.z(20),
         k.opacity(0.3),
     ]);
-    
+
     const outerBox = k.add([
         k.rect(790, 230, { radius: 1 }),
-        k.pos(k.width() * 0.30-5, k.height() * 0.52),
+        k.pos(k.width() * 0.30 - 5, k.height() * 0.52),
         k.color(0, 0, 0),
         k.z(20),
         k.opacity(1),
@@ -48,30 +48,47 @@ k.scene("selection", () => {
     const StartText = k.add([
         k.anchor("left"),
         k.text("Start with sound", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.55+20)),
+        resizablePos(() => k.vec2(k.width() * 0.35 - 40, k.height() * 0.55 + 20)),
         k.opacity(1),
         k.z(21),
     ]);
     const muteText = k.add([
         k.anchor("left"),
         k.text("start mute", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.6+20)),
+        resizablePos(() => k.vec2(k.width() * 0.35 - 40, k.height() * 0.6 + 10)),
         k.opacity(1),
         k.z(21),
     ]);
     const gitText = k.add([
         k.anchor("left"),
         k.text("Github", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.55+20)),
+        resizablePos(() => k.vec2(k.width() * 0.6 - 40, k.height() * 0.55 + 20)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("left"),
         k.text("About", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.6+20)),
+        resizablePos(() => k.vec2(k.width() * 0.6 - 40, k.height() * 0.6 + 10)),
         k.opacity(1),
         k.z(21),
+    ]);
+    const arrowStart = k.add([
+        k.text("←", { size: 28 }),
+        resizablePos(() => k.vec2(StartText.pos.x + StartText.text.length * 14 + 10, StartText.pos.y)),
+        k.anchor("left"),
+        k.color(k.rgb(3, 255, 87)),
+        k.opacity(0),
+        k.z(22),
+    ]);
+
+    const arrowMute = k.add([
+        k.text("←", { size: 28 }),
+        resizablePos(() => k.vec2(muteText.pos.x + muteText.text.length * 14 + 10, muteText.pos.y)),
+        k.anchor("left"),
+        k.color(k.rgb(3, 255, 87)),
+        k.opacity(0),
+        k.z(22),
     ]);
     k.add([
         k.anchor("center"),
@@ -112,11 +129,33 @@ k.scene("selection", () => {
         k.animate(),
         k.z(50),
     ]);
+    const commandArrow = k.add([
+        k.text("←", { size: 32 }),
+        resizablePos(() => k.vec2(0, 0)),
+        k.anchor("left"),
+        k.color(k.rgb(3, 255, 87)),
+        k.opacity(1),
+        k.z(22),
+        k.animate(),
+    ]);
+
+    function moveArrow(targetObj) {
+        const newY = targetObj.pos.y;
+        const newX = targetObj.pos.x + targetObj.text.length * 16;
+
+        commandArrow.pos = k.vec2(newX, newY);
+
+        commandArrow.animate("pos", [k.vec2(newX, newY), k.vec2(newX + 10, newY)], {
+            duration: 0.5,
+            loop: true,
+            direction: "ping-pong",
+        });
+    }
 
     let targetText = "start with sound";
     let maxLength = targetText.length;
     const letterSpacing = 14;
-    const fixedStartX = k.width() / 2.55 - ((maxLength - 1) * letterSpacing) / 2;
+    const fixedStartX = k.width() / 2.5 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
 
@@ -147,30 +186,33 @@ k.scene("selection", () => {
         }
     }
     createLetterObjects();
+
     function updateTextColors() {
         const targetLower = targetText.toLowerCase();
-        const blink = Math.abs(Math.sin(k.time() * 2));
-    
-        function setColor(textObj, matchWord) {
-            const isSelected = targetLower === matchWord.toLowerCase();
-    
+
+        const allCommands = [
+            { textObj: StartText, label: "start with sound" },
+            { textObj: muteText, label: "start mute" },
+            { textObj: gitText, label: "github" },
+            { textObj: aboutText, label: "about" },
+        ];
+
+        let targetObj = null;
+
+        allCommands.forEach(({ textObj, label }) => {
+            const isSelected = targetLower === label.toLowerCase();
+            textObj.color = isSelected ? k.rgb(3, 255, 87) : k.rgb(255, 255, 255);
             if (isSelected) {
-                textObj.color = k.rgb(3, 255, 87);
-                textObj.opacity = blink;
-            } else {
-                textObj.color = k.rgb(255, 255, 255);
-                textObj.opacity = 1;
+                targetObj = textObj;
             }
-    
-            textObj.text = isSelected
-                ? `-> ${matchWord}`
-                : matchWord;
+        });
+
+        if (targetObj) {
+            commandArrow.opacity = 1;
+            moveArrow(targetObj);
+        } else {
+            commandArrow.opacity = 0;
         }
-    
-        setColor(StartText, "start with sound");
-        setColor(gitText,   "github");
-        setColor(muteText,  "start mute");
-        setColor(aboutText, "about");
     }
 
     function loadMute() {
@@ -184,15 +226,15 @@ k.scene("selection", () => {
     const name = k.add([
         k.text("", { size: 28 }),
         k.textInput(true, 20),
-        k.pos(fixedStartX, k.height() / 1.48), 
+        k.pos(fixedStartX, k.height() / 1.48),
         k.anchor("left"),
         k.color(k.YELLOW),
         k.opacity(0),
         k.z(21),
     ]);
     const slashChar = k.add([
-        k.text("/", { size: 28 }),
-        k.pos(name.pos.x-20, name.pos.y),
+        k.text("$-", { size: 28 }),
+        k.pos(name.pos.x - 40, name.pos.y),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
         k.z(21),

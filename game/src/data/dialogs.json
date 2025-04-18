@@ -44,36 +44,7 @@
     ]
   },
   {
-    "id": 3,
-    "title": "romanToInt",
-    "language": "js",
-    "blocks": [
-      "var romanToInt = function(s) {\n",
-      "    let res = 0;\n",
-      "    const roman = {\n",
-      "        I: 1,\n",
-      "        V: 5,\n",
-      "        X: 10,\n",
-      "        L: 50,\n",
-      "        C: 100,\n",
-      "        D: 500,\n",
-      "        M: 1000\n",
-      "    };\n",
-      "    \n",
-      "    for (let i = 0; i < s.length - 1; i++) {\n",
-      "        if (roman[s[i]] < roman[s[i + 1]]) {\n",
-      "            res -= roman[s[i]];\n",
-      "        } else {\n",
-      "            res += roman[s[i]];\n",
-      "        }\n",
-      "    }\n",
-      "    \n",
-      "    return res + roman[s[s.length - 1]];\n",
-      "};\n"
-    ]
-  },
-  {
-    "id": 4,
+    "id": 5,
     "title": "longestCommonPrefix",
     "language": "js",
     "blocks": [
@@ -87,16 +58,16 @@
     ]
   },
   {
-    "id": 5,
+    "id": 6,
     "title": "validParenthesis",
     "language": "js",
     "blocks": [
       "var isValid = function(s) {\n",
       "    const stack = [];\n",
       "    const mapping = {\n",
-      "        ')': '(',\n",
-      "        '}': '{',\n",
-      "        ']': '['\n",
+      "        ):(,\n",
+      "        }:{,\n",
+      "        ]:[,\n",
       "    };\n",
       "    \n",
       "    for (const c of s) {\n",
@@ -114,7 +85,7 @@
     ]
   },
   {
-    "id": 6,
+    "id": 7,
     "title": "mergeTwoLists",
     "language": "js",
     "blocks": [
@@ -140,7 +111,7 @@
     ]
   },
   {
-    "id": 7,
+    "id": 8,
     "title": "removeDuplicates",
     "language": "js",
     "blocks": [
@@ -159,7 +130,7 @@
     ]
   },
   {
-    "id": 8,
+    "id": 9,
     "title": "strStr",
     "language": "js",
     "blocks": [
@@ -179,7 +150,7 @@
     ]
   },
   {
-    "id": 9,
+    "id": 10,
     "title": "searchInsert",
     "language": "js",
     "blocks": [
@@ -204,7 +175,7 @@
     ]
   },
   {
-    "id": 10,
+    "id": 11,
     "title": "lengthOfLastWord",
     "language": "js",
     "blocks": [
@@ -223,7 +194,7 @@
     ]
   },
   {
-    "id": 11,
+    "id": 12,
     "title": "plusOne",
     "language": "js",
     "blocks": [
@@ -243,7 +214,7 @@
     ]
   },
   {
-    "id": 12,
+    "id": 13,
     "title": "addBinary",
     "language": "js",
     "blocks": [
@@ -270,7 +241,7 @@
     ]
   },
   {
-    "id": 13,
+    "id": 14,
     "title": "mySqrt",
     "language": "js",
     "blocks": [
@@ -296,7 +267,7 @@
     ]
   },
   {
-    "id": 14,
+    "id": 15,
     "title": "climbStairs",
     "language": "js",
     "blocks": [
@@ -318,7 +289,7 @@
     ]
   },
   {
-    "id": 15,
+    "id": 16,
     "title": "deleteDuplicates",
     "language": "js",
     "blocks": [
@@ -338,7 +309,7 @@
     ]
   },
   {
-    "id": 16,
+    "id": 17,
     "title": "mergeSortedArray",
     "language": "js",
     "blocks": [
@@ -351,7 +322,7 @@
     ]
   },
   {
-    "id": 17,
+    "id": 18,
     "title": "inorderTraversal",
     "language": "js",
     "blocks": [
@@ -373,7 +344,7 @@
     ]
   },
   {
-    "id": 18,
+    "id": 19,
     "title": "isSameTree",
     "language": "js",
     "blocks": [
@@ -391,7 +362,7 @@
     ]
   },
   {
-    "id": 19,
+    "id": 20,
     "title": "isSymmetric",
     "language": "js",
     "blocks": [

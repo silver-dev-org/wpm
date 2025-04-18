@@ -72,13 +72,15 @@ export let totalCorrectChars = 0;
 export let totalIcorrectCorrectChars = 0;
 export let totalTypedCharacters = 0;
 export let totalCorrectlines = 0;
+export let startTime = 0;
 export let goal_wpm = actual_wpm;
 export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
+export let goal_time = startTime;
 export let goalCompletedBlocks = completedBlocks;
 export let lastChallenge = "";
-export let startTime = 0;
+
 let fontSize = 30;
 let fontWidth = 17;
 let errorCharsIndexes = [];
@@ -287,6 +289,7 @@ const gameScene = (params) => {
         goal_awpm = actual_awpm;
         goal_lpm = actual_lpm;
         goal_acc = actual_acc;
+        goal_time = startTime;
         goalCompletedBlocks = completedBlocks;
     }
 

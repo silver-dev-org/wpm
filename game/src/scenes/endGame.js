@@ -1,5 +1,5 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge,startTime} from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge,startTime, goal_time} from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname, settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
@@ -20,7 +20,7 @@ k.scene("endgame", () => {
     let wpm = goal_wpm;
     let lpm = goal_lpm;
     let acc = goal_acc;
-
+    let time = goal_time;
     let prev_awpm = 0;
     let prev_wpm = 0;
     let prev_lpm = 0;
@@ -152,7 +152,7 @@ k.scene("endgame", () => {
         k.z(18),
     ]);
     k.add([
-        k.text(startTime.toFixed(2)+" seg", { size: 32 }),
+        k.text(goal_time.toFixed(2)+" seg", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.80)),
         k.anchor("center"),
         k.color(k.YELLOW),

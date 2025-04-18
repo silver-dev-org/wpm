@@ -75,7 +75,6 @@ k.scene("endgame", () => {
 
     if (retrievedData) {
 
-        console.log("Load data:", retrievedData);
         reciveprevdata = retrievedData;
         prevdata = JSON.parse(reciveprevdata);
         prev_awpm = parseFloat(prevdata.awpm) || 0;

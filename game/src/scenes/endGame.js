@@ -1,10 +1,10 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge,startTime} from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname, settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
-import { MAX_BLOCKS } from "../constants.js";
+import { MAX_BLOCKS,goalBlocks } from "../constants.js";
 k.scene("endgame", () => {
 
     const background = k.add([
@@ -124,43 +124,50 @@ k.scene("endgame", () => {
         k.z(19),
     ]);
     k.add([
-        k.text("Last Position", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.7)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(record_blocks, { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.75)),
+        k.text("Challenges "+  record_blocks+ " / " + goalBlocks, { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.51, k.height() * 0.65)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
         k.text("Last Challenge", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75)),
         k.anchor("center"),
         k.color(k.WHITE),
         k.z(18),
     ]);
     k.add([
         k.text(record_challenges, { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.8)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Time elapsed", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(startTime.toFixed(2)+" seg", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.80)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
         k.text("Last 60s WPM", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
         k.anchor("center"),
         k.color(k.WHITE),
         k.z(18),
     ]);
     k.add([
         k.text(awpm, { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.80)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),

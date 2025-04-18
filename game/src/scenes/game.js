@@ -59,7 +59,7 @@ style.innerHTML = `
 document.head.appendChild(style);
 let titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#5c5a5a");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let actual_rivalSpeed = EASY_RIVAL_SPEED;
@@ -78,6 +78,7 @@ export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
 export let goalCompletedBlocks = completedBlocks;
 export let lastChallenge = "";
+export let startTime = 0;
 let fontSize = 30;
 let fontWidth = 17;
 let errorCharsIndexes = [];
@@ -107,7 +108,6 @@ const gameScene = (params) => {
     k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
     k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
     k.loadSprite("BG_analitycs9", "/sprites/BG_AWPM_IN_GAME.png");
-    let startTime = 0;
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
@@ -292,6 +292,7 @@ const gameScene = (params) => {
 
     function resetGameStats() {
         completedBlocks = -1;
+        startTime = 0;
         actual_wpm = 0;
         actual_awpm = 0;
         actual_lpm = 0;
@@ -528,10 +529,10 @@ const gameScene = (params) => {
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
-        k.color(k.rgb(31, 31, 31)),
+        k.color(k.rgb(53, 53, 71)),
         resizablePos(textboxPos),
         k.anchor("topleft"),
-        k.opacity(0.4),
+        k.opacity(0.3),
         k.z(0),
     ]);
     const textboxBackParent = k.add([

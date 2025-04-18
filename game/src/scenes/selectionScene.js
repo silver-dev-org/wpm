@@ -13,7 +13,7 @@ k.scene("selection", () => {
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
-    const commands = ["about", "github", "start with sound", "start without sound"];
+    const commands = ["about", "github", "start with sound", "start mute"];
 
     function calcNewTarget(input) {
         if (input === "") return "start with sound";
@@ -47,28 +47,28 @@ k.scene("selection", () => {
     ]);
     const StartText = k.add([
         k.anchor("left"),
-        k.text("/Start with sound", { size: 28 }),
+        k.text("Start with sound", { size: 28 }),
         resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.55+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const muteText = k.add([
         k.anchor("left"),
-        k.text("/Start without sound", { size: 28 }),
+        k.text("start mute", { size: 28 }),
         resizablePos(() => k.vec2(k.width() * 0.35-40, k.height() * 0.6+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const gitText = k.add([
         k.anchor("left"),
-        k.text("/Github", { size: 28 }),
+        k.text("Github", { size: 28 }),
         resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.55+20)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("left"),
-        k.text("/About", { size: 28 }),
+        k.text("About", { size: 28 }),
         resizablePos(() => k.vec2(k.width() * 0.6-40, k.height() * 0.6+20)),
         k.opacity(1),
         k.z(21),
@@ -147,23 +147,29 @@ k.scene("selection", () => {
         }
     }
     createLetterObjects();
-
     function updateTextColors() {
         const targetLower = targetText.toLowerCase();
         const blink = Math.abs(Math.sin(k.time() * 2));
-
+    
         function setColor(textObj, matchWord) {
-            if (targetLower === matchWord.toLowerCase()) {
+            const isSelected = targetLower === matchWord.toLowerCase();
+    
+            if (isSelected) {
                 textObj.color = k.rgb(3, 255, 87);
                 textObj.opacity = blink;
             } else {
                 textObj.color = k.rgb(255, 255, 255);
                 textObj.opacity = 1;
             }
+    
+            textObj.text = isSelected
+                ? `-> ${matchWord}`
+                : matchWord;
         }
+    
         setColor(StartText, "start with sound");
-        setColor(gitText, "github");
-        setColor(muteText, "start without sound");
+        setColor(gitText,   "github");
+        setColor(muteText,  "start mute");
         setColor(aboutText, "about");
     }
 
@@ -296,7 +302,7 @@ k.scene("selection", () => {
                 name.text = "";
                 k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
                 break;
-            case "start without sound":
+            case "start mute":
                 settings.mute = true;
                 k.volume(0);
                 button_muteON.opacity = 0;

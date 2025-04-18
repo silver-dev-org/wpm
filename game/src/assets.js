@@ -3,13 +3,13 @@ import { k } from "./kaplay.js";
 k.loadFont("monogram", "/fonts/monogram.ttf", {
     outline: {
         width: 6,
-        color: k.rgb(0, 0, 0)
+        color: k.rgb(8, 8, 8)
     },
 });
 k.loadFont("thaleahFat", "/fonts/thaleahFat.ttf", {
     outline: {
         width: 4,
-        color: k.rgb(0, 0, 0)
+        color: k.rgb(8, 8, 8)
     },
 });
 k.loadSprite("bg4", "/sprites/bg4.png");

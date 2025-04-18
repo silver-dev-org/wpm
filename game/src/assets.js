@@ -6,6 +6,12 @@ k.loadFont("monogram", "/fonts/monogram.ttf", {
         color: k.rgb(0, 0, 0)
     },
 });
+k.loadFont("thaleahFat", "/fonts/thaleahFat.ttf", {
+    outline: {
+        width: 4,
+        color: k.rgb(0, 0, 0)
+    },
+});
 k.loadSprite("bg4", "/sprites/bg4.png");
 k.loadSprite("bg2", "/sprites/bg2.png");
 k.loadSound("code_sound", "/sounds/code_sound.mp3");

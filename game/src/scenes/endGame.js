@@ -1,48 +1,12 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge } from "./game.js";
 import { savePlay, getPlay } from "../systems/saves.js";
 import { actualname, settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 import { MAX_BLOCKS } from "../constants.js";
 k.scene("endgame", () => {
-    //CSS
-    const style = document.createElement("style");
-    style.innerHTML = `
-        :root {
-          --bg: hsl(0, 3.60%, 11.00%);
-          --gray1: #0a080a;
-          --gray2: #110b11;
-        }
-        
-        body {
-          margin: 0;
-          overflow: hidden;
-          background: var(--bg);
-          position: relative;
-        }
-        
-        body::before {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background:
-            linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
-            linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
-            linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
-            linear-gradient(-45deg, transparent 75%, var(--gray1) 75%),
-            rgba(0, 0, 0, 0.81);
-          background-size: 15px 15px, 15px 15px, 15px 15px, 15px 15px, cover;
-          background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0, center;
-          background-blend-mode: multiply;
-          backdrop-filter: blur(10px);
-          z-index: -1;
-        }
-      `;
-    document.head.appendChild(style);
+
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -51,7 +15,7 @@ k.scene("endgame", () => {
     ]);
 
     let record_blocks = goalCompletedBlocks;
-
+    let record_challenges = lastChallenge;
     let awpm = goal_awpm;
     let wpm = goal_wpm;
     let lpm = goal_lpm;
@@ -106,14 +70,6 @@ k.scene("endgame", () => {
             }, intervalTime);
         }
     }
-
-    const title = k.add([
-        k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-
     const username = actualname;
     const retrievedData = getPlay(username);
 
@@ -139,44 +95,80 @@ k.scene("endgame", () => {
         best_lpm = lpm;
         best_acc = acc;
     }
-    k.add([
-        k.text("ACC", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.32, k.height() * 0.55)),
+    const title = k.add([
+        k.sprite("WPM"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
         k.anchor("center"),
-        k.color(k.YELLOW),
         k.z(18),
     ]);
+
     k.add([
-        k.text("CHALLENGES COMPLETED " + record_blocks, { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.8)),
+        k.text("WPM "+wpm.toFixed(2), {
+            size: 48,
+            font: "thaleahFat",
+        }),
+        resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.55)),
         k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    k.add([
-        k.text("WPM", { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.55)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(wpm.toFixed(2) + "%", { size: 36, }),
-        resizablePos(() => k.vec2(k.width() * 0.48, k.height() * 0.6)),
         k.color(k.YELLOW),
         k.opacity(1),
         k.z(19),
     ]);
     k.add([
-        k.text(acc.toFixed(2) + "%", { size: 36, }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.6)),
+         k.text("ACC "+ acc.toFixed(2) + "%", {
+            size: 48,
+            font: "thaleahFat",
+        }),
+        resizablePos(() => k.vec2(k.width() * 0.6, k.height() * 0.55)),
         k.color(k.YELLOW),
+        k.anchor("center"),
         k.opacity(1),
         k.z(19),
+    ]);
+    k.add([
+        k.text("Last Position", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(record_blocks, { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Last Challenge", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(record_challenges, { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Last 60s WPM", { size: 32 }),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(awpm, { size: 36 }),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
     ]);
 
     const textPressEnd = k.add([
-        k.text("Press ENTER to retry", { size: 36 }),
+        k.text("Press ENTER to retry", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.YELLOW),
@@ -225,97 +217,10 @@ k.scene("endgame", () => {
         button_muteOFF.opacity = 0;
         updateMusicVolume();
     }
-
-    const chartScale = 0.6;
-
-    const chartBaseY = k.height() * 0.65;
-    const maxBarHeight = k.height() * 0.15 * chartScale;
-    const minBarHeight = 20 * chartScale;
-    const barWidth = 30 * chartScale;
-
-    const expectedMaxStat = 100;
-
-    const scaleBar = (value) => {
-        const v = Math.max(0, Math.min(value, expectedMaxStat));
-        const rawHeight = minBarHeight + (v / expectedMaxStat) * (maxBarHeight - minBarHeight);
-        return rawHeight;
-    };
-
-    const bars = [
-        { label: "WPM", value: wpm, x: 0.62, color: k.rgb(255, 100, 100) },
-        { label: "Best WPM", value: best_wpm, x: 0.67, color: k.rgb(100, 255, 100) },
-        { label: "AWPM", value: awpm, x: 0.72, color: k.rgb(100, 100, 255) },
-        { label: "Best AWPM", value: best_awpm, x: 0.77, color: k.rgb(255, 255, 100) }
-    ];
-
-    bars.forEach(({ label, value, x, color }) => {
-        const barHeight = scaleBar(value);
-
-        k.add([
-            k.rect(barWidth, barHeight),
-            resizablePos(() => k.vec2(
-                k.width() * x,
-                chartBaseY - barHeight / 2
-            )),
-            k.color(color),
-            k.anchor("center"),
-            k.z(20),
-        ]);
-
-        k.add([
-            k.text(value.toFixed(2), { size: 32 * chartScale }),
-            resizablePos(() => k.vec2(
-                k.width() * x,
-                chartBaseY + 20 * chartScale
-            )),
-            k.color(color),
-            k.anchor("center"),
-            k.z(21),
-        ]);
-
-        k.add([
-            k.text(label, { size: 24 }),
-            resizablePos(() => k.vec2(
-                k.width() * x,
-                chartBaseY + 70 * chartScale
-            )),
-            k.color(k.rgb(250, 250, 250)),
-            k.anchor("center"),
-            k.z(21),
-        ]);
-    });
-
-    const boxWidth = k.width() * 0.4 * chartScale;
-    const boxHeight = 300 * chartScale;
-    const boxX = k.width() * 0.59;
-    const boxY = chartBaseY - 250 * chartScale;
     
-    k.add([
-        k.rect(boxWidth, boxHeight),
-        k.pos(boxX, boxY),
-        k.color(k.rgb(157, 82, 228)),
-        k.anchor("topleft"),
-        k.z(20),
-        k.opacity(0.03),
-    ]);
-
-    k.add([
-        k.rect(5 * chartScale, boxHeight),
-        k.pos(boxX, boxY),
-        k.color(k.rgb(255, 255, 0)),
-        k.anchor("topleft"),
-        k.z(51),
-    ]);
-
-    k.add([
-        k.rect(boxWidth, 5 * chartScale),
-        k.pos(boxX, boxY + boxHeight - 5 * chartScale),
-        k.color(k.rgb(255, 255, 0)),
-        k.anchor("topleft"),
-        k.z(51),
-    ]);
     onKeyPress("enter", () => {
         record_blocks = 0;
+        record_challenges = "";
         music.stop();
         k.go("selection");
     });

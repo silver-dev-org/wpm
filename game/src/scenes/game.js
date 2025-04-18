@@ -40,8 +40,9 @@ export let goal_awpm = actual_awpm;
 export let goal_lpm = actual_lpm;
 export let goal_acc = actual_acc;
 export let goalCompletedBlocks = completedBlocks;
-let fontSize = 28;
-let fontWidth = 15.8;
+export let lastChallenge = "";
+let fontSize = 30;
+let fontWidth = 17;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -62,6 +63,7 @@ let fixedText = "";
  * @param {GameParams} params
  */
 const gameScene = (params) => {
+
     k.loadMusic("endgame", "/sounds/endgame.mp3");
     k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
@@ -76,44 +78,6 @@ const gameScene = (params) => {
     let curBlockData = {
         lineCount: 0,
     };
-
-    //CSS
-    const style = document.createElement("style");
-    style.innerHTML = `
-      :root {
-        --bg: hsl(0, 3.60%, 11.00%);
-        --gray1: #0a080a;
-        --gray2: #110b11;
-      }
-      
-      body {
-        margin: 0;
-        overflow: hidden;
-        background: var(--bg);
-        position: relative;
-      }
-      
-      body::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
-          linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
-          linear-gradient(-45deg, transparent 75%, var(--gray1) 75%),
-          rgba(0, 0, 0, 0.81);
-        background-size: 15px 15px, 15px 15px, 15px 15px, 15px 15px, cover;
-        background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0, center;
-        background-blend-mode: multiply;
-        backdrop-filter: blur(10px);
-        z-index: -1;
-      }
-    `;
-    document.head.appendChild(style);
 
     // Music
     const music = k.play("videogame");
@@ -277,7 +241,7 @@ const gameScene = (params) => {
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
-        awmp_text.text = Math.floor(awpm).toString();
+       // awmp_text.text = Math.floor(awpm).toString();
 
     });
 
@@ -315,7 +279,7 @@ const gameScene = (params) => {
     };
     const filesFoldersPos = () => k.vec2(0, 0);
 
-    const awmp_text = k.add([
+   /* const awmp_text = k.add([
         k.anchor("center"),
         k.pos(k.width() * 0.4, k.height() * 0.02),
         k.text("AWPM: ", {
@@ -323,10 +287,10 @@ const gameScene = (params) => {
         }),
         k.color(k.YELLOW),
         k.z(50),
-    ]);
+    ]);*/
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.6, k.height() * 0.02),
+        k.pos(k.width() * 0.4, k.height() * 0.02),
         k.text("0", {
             size: 32,
         }),
@@ -335,7 +299,7 @@ const gameScene = (params) => {
     ]);
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.8, k.height() * 0.02),
+        k.pos(k.width() * 0.6, k.height() * 0.02),
         k.text("time: ", {
             size: 32,
         }),
@@ -343,21 +307,21 @@ const gameScene = (params) => {
         k.z(50),
     ]);
 
-    k.add([
+   /* k.add([
         k.sprite("BG_analitycs9"),
+        k.pos(k.width() * 0.3, k.height() * 0.023),
+        k.anchor("center"),
+        k.z(51),
+    ]);*/
+    k.add([
+        k.sprite("BG_analitycs7"),
         k.pos(k.width() * 0.3, k.height() * 0.023),
         k.anchor("center"),
         k.z(51),
     ]);
     k.add([
-        k.sprite("BG_analitycs7"),
-        k.pos(k.width() * 0.5, k.height() * 0.023),
-        k.anchor("center"),
-        k.z(51),
-    ]);
-    k.add([
         k.sprite("BG_analitycs8"),
-        k.pos(k.width() * 0.7, k.height() * 0.023),
+        k.pos(k.width() * 0.5, k.height() * 0.023),
         k.anchor("center"),
         k.z(51),
     ]);
@@ -385,14 +349,14 @@ const gameScene = (params) => {
         k.z(10),
     ]);
     const text_challenge = k.add([
-        k.text("Challenges", { size: 28 }),
+        k.text("Challenges", { size: 30 }),
         resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.1)),
         k.color(k.WHITE),
         k.opacity(1),
     ]);
     const rest_text = k.add([
-        k.text("ESC to reset", { size: 28 }),
-        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.9)),
+        k.text("ESC to reset", { size: 30 }),
+        resizablePos(() => k.vec2(k.width() * 0.05+10, k.height() * 0.9)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
@@ -449,7 +413,7 @@ const gameScene = (params) => {
         ]);
 
         k.add([
-            k.text(title, { size: 28 }),
+            k.text(title, { size: 30 }),
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.05,
@@ -521,7 +485,7 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(420, 0);
+            return k.vec2(460, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
@@ -533,10 +497,10 @@ const gameScene = (params) => {
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
-        k.color(k.rgb(24, 24, 29)),
+        k.color(k.rgb(31, 31, 31)),
         resizablePos(textboxPos),
         k.anchor("topleft"),
-        k.opacity(0.7),
+        k.opacity(0.4),
         k.z(0),
     ]);
     const textboxBackParent = k.add([
@@ -580,7 +544,7 @@ const gameScene = (params) => {
     };
 
     const cursorPointer = k.add([
-        k.text("_", { size: 28 }),
+        k.text("_", { size: 30 }),
         resizablePos(() => cursorPos()),
         k.opacity(1),
         k.anchor("left"),
@@ -589,7 +553,7 @@ const gameScene = (params) => {
     ]);
 
     const rivalPointer = k.add([
-        k.text("_", { size: 28 }),
+        k.text("_", { size: 30 }),
         resizablePos(() => cursorPos(true)),
         k.opacity(1),
         k.anchor("left"),
@@ -645,6 +609,7 @@ const gameScene = (params) => {
         musicRate += 0.05;
         updateMusic();
         if (completedBlocks === goalBlocks) {
+            completedBlocks = goalBlocks;
             StatsforAnalitics();
             resetGameStats();
             music.stop();
@@ -684,7 +649,8 @@ const gameScene = (params) => {
 
         playerState.line = fixedText.split("\n")[0];
         rivalState.line = playerState.line;
-
+            
+        lastChallenge = currentDialog.title;
         cursorPointer.updatePos();
         rivalPointer.updatePos();
     }
@@ -775,7 +741,6 @@ const gameScene = (params) => {
             nextChar(true);
         }
     }
-
 
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {

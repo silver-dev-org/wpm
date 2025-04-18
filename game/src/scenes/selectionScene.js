@@ -9,6 +9,7 @@ export const settings = {
 };
 
 k.scene("selection", () => {
+    
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
@@ -19,44 +20,6 @@ k.scene("selection", () => {
         const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
         return found ? found : "start with sound";
     }
-
-    // CSS
-    const style = document.createElement("style");
-    style.innerHTML = `
-      :root {
-        --bg: hsl(0, 3.60%, 11.00%);
-        --gray1: #0a080a;
-        --gray2: #110b11;
-      }
-      
-      body {
-        margin: 0;
-        overflow: hidden;
-        background: var(--bg);
-        position: relative;
-      }
-      
-      body::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background:
-          linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
-          linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
-          linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
-          linear-gradient(-45deg, transparent 75%, var(--gray1) 75%),
-          rgba(0, 0, 0, 0.81);
-        background-size: 15px 15px, 15px 15px, 15px 15px, 15px 15px, cover;
-        background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0, center;
-        background-blend-mode: multiply;
-        backdrop-filter: blur(10px);
-        z-index: -1;
-      }
-    `;
-    document.head.appendChild(style);
 
     k.volume(0.5);
     loadMute();
@@ -70,7 +33,7 @@ k.scene("selection", () => {
     const outsideBox = k.add([
         k.rect(800, 260, { radius: 2 }),
         k.pos(k.width() * 0.30 - 10, k.height() * 0.50),
-        k.color(150, 150, 150),
+        k.color(k.rgb(52, 53, 54)),
         k.z(20),
         k.opacity(0.3),
     ]);
@@ -191,7 +154,7 @@ k.scene("selection", () => {
 
         function setColor(textObj, matchWord) {
             if (targetLower === matchWord.toLowerCase()) {
-                textObj.color = k.rgb(0, 153, 255);
+                textObj.color = k.rgb(3, 255, 87);
                 textObj.opacity = blink;
             } else {
                 textObj.color = k.rgb(255, 255, 255);
@@ -225,7 +188,7 @@ k.scene("selection", () => {
         k.text("/", { size: 28 }),
         k.pos(name.pos.x-20, name.pos.y),
         k.anchor("left"),
-        k.color(k.rgb(0, 153, 255)),
+        k.color(k.rgb(3, 255, 87)),
         k.z(21),
     ]);
     let previousInput = "";
@@ -301,14 +264,14 @@ k.scene("selection", () => {
                 ? k.rgb(128, 128, 128)
                 : ((char === " " && correct !== " ") || (char.toLowerCase() !== correct.toLowerCase())
                     ? k.rgb(255, 0, 0)
-                    : k.rgb(0, 153, 255));
+                    : k.rgb(3, 255, 87));
             letterObj.text = displayChar;
             letterObj.color = color;
         });
 
         underscoreObjects.forEach((uObj, i) => {
             if (i === input.length) {
-                uObj.color = k.rgb(0, 153, 255);
+                uObj.color = k.rgb(3, 255, 87);
                 const blink = Math.abs(Math.sin(k.time() * 5));
                 uObj.opacity = blink;
             } else {

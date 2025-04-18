@@ -13,8 +13,8 @@ k.scene("selection", () => {
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
-    const commands = ["about", "github", "start with sound", "start mute"];
-
+    const commands = ["about", "github", "start with sound", "start muted"];
+    let fontsize =18;
     function calcNewTarget(input) {
         if (input === "") return "start with sound";
         const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
@@ -23,7 +23,6 @@ k.scene("selection", () => {
 
     k.volume(0.5);
     loadMute();
-
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -47,34 +46,34 @@ k.scene("selection", () => {
     ]);
     const StartText = k.add([
         k.anchor("left"),
-        k.text("Start with sound", { size: 28 }),
+        k.text("Start with sound", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.35 - 40, k.height() * 0.55 + 20)),
         k.opacity(1),
         k.z(21),
     ]);
     const muteText = k.add([
         k.anchor("left"),
-        k.text("start mute", { size: 28 }),
+        k.text("start muted", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.35 - 40, k.height() * 0.6 + 10)),
         k.opacity(1),
         k.z(21),
     ]);
     const gitText = k.add([
         k.anchor("left"),
-        k.text("Github", { size: 28 }),
+        k.text("Github", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.6 - 40, k.height() * 0.55 + 20)),
         k.opacity(1),
         k.z(21),
     ]);
     const aboutText = k.add([
         k.anchor("left"),
-        k.text("About", { size: 28 }),
+        k.text("About", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.6 - 40, k.height() * 0.6 + 10)),
         k.opacity(1),
         k.z(21),
     ]);
     const arrowStart = k.add([
-        k.text("←", { size: 28 }),
+        k.text("←", { size: fontsize }),
         resizablePos(() => k.vec2(StartText.pos.x + StartText.text.length * 14 + 10, StartText.pos.y)),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
@@ -83,7 +82,7 @@ k.scene("selection", () => {
     ]);
 
     const arrowMute = k.add([
-        k.text("←", { size: 28 }),
+        k.text("←", { size: fontsize }),
         resizablePos(() => k.vec2(muteText.pos.x + muteText.text.length * 14 + 10, muteText.pos.y)),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
@@ -94,7 +93,7 @@ k.scene("selection", () => {
         k.anchor("center"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
         k.text("Get faster and better at technical interviewing ", {
-            size: 32,
+            size: 22,
         }),
         k.color(k.WHITE),
         k.z(21),
@@ -103,7 +102,7 @@ k.scene("selection", () => {
         k.anchor("center"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.90)),
         k.text("by practicing typing code.", {
-            size: 32,
+            size: 22,
         }),
         k.color(k.WHITE),
         k.z(21),
@@ -130,7 +129,7 @@ k.scene("selection", () => {
         k.z(50),
     ]);
     const commandArrow = k.add([
-        k.text("←", { size: 32 }),
+        k.text("←", { size: 22 }),
         resizablePos(() => k.vec2(0, 0)),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
@@ -166,7 +165,7 @@ k.scene("selection", () => {
         underscoreObjects = [];
         for (let i = 0; i < maxLength; i++) {
             const letter = k.add([
-                k.text(targetText[i], { size: 28 }),
+                k.text(targetText[i], { size: fontsize }),
                 k.pos(fixedStartX + i * letterSpacing, k.height() / 1.48),
                 k.anchor("center"),
                 k.color(k.rgb(128, 128, 128)),
@@ -176,7 +175,7 @@ k.scene("selection", () => {
             letterObjects.push(letter);
 
             const underscore = k.add([
-                k.text("_", { size: 32 }),
+                k.text("_", { size: fontsize+4 }),
                 k.pos(fixedStartX + i * letterSpacing, k.height() / 1.45),
                 k.anchor("center"),
                 k.color(k.WHITE),
@@ -192,7 +191,7 @@ k.scene("selection", () => {
 
         const allCommands = [
             { textObj: StartText, label: "start with sound" },
-            { textObj: muteText, label: "start mute" },
+            { textObj: muteText, label: "start muted" },
             { textObj: gitText, label: "github" },
             { textObj: aboutText, label: "about" },
         ];
@@ -224,7 +223,7 @@ k.scene("selection", () => {
     }
 
     const name = k.add([
-        k.text("", { size: 28 }),
+        k.text("", { size: fontsize }),
         k.textInput(true, 20),
         k.pos(fixedStartX, k.height() / 1.48),
         k.anchor("left"),
@@ -233,7 +232,7 @@ k.scene("selection", () => {
         k.z(21),
     ]);
     const slashChar = k.add([
-        k.text("$-", { size: 28 }),
+        k.text("$-", { size: fontsize }),
         k.pos(name.pos.x - 40, name.pos.y),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
@@ -349,7 +348,7 @@ k.scene("selection", () => {
                 name.text = "";
                 k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
                 break;
-            case "start mute":
+            case "start muted":
                 settings.mute = true;
                 k.volume(0);
                 button_muteON.opacity = 0;

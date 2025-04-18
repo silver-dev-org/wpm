@@ -81,8 +81,8 @@ export let goal_time = startTime;
 export let goalCompletedBlocks = completedBlocks;
 export let lastChallenge = "";
 
-let fontSize = 30;
-let fontWidth = 17;
+let fontSize = 18;
+let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 
@@ -280,7 +280,7 @@ const gameScene = (params) => {
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
-       // awmp_text.text = Math.floor(awpm).toString();
+        // awmp_text.text = Math.floor(awpm).toString();
 
     });
 
@@ -320,29 +320,29 @@ const gameScene = (params) => {
     };
     const filesFoldersPos = () => k.vec2(0, 0);
 
-   /* const awmp_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.4, k.height() * 0.02),
-        k.text("AWPM: ", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(50),
-    ]);*/
+    /* const awmp_text = k.add([
+         k.anchor("center"),
+         k.pos(k.width() * 0.4, k.height() * 0.02),
+         k.text("AWPM: ", {
+             size: 32,
+         }),
+         k.color(k.YELLOW),
+         k.z(50),
+     ]);*/
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.4, k.height() * 0.02),
+        k.pos(k.width() * 0.4, k.height() * 0.025),
         k.text("0", {
-            size: 32,
+            size: 18,
         }),
         k.color(k.YELLOW),
         k.z(50),
     ]);
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.6, k.height() * 0.02),
+        k.pos(k.width() * 0.6, k.height() * 0.025),
         k.text("time: ", {
-            size: 32,
+            size: 18,
         }),
         k.color(k.YELLOW),
         k.z(50),
@@ -384,16 +384,18 @@ const gameScene = (params) => {
         k.z(10),
     ]);
     const text_challenge = k.add([
-        k.text("Challenges", { size: 30 }),
+        k.text("Challenges", { size: 20 }),
         resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.1)),
         k.color(k.WHITE),
         k.opacity(1),
     ]);
     const rest_text = k.add([
-        k.text("ESC to reset", { size: 30 }),
-        resizablePos(() => k.vec2(k.width() * 0.05+10, k.height() * 0.9)),
-        k.color(k.YELLOW),
-        k.opacity(1),
+        k.text("ESC to retry", { size: 20 }),
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.9)),
+        k.anchor("center"),
+        k.color(k.rgb(127, 134, 131)),
+        k.animate(),
+        k.z(19),
     ]);
     const button_muteON = k.add([
         k.sprite("muteON"),
@@ -409,6 +411,7 @@ const gameScene = (params) => {
         k.animate(),
         k.z(50),
     ]);
+
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
@@ -448,7 +451,7 @@ const gameScene = (params) => {
         ]);
 
         k.add([
-            k.text(title, { size: 30 }),
+            k.text(title, { size: 20 }),
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.05,
@@ -557,6 +560,8 @@ const gameScene = (params) => {
     const textboxText = textboxBackParent.add([
         k.text("", {
             size: fontSize,
+            lineSpacing: 12,
+            letterSpacing: 2,
             transform: (idx, ch) => ({
                 color: matchColorToken(idx, ch),
             }),
@@ -565,21 +570,25 @@ const gameScene = (params) => {
         resizablePos(textboxTextPos),
     ]);
 
+    const lineSpacing = 12;
+    const actualLineHeight = fontSize + lineSpacing;
+    const cursorVerticalOffset = (actualLineHeight - fontSize) / 2;
+    const CURSOR_EXTRA_OFFSET = 10;
+
     const cursorPos = (rival = false) => {
         const player = rival ? rivalState : playerState;
-
-        return k.vec2(
-            textboxBackParent.pos
-                .add(textboxText.pos)
-                .add(
-                    player.curCharInLine * fontWidth,
-                    (player.curLineCount + 1) * lineHeight,
-                ),
-        );
+        const displayLine = player.curLineCount - jumpCount * JUMP_AFTER;
+        const x = player.curCharInLine * fontWidth;
+        const y = displayLine * actualLineHeight
+            + cursorVerticalOffset
+            + CURSOR_EXTRA_OFFSET;
+        return textboxBackParent.pos
+            .add(textboxText.pos)
+            .add(x, y);
     };
 
     const cursorPointer = k.add([
-        k.text("_", { size: 30 }),
+        k.text("_", { size: 16 }),
         resizablePos(() => cursorPos()),
         k.opacity(1),
         k.anchor("left"),
@@ -588,7 +597,7 @@ const gameScene = (params) => {
     ]);
 
     const rivalPointer = k.add([
-        k.text("_", { size: 30 }),
+        k.text("_", { size: 16 }),
         resizablePos(() => cursorPos(true)),
         k.opacity(1),
         k.anchor("left"),

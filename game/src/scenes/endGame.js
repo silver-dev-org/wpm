@@ -6,14 +6,7 @@ import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 import { MAX_BLOCKS,goalBlocks } from "../constants.js";
 k.scene("endgame", () => {
-
-    const background = k.add([
-        k.sprite("bg2"),
-        k.pos(k.width() / 2, k.height() / 2),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-
+    let fontsize =18;
     let record_blocks = goalCompletedBlocks;
     let record_challenges = lastChallenge;
     let awpm = goal_awpm;
@@ -94,6 +87,13 @@ k.scene("endgame", () => {
         best_lpm = lpm;
         best_acc = acc;
     }
+    const background = k.add([
+        k.sprite("bg2"),
+        k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(10),
+    ]);
+
     const title = k.add([
         k.sprite("WPM"),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
@@ -104,91 +104,81 @@ k.scene("endgame", () => {
     k.add([
         k.text("WPM "+wpm.toFixed(2), {
             size: 48,
-            font: "thaleahFat",
         }),
-        resizablePos(() => k.vec2(k.width() * 0.40, k.height() * 0.55)),
-        k.anchor("center"),
+        resizablePos(() => k.vec2(k.width() * 0.4, k.height() * 0.55)),
+        k.anchor("left"),
         k.color(k.YELLOW),
         k.opacity(1),
         k.z(19),
     ]);
     k.add([
          k.text("ACC "+ acc.toFixed(2) + "%", {
-            size: 48,
-            font: "thaleahFat",
+            size: 22,
         }),
-        resizablePos(() => k.vec2(k.width() * 0.6, k.height() * 0.55)),
-        k.color(k.YELLOW),
-        k.anchor("center"),
+        resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.55-50)),
+        k.color(k.WHITE),
+        k.anchor("left"),
         k.opacity(1),
         k.z(19),
     ]);
     k.add([
-        k.text("Challenges "+  record_blocks+ " / " + goalBlocks, { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.51, k.height() * 0.65)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    k.add([
-        k.text("Last Challenge", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(record_challenges, { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.8)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    k.add([
-        k.text("Time elapsed", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(goal_time.toFixed(2)+" seg", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.80)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    k.add([
-        k.text("Last 60s WPM", { size: 32 }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(awpm, { size: 36 }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.80)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-
-    const textPressEnd = k.add([
-        k.text("Press ENTER to retry", { size: 32 }),
+        k.text("Challenges "+  record_blocks+ " / " + goalBlocks, { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.9)),
         k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Last Challenge", { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(record_challenges, { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75)),
+        k.anchor("center"),
         k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Time elapsed", { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(goal_time.toFixed(2)+" seg", { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    k.add([
+        k.text("Last 60s WPM", { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7)),
+        k.anchor("center"),
+        k.color(k.WHITE),
+        k.z(18),
+    ]);
+    k.add([
+        k.text(awpm, { size: fontsize }),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
+        k.anchor("center"),
+        k.color(k.YELLOW),
+        k.z(18),
+    ]);
+    const textPressEnd = k.add([
+        k.text("ESC to retry", { size: 20 }),
+        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.9)),
+        k.anchor("center"),
+        k.color(k.rgb(127, 134, 131)),
         k.animate(),
         k.z(19),
     ]);
 
-    moveText();
-    function moveText() {
-        textPressEnd.animate("pos", [k.vec2(textPressEnd.pos.x, textPressEnd.pos.y + 5), k.vec2(textPressEnd.pos.x, textPressEnd.pos.y - 5)], {
-            duration: 0.5,
-            direction: "ping-pong",
-        });
-    }
     savePlay({
         userName: username,
         awpm: currentResults.awpm,
@@ -224,7 +214,7 @@ k.scene("endgame", () => {
         updateMusicVolume();
     }
     
-    onKeyPress("enter", () => {
+    onKeyPress("escape", () => {
         record_blocks = 0;
         record_challenges = "";
         music.stop();

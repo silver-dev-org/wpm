@@ -12,13 +12,8 @@ export const k = kaplay({
     height: 1080,
     letterbox: true,
     pixelDensity: 5,
-    crisp: true,
+    crisp: false,
     texFilter: "nearest",
 });
 k.onLoading((progress) => {
 });
-window.addEventListener('keydown', (e) => {
-    if (e.key === '/' || e.key === '?') {
-      e.preventDefault();
-    }
-  });

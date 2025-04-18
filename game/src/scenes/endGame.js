@@ -8,7 +8,7 @@ import { MAX_BLOCKS } from "../constants.js";
 k.scene("endgame", () => {
 
     const background = k.add([
-        k.sprite("bg"),
+        k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),
@@ -124,7 +124,7 @@ k.scene("endgame", () => {
         k.z(19),
     ]);
     k.add([
-        k.text("Complete challenges", { size: 32 }),
+        k.text("Last Position", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.3, k.height() * 0.7)),
         k.anchor("center"),
         k.color(k.WHITE),
@@ -138,7 +138,7 @@ k.scene("endgame", () => {
         k.z(18),
     ]);
     k.add([
-        k.text("Last challenge", { size: 32 }),
+        k.text("Last Challenge", { size: 32 }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
         k.anchor("center"),
         k.color(k.WHITE),
@@ -216,7 +216,7 @@ k.scene("endgame", () => {
         button_muteOFF.opacity = 0;
         updateMusicVolume();
     }
-
+    
     onKeyPress("enter", () => {
         record_blocks = 0;
         record_challenges = "";

@@ -25,7 +25,7 @@ k.scene("selection", () => {
     loadMute();
 
     const background = k.add([
-        k.sprite("bg2"),
+        k.sprite("bg"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),

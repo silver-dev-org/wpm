@@ -4,7 +4,6 @@ import {
     gameState,
     dialogsData,
     lineHeight,
-    MAX_TIME,
     EASY_RIVAL_SPEED,
     JUMP_AFTER,
     TEXT_START_Y,
@@ -22,7 +21,7 @@ import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./selectionScene.js";
 let titles = dialogsData.map((item) => item.title);
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#5c5a5a");
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#707478");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let actual_rivalSpeed = EASY_RIVAL_SPEED;
@@ -69,7 +68,6 @@ const gameScene = (params) => {
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
     k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
     k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
-    k.loadSprite("BG_analitycs9", "/sprites/BG_AWPM_IN_GAME.png");
     let startTime = 0;
     let jumpCount = 0;
     let theme = themes[0];
@@ -241,8 +239,6 @@ const gameScene = (params) => {
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
-       // awmp_text.text = Math.floor(awpm).toString();
-
     });
 
     function StatsforAnalitics() {
@@ -279,15 +275,6 @@ const gameScene = (params) => {
     };
     const filesFoldersPos = () => k.vec2(0, 0);
 
-   /* const awmp_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.4, k.height() * 0.02),
-        k.text("AWPM: ", {
-            size: 32,
-        }),
-        k.color(k.YELLOW),
-        k.z(50),
-    ]);*/
     const wmp_text = k.add([
         k.anchor("center"),
         k.pos(k.width() * 0.4, k.height() * 0.02),
@@ -306,13 +293,6 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.z(50),
     ]);
-
-   /* k.add([
-        k.sprite("BG_analitycs9"),
-        k.pos(k.width() * 0.3, k.height() * 0.023),
-        k.anchor("center"),
-        k.z(51),
-    ]);*/
     k.add([
         k.sprite("BG_analitycs7"),
         k.pos(k.width() * 0.3, k.height() * 0.023),
@@ -327,7 +307,7 @@ const gameScene = (params) => {
     ]);
     k.add([
         resizablePos(filesFoldersPos),
-        k.sprite("bg2"),
+        k.sprite("bg"),
         k.anchor("topleft"),
         k.opacity(1),
     ]);
@@ -340,7 +320,7 @@ const gameScene = (params) => {
     ]);
     const textboxBack = k.add([
         k.pos(1000, 0),
-        k.sprite("bg4", {
+        k.sprite("bg2", {
             tiled: true,
             width: 2000,
             height: 54,
@@ -349,14 +329,20 @@ const gameScene = (params) => {
         k.z(10),
     ]);
     const text_challenge = k.add([
-        k.text("Challenges", { size: 30 }),
+        k.text("Challenges", {
+            size: 28,
+            font: "thaleahFat",
+        }),
         resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.1)),
         k.color(k.WHITE),
         k.opacity(1),
     ]);
     const rest_text = k.add([
-        k.text("ESC to reset", { size: 30 }),
-        resizablePos(() => k.vec2(k.width() * 0.05+10, k.height() * 0.9)),
+        k.text("ESC to reset", {
+            size: 28,
+            font: "thaleahFat",
+        }),
+        resizablePos(() => k.vec2(k.width() * 0.06, k.height() * 0.9)),
         k.color(k.YELLOW),
         k.opacity(1),
     ]);
@@ -497,10 +483,10 @@ const gameScene = (params) => {
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
-        k.color(k.rgb(31, 31, 31)),
+        k.color(k.rgb(47, 47, 59)),
         resizablePos(textboxPos),
         k.anchor("topleft"),
-        k.opacity(0.4),
+        k.opacity(0.3),
         k.z(0),
     ]);
     const textboxBackParent = k.add([
@@ -513,7 +499,6 @@ const gameScene = (params) => {
         k.z(10),
         k.opacity(0),
     ]);
-
 
     const textboxTextPos = () => {
         return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
@@ -626,8 +611,6 @@ const gameScene = (params) => {
             currentIndex++;
             moveArrow();
         }
-
-        gameState.timeLeft = MAX_TIME;
         jumpCount = 0;
         textboxText.updatePos();
 
@@ -836,7 +819,6 @@ const gameScene = (params) => {
         if (playerState.curLineCount >= curBlockData.lineCount - 1) {
             return updateDialog();
         }
-        // totalCorrectlines++;
 
         nextChar();
         nextLine();

@@ -182,10 +182,10 @@ k.scene("selection", () => {
     }
 
     const name = k.add([
-        k.text("", { size: 36 }),
+        k.text("", { size: 28 }),
         k.textInput(true, 20),
         k.pos(fixedStartX, k.height() / 1.48), 
-        k.anchor("center"),
+        k.anchor("left"),
         k.color(k.YELLOW),
         k.opacity(0),
         k.z(21),
@@ -258,19 +258,24 @@ k.scene("selection", () => {
         previousInput = name.text;
 
         letterObjects.forEach((letterObj, i) => {
-            let char = input[i];
             const correct = targetText[i];
-            let displayChar = char;
-            if (char === " " && correct !== " ") {
+            const char = input[i];
+            let displayChar;
+            if (!char) {
+                displayChar = correct;
+            } else if (char === " " && correct !== " ") {
                 displayChar = "_";
-            } else if (!char) {
-                displayChar = "";
+            } else {
+                displayChar = char;
             }
-            const color = !char
-                ? k.rgb(128, 128, 128)
-                : ((char === " " && correct !== " ") || (char.toLowerCase() !== correct.toLowerCase())
-                    ? k.rgb(255, 0, 0)
-                    : k.rgb(3, 255, 87));
+            let color;
+            if (!char) {
+                color = k.rgb(128, 128, 128);
+            } else if (char.toLowerCase() !== correct.toLowerCase() || (char === " " && correct !== " ")) {
+                color = k.rgb(255, 0, 0);
+            } else {
+                color = k.rgb(3, 255, 87);
+            }
             letterObj.text = displayChar;
             letterObj.color = color;
         });

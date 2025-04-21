@@ -206,6 +206,10 @@ const gameScene = (params) => {
     const matchColorToken = (i, ch) => {
         const T = theme.tokens;
         const A = theme.associations;
+
+        if (errorCharsIndexes.includes(i)) {
+            return COLOR_TEXT_INCORRECT;
+        }
         if (i === rivalState.cursorPos) {
             return COLOR_TEXT_RIVAL;
         }
@@ -217,12 +221,11 @@ const gameScene = (params) => {
                 ? COLOR_TEXT_RIVAL
                 : COLOR_TEXT_DEFAULT;
         }
-    
-        if (ch.match(A.brackets))   return k.Color.fromHex(T.brackets);
-        if (ch.match(A.operators))  return k.Color.fromHex(T.operators);
-        if (ch.match(A.punctuation))return k.Color.fromHex(T.punctuation);
+        if (ch.match(A.brackets)) return k.Color.fromHex(T.brackets);
+        if (ch.match(A.operators)) return k.Color.fromHex(T.operators);
+        if (ch.match(A.punctuation)) return k.Color.fromHex(T.punctuation);
         if (ch === '"' || ch === "'") return k.Color.fromHex(T.strings);
-    
+
         const tokenPattern = /[\w$]+|[^\s\w]/g;
         const matches = Array.from(originalText.matchAll(tokenPattern));
         let token = "";
@@ -234,28 +237,17 @@ const gameScene = (params) => {
                 break;
             }
         }
-        let color;
-        if (errorCharsIndexes.includes(i)) {
-            color = COLOR_TEXT_INCORRECT;
-        } else if (A.tags.test(token)) {
-            color = k.Color.fromHex(T.tags);
-        } else if (A.numbers.test(token)) {
-            color = k.Color.fromHex(T.numbers);
-        } else if (A.classes.test(token)) {
-            color = k.Color.fromHex(T.classes);
-        } else if (A.functions.test(token)) {
-            color = k.Color.fromHex(T.functions);
-        } else if (A.keywords.test(token)) {
-            color = k.Color.fromHex(T.keywords);
-        } else if (A.strings.test(token)) {
-            color = k.Color.fromHex(T.strings);
-        } else if (/^[A-Za-z_$][\w$]*$/.test(token)) {
-            color = k.Color.fromHex(T.variables);
-        } else {
-            color = k.Color.fromHex(T.text);
+
+        if (A.tags.test(token)) return k.Color.fromHex(T.tags);
+        if (A.numbers.test(token)) return k.Color.fromHex(T.numbers);
+        if (A.classes.test(token)) return k.Color.fromHex(T.classes);
+        if (A.functions.test(token)) return k.Color.fromHex(T.functions);
+        if (A.keywords.test(token)) return k.Color.fromHex(T.keywords);
+        if (A.strings.test(token)) return k.Color.fromHex(T.strings);
+        if (/^[A-Za-z_$][\w$]*$/.test(token)) {
+            return k.Color.fromHex(T.variables);
         }
-    
-        return color;
+        return k.Color.fromHex(T.text);
     };
 
     let rivalTimer = 0;

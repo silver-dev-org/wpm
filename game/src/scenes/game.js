@@ -113,7 +113,7 @@ const gameScene = (params) => {
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
-    let rivalSpeed = params.rivalSpeed ?? actual_rivalSpeed;
+    let rivalSpeed = actual_rivalSpeed;
     let curBlockData = {
         lineCount: 0,
     };
@@ -204,58 +204,58 @@ const gameScene = (params) => {
      * @param {number} i
      */
     const matchColorToken = (i, ch) => {
-        const themeTokens = theme.tokens;
-        const themeAssociations = theme.associations;
-
+        const T = theme.tokens;
+        const A = theme.associations;
         if (i === rivalState.cursorPos) {
             return COLOR_TEXT_RIVAL;
         }
-
-        if (ch === " ") return COLOR_TEXT_DEFAULT;
-        if (playerState.cursorPos - 1 < i) {
-            if (rivalState.cursorPos + 1 > i) {
-                return COLOR_TEXT_RIVAL;
-            }
+        if (ch === " ") {
             return COLOR_TEXT_DEFAULT;
         }
-
-        let charColor = COLOR_TEXT_DEFAULT;
-
-        const words = originalText.split(" ");
-        let wordCharsIndex = 0;
-        const word =
-            words.find((w) => {
-                const found = w.length + wordCharsIndex >= i;
-                wordCharsIndex += w.length + 1;
-                return found;
-            }) || "";
-
+        if (i > playerState.cursorPos - 1) {
+            return i < rivalState.cursorPos + 1
+                ? COLOR_TEXT_RIVAL
+                : COLOR_TEXT_DEFAULT;
+        }
+    
+        if (ch.match(A.brackets))   return k.Color.fromHex(T.brackets);
+        if (ch.match(A.operators))  return k.Color.fromHex(T.operators);
+        if (ch.match(A.punctuation))return k.Color.fromHex(T.punctuation);
+        if (ch === '"' || ch === "'") return k.Color.fromHex(T.strings);
+    
+        const tokenPattern = /[\w$]+|[^\s\w]/g;
+        const matches = Array.from(originalText.matchAll(tokenPattern));
+        let token = "";
+        for (const m of matches) {
+            const start = m.index;
+            const end = start + m[0].length;
+            if (i >= start && i < end) {
+                token = m[0];
+                break;
+            }
+        }
+        let color;
         if (errorCharsIndexes.includes(i)) {
-            charColor = COLOR_TEXT_INCORRECT;
-        } else if (ch.match(themeAssociations.brackets)) {
-            charColor = k.Color.fromHex(themeTokens.brackets);
-        } else if (ch.match(themeAssociations.punctuation)) {
-            charColor = k.Color.fromHex(themeTokens.punctuation);
-        } else if (word.match(themeAssociations.classes)) {
-            charColor = k.Color.fromHex(themeTokens.classes);
-        } else if (word.match(themeAssociations.functions)) {
-            charColor = k.Color.fromHex(themeTokens.functions);
-        } else if (word.match(themeAssociations.keywords)) {
-            charColor = k.Color.fromHex(themeTokens.keywords);
-        } else if (word.match(themeAssociations.strings)) {
-            charColor = k.Color.fromHex(themeTokens.strings);
+            color = COLOR_TEXT_INCORRECT;
+        } else if (A.tags.test(token)) {
+            color = k.Color.fromHex(T.tags);
+        } else if (A.numbers.test(token)) {
+            color = k.Color.fromHex(T.numbers);
+        } else if (A.classes.test(token)) {
+            color = k.Color.fromHex(T.classes);
+        } else if (A.functions.test(token)) {
+            color = k.Color.fromHex(T.functions);
+        } else if (A.keywords.test(token)) {
+            color = k.Color.fromHex(T.keywords);
+        } else if (A.strings.test(token)) {
+            color = k.Color.fromHex(T.strings);
+        } else if (/^[A-Za-z_$][\w$]*$/.test(token)) {
+            color = k.Color.fromHex(T.variables);
         } else {
-            charColor = k.Color.fromHex(themeTokens.text);
+            color = k.Color.fromHex(T.text);
         }
-
-        if (
-            rivalState.cursorPos < playerState.cursorPos &&
-            rivalState.cursorPos > i
-        ) {
-            return charColor
-        }
-
-        return charColor;
+    
+        return color;
     };
 
     let rivalTimer = 0;
@@ -554,6 +554,7 @@ const gameScene = (params) => {
 
 
     const textboxTextPos = () => {
+        matchColorToken
         return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
     }
 
@@ -646,7 +647,7 @@ const gameScene = (params) => {
         currentBlockIndex++;
         completedBlocks++;
         if (completedBlocks > 0 && completedBlocks <= 2) {
-            actual_rivalSpeed -= 0.05;
+            actual_rivalSpeed -= 0.06;
         } else if (completedBlocks > 2) {
             actual_rivalSpeed -= 0.06;
         }

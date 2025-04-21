@@ -1,12 +1,8 @@
 import { k } from "../kaplay.js";
-import { EASY_RIVAL_SPEED } from "../constants.js";
-import { savePlay, getPlay } from "../systems/saves.js";
+import { getMute, saveMute, getPlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
-export let actualname;
-export const settings = {
-    mute: false
-};
+export const settings = { mute: false };
 
 k.scene("selection", () => {
 
@@ -14,15 +10,20 @@ k.scene("selection", () => {
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
     const commands = ["about", "github", "start with sound", "start muted"];
-    let fontsize =18;
-    function calcNewTarget(input) {
-        if (input === "") return "start with sound";
-        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
-        return found ? found : "start with sound";
-    }
+    let fontsize = 18;
 
-    k.volume(0.5);
-    loadMute();
+    function calcNewTarget(input) {
+        if (input === "") return "Start with sound";
+        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
+        return found ? found : "Start with sound";
+    }
+    const playData = getPlay();
+    if (playData) {
+        console.log("Data:", playData.wpm, playData.acc);
+    }
+    settings.mute = getMute();
+    k.volume(settings.mute ? 0 : 0.5);
+
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -53,7 +54,7 @@ k.scene("selection", () => {
     ]);
     const muteText = k.add([
         k.anchor("left"),
-        k.text("start muted", { size: fontsize }),
+        k.text("Start muted", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.35 - 40, k.height() * 0.6 + 10)),
         k.opacity(1),
         k.z(21),
@@ -175,7 +176,7 @@ k.scene("selection", () => {
             letterObjects.push(letter);
 
             const underscore = k.add([
-                k.text("_", { size: fontsize+4 }),
+                k.text("_", { size: fontsize + 4 }),
                 k.pos(fixedStartX + i * letterSpacing, k.height() / 1.45),
                 k.anchor("center"),
                 k.color(k.WHITE),
@@ -214,13 +215,11 @@ k.scene("selection", () => {
         }
     }
 
-    function loadMute() {
-        const playDataString = getPlay(actualname);
-        if (playDataString) {
-            const playData = JSON.parse(playDataString);
-            const mute = playData.mute;
-        }
-    }
+    settings.mute = getMute();
+    k.volume(settings.mute ? 0 : 0.5);
+    
+    button_muteON.opacity = settings.mute ? 0 : 1;
+    button_muteOFF.opacity = settings.mute ? 1 : 0;
 
     const name = k.add([
         k.text("", { size: fontsize }),
@@ -344,31 +343,26 @@ k.scene("selection", () => {
                 k.volume(0.5);
                 button_muteON.opacity = 1;
                 button_muteOFF.opacity = 0;
-                savePlay({ userName: input });
+                saveMute(false);
                 name.text = "";
-                k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
+                k.go("game");
                 break;
             case "start muted":
                 settings.mute = true;
                 k.volume(0);
                 button_muteON.opacity = 0;
                 button_muteOFF.opacity = 1;
-                savePlay({ userName: input });
+                saveMute(true);
                 name.text = "";
-                k.go("game", { rivalSpeed: EASY_RIVAL_SPEED, userName: input });
+                k.go("game");
                 break;
         }
 
         updateTextColors();
     });
 
-    if (settings.mute) {
-        button_muteON.opacity = 0;
-        button_muteOFF.opacity = 1;
-    } else {
-        button_muteON.opacity = 1;
-        button_muteOFF.opacity = 0;
-    }
+    button_muteON.opacity = settings.mute ? 0 : 1;
+    button_muteOFF.opacity = settings.mute ? 1 : 0;
 
     let isPreventingError = false;
     function preventError() {

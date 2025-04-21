@@ -1,12 +1,12 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks,lastChallenge,startTime, goal_time} from "./game.js";
-import { savePlay, getPlay } from "../systems/saves.js";
-import { actualname, settings } from "./selectionScene.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks, lastChallenge, startTime, goal_time } from "./game.js";
+import { savePlay, getPlay,saveMute } from "../systems/saves.js";
+import { settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
-import { MAX_BLOCKS,goalBlocks } from "../constants.js";
+import { MAX_BLOCKS, goalBlocks } from "../constants.js";
 k.scene("endgame", () => {
-    let fontsize =18;
+    let fontsize = 18;
     let record_blocks = goalCompletedBlocks;
     let record_challenges = lastChallenge;
     let awpm = goal_awpm;
@@ -63,23 +63,17 @@ k.scene("endgame", () => {
             }, intervalTime);
         }
     }
-    const username = actualname;
-    const retrievedData = getPlay(username);
-
+    const retrievedData = getPlay();
     if (retrievedData) {
+        prev_awpm = parseFloat(retrievedData.awpm) || 0;
+        prev_wpm = parseFloat(retrievedData.wpm) || 0;
+        prev_lpm = parseFloat(retrievedData.lpm) || 0;
+        prev_acc = parseFloat(retrievedData.acc) || 0;
 
-        reciveprevdata = retrievedData;
-        prevdata = JSON.parse(reciveprevdata);
-        prev_awpm = parseFloat(prevdata.awpm) || 0;
-        prev_wpm = parseFloat(prevdata.wpm) || 0;
-        prev_lpm = parseFloat(prevdata.lpm) || 0;
-        prev_acc = parseFloat(prevdata.acc) || 0;
-
-        best_awpm = Math.max(prevdata.awpm || 0, awpm);
-        best_wpm = Math.max(prevdata.wpm || 0, wpm);
-        best_lpm = Math.max(prevdata.lpm || 0, lpm);
-        best_acc = Math.max(prevdata.acc || 0, acc);
-
+        best_awpm = Math.max(retrievedData.awpm || 0, awpm);
+        best_wpm = Math.max(retrievedData.wpm || 0, wpm);
+        best_lpm = Math.max(retrievedData.lpm || 0, lpm);
+        best_acc = Math.max(retrievedData.acc || 0, acc);
     } else {
         console.log("Empty load, load default data.");
         best_awpm = awpm;
@@ -102,7 +96,7 @@ k.scene("endgame", () => {
     ]);
 
     k.add([
-        k.text("WPM "+wpm.toFixed(2), {
+        k.text("WPM " + wpm.toFixed(2), {
             size: 48,
         }),
         resizablePos(() => k.vec2(k.width() * 0.4, k.height() * 0.55)),
@@ -112,17 +106,17 @@ k.scene("endgame", () => {
         k.z(19),
     ]);
     k.add([
-         k.text("ACC "+ acc.toFixed(2) + "%", {
+        k.text("ACC " + acc.toFixed(2) + "%", {
             size: 22,
         }),
-        resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.55-50)),
+        resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.55 - 50)),
         k.color(k.WHITE),
         k.anchor("left"),
         k.opacity(1),
         k.z(19),
     ]);
     k.add([
-        k.text("Challenges "+  record_blocks+ " / " + goalBlocks, { size: fontsize }),
+        k.text("Challenges " + record_blocks + " / " + goalBlocks, { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.WHITE),
@@ -150,7 +144,7 @@ k.scene("endgame", () => {
         k.z(18),
     ]);
     k.add([
-        k.text(goal_time.toFixed(2)+" seg", { size: fontsize }),
+        k.text(goal_time.toFixed(2) + " seg", { size: fontsize }),
         resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
         k.anchor("center"),
         k.color(k.YELLOW),
@@ -179,14 +173,8 @@ k.scene("endgame", () => {
         k.z(19),
     ]);
 
-    savePlay({
-        userName: username,
-        awpm: currentResults.awpm,
-        wpm: currentResults.wpm,
-        lpm: currentResults.lpm,
-        acc: currentResults.acc,
-        mute: settings.mute,
-    });
+    savePlay({ wpm: best_wpm, lpm: best_lpm, acc: best_acc });
+    saveMute(settings.mute);
 
     const button_muteON = k.add([
         k.sprite("muteON"),
@@ -213,12 +201,12 @@ k.scene("endgame", () => {
         button_muteOFF.opacity = 0;
         updateMusicVolume();
     }
-    
+
     onKeyPress("escape", () => {
         record_blocks = 0;
         record_challenges = "";
         music.stop();
-        k.go("selection");
+        k.go("game");
     });
 
 });

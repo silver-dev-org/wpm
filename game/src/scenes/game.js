@@ -62,7 +62,6 @@ let titles = dialogsData.map((item) => item.title);
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
-let actual_rivalSpeed = EASY_RIVAL_SPEED;
 let completedBlocks = -1;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
@@ -113,7 +112,7 @@ const gameScene = (params) => {
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
-    let rivalSpeed = actual_rivalSpeed;
+    let rivalSpeed = settings.rivalSpeed;
     let curBlockData = {
         lineCount: 0,
     };
@@ -263,7 +262,7 @@ const gameScene = (params) => {
                 rivalWrite();
             } else {
                 music.stop();
-                k.go("endgame", { rivalSpeed: actual_rivalSpeed });
+                k.go("endgame", { rivalSpeed: settings.rivalSpeed });
                 StatsforAnalitics();
                 resetGameStats();
             }
@@ -296,7 +295,7 @@ const gameScene = (params) => {
         totalIcorrectCorrectChars = 0;
         totalTypedCharacters = 0;
         totalCorrectlines = 0;
-        actual_rivalSpeed = EASY_RIVAL_SPEED;
+        rivalSpeed = EASY_RIVAL_SPEED;
         errorCharsIndexes = [];
         errorCharsReplaces = {};
     }
@@ -472,7 +471,7 @@ const gameScene = (params) => {
         music.stop();
         resetGameStats();
         k.go("game", {
-            rivalSpeed: actual_rivalSpeed,
+            rivalSpeed: EASY_RIVAL_SPEED,
         });
     });
 
@@ -481,7 +480,7 @@ const gameScene = (params) => {
         resetGameStats();
         music.stop();
         k.go("endgame", {
-            rivalSpeed: actual_rivalSpeed,
+            rivalSpeed: EASY_RIVAL_SPEED,
         });
     });
 
@@ -638,11 +637,6 @@ const gameScene = (params) => {
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
-        if (completedBlocks > 0 && completedBlocks <= 2) {
-            actual_rivalSpeed -= 0.06;
-        } else if (completedBlocks > 2) {
-            actual_rivalSpeed -= 0.06;
-        }
         musicRate += 0.05;
         updateMusic();
         if (completedBlocks === goalBlocks) {
@@ -650,11 +644,10 @@ const gameScene = (params) => {
             StatsforAnalitics();
             resetGameStats();
             music.stop();
-            k.go("endgame", { rivalSpeed: actual_rivalSpeed });
+            k.go("endgame");
             return;
         }
-
-        rivalSpeed -= 0.02;
+       // rivalSpeed -= 0.02;update rival speed
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);

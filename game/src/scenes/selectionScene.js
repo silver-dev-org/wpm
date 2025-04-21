@@ -2,10 +2,22 @@ import { k } from "../kaplay.js";
 import { getMute, saveMute, getPlay } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
-export const settings = { mute: false };
-
+export const settings = { 
+    mute: false, 
+    rivalSpeed: 0.3 
+};
 k.scene("selection", () => {
+    //testing options
+    k.onKeyPress("up", () => {
+        settings.rivalSpeed = Math.min(2, settings.rivalSpeed + 0.01);
+        k.debug.log(` ${settings.rivalSpeed.toFixed(2)}`);
+    });
 
+    k.onKeyPress("down", () => {
+        settings.rivalSpeed = Math.max(0, settings.rivalSpeed - 0.01);
+        k.debug.log(` ${settings.rivalSpeed.toFixed(2)}`);
+    });
+    //
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");

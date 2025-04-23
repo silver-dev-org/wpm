@@ -333,7 +333,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.1+20, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),
@@ -456,7 +456,7 @@ const gameScene = (params) => {
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(460, 0);
+            return k.vec2(450, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);

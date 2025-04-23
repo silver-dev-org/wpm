@@ -26,9 +26,9 @@ k.scene("endgame", () => {
 
     let reciveprevdata = 0;
     let prevdata = 0;
-    wpm = parseFloat(wpm.toFixed(2));
-    lpm = parseFloat(lpm.toFixed(2));
-    acc = parseFloat(acc.toFixed(2));
+    wpm = parseFloat((wpm  || 0).toFixed(2));
+    lpm = parseFloat((lpm  || 0).toFixed(2));
+    acc = parseFloat((acc  || 0).toFixed(2));
 
     const currentResults = {
         wpm: wpm,
@@ -85,7 +85,7 @@ k.scene("endgame", () => {
 if (saved) {
   k.add([
     k.text(
-      `Best WPM (${new Date(saved.loadDate).toLocaleDateString()}): ${saved.bestWpm.toFixed(2)}`,
+      `Best WPM (${new Date(saved.loadDate).toLocaleDateString()}): ${(saved.bestWpm || 0).toFixed(2)}`,
       { size: 22 }
     ),
     resizablePos(() => k.vec2(k.width()*0.5, k.height()*0.80)),
@@ -179,7 +179,7 @@ if (saved) {
     ]);
     const textPressEnd = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.1+20, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),

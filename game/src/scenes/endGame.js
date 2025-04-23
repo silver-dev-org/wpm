@@ -1,12 +1,12 @@
 import { k } from "../kaplay";
 import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks, lastChallenge, startTime, goal_time } from "./game.js";
-import { savePlay, getPlay,saveMute } from "../systems/saves.js";
+import { savePlay, getPlay, saveMute } from "../systems/saves.js";
 import { settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 import { MAX_BLOCKS, goalBlocks } from "../constants.js";
 k.scene("endgame", () => {
-    let fontsize = 18;
+    let fontsize = 20;
     let record_blocks = goalCompletedBlocks;
     let record_challenges = lastChallenge;
     let awpm = goal_awpm;
@@ -81,6 +81,19 @@ k.scene("endgame", () => {
         best_lpm = lpm;
         best_acc = acc;
     }
+    const saved = getPlay();
+if (saved) {
+  k.add([
+    k.text(
+      `Best WPM (${new Date(saved.loadDate).toLocaleDateString()}): ${saved.bestWpm.toFixed(2)}`,
+      { size: 22 }
+    ),
+    resizablePos(() => k.vec2(k.width()*0.5, k.height()*0.80)),
+    k.anchor("center"),
+    k.color(k.YELLOW),
+    k.z(20),
+  ]);
+}
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -97,9 +110,9 @@ k.scene("endgame", () => {
 
     k.add([
         k.text("WPM " + wpm.toFixed(2), {
-            size: 48,
+            size: 32,
         }),
-        resizablePos(() => k.vec2(k.width() * 0.4, k.height() * 0.55)),
+        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.50+20)),
         k.anchor("left"),
         k.color(k.YELLOW),
         k.opacity(1),
@@ -107,10 +120,10 @@ k.scene("endgame", () => {
     ]);
     k.add([
         k.text("ACC " + acc.toFixed(2) + "%", {
-            size: 22,
+            size: 32,
         }),
-        resizablePos(() => k.vec2(k.width() * 0.62, k.height() * 0.55 - 50)),
-        k.color(k.WHITE),
+        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.5+20)),
+        k.color(k.YELLOW),
         k.anchor("left"),
         k.opacity(1),
         k.z(19),
@@ -124,42 +137,42 @@ k.scene("endgame", () => {
     ]);
     k.add([
         k.text("Last Challenge", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.7)),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.7-70)),
         k.anchor("center"),
         k.color(k.WHITE),
         k.z(18),
     ]);
     k.add([
         k.text(record_challenges, { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75-70)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
         k.text("Time elapsed", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7-70)),
         k.anchor("center"),
         k.color(k.WHITE),
         k.z(18),
     ]);
     k.add([
         k.text(goal_time.toFixed(2) + " seg", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75-70)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
     ]);
     k.add([
         k.text("Last 60s WPM", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7-70)),
         k.anchor("center"),
         k.color(k.WHITE),
         k.z(18),
     ]);
     k.add([
         k.text(awpm, { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75)),
+        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75-70)),
         k.anchor("center"),
         k.color(k.YELLOW),
         k.z(18),
@@ -173,7 +186,13 @@ k.scene("endgame", () => {
         k.z(19),
     ]);
 
-    savePlay({ wpm: best_wpm, lpm: best_lpm, acc: best_acc });
+    savePlay({
+        wpm: best_wpm,
+        lpm: best_lpm,
+        acc: best_acc,
+        bestWpm: best_wpm,
+    });
+    
     saveMute(settings.mute);
 
     const button_muteON = k.add([

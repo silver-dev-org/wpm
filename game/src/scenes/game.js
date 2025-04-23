@@ -20,43 +20,7 @@ import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./selectionScene.js";
-//CSS
-const style = document.createElement("style");
-style.innerHTML = `
-    :root {
-      --bg: hsl(0, 3.60%, 11.00%);
-      --gray1: #0a080a;
-      --gray2: #110b11;
-    }
-    
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: var(--bg);
-      position: relative;
-    }
-    
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background:
-        linear-gradient(45deg, var(--gray1) 25%, transparent 25%),
-        linear-gradient(-45deg, var(--gray1) 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, var(--gray1) 75%),
-        linear-gradient(-45deg, transparent 75%, var(--gray1) 75%),
-        rgba(0, 0, 0, 0.81);
-      background-size: 15px 15px, 15px 15px, 15px 15px, 15px 15px, cover;
-      background-position: 0 0, 0 7.5px, 7.5px -7.5px, -7.5px 0, center;
-      background-blend-mode: multiply;
-      backdrop-filter: blur(10px);
-      z-index: -1;
-    }
-  `;
-document.head.appendChild(style);
+
 let titles = dialogsData.map((item) => item.title);
 
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
@@ -106,9 +70,8 @@ const gameScene = (params) => {
     k.loadMusic("endgame", "/sounds/endgame.mp3");
     k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
-    k.loadSprite("BG_analitycs7", "/sprites/BG_WPM_IN_GAME.png");
-    k.loadSprite("BG_analitycs8", "/sprites/BG_TIME_IN_GAME.png");
-    k.loadSprite("BG_analitycs9", "/sprites/BG_AWPM_IN_GAME.png");
+    k.loadSprite("BG_WPM_IN_GAME", "/sprites/BG_WPM_IN_GAME.png");
+    k.loadSprite("BG_TIME_IN_GAME", "/sprites/BG_TIME_IN_GAME.png");
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
@@ -262,8 +225,8 @@ const gameScene = (params) => {
                 rivalWrite();
             } else {
                 music.stop();
-                k.go("endgame", { rivalSpeed: settings.rivalSpeed });
                 StatsforAnalitics();
+                k.go("endgame", { rivalSpeed: settings.rivalSpeed });
                 resetGameStats();
             }
         }
@@ -271,8 +234,6 @@ const gameScene = (params) => {
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
-        // awmp_text.text = Math.floor(awpm).toString();
-
     });
 
     function StatsforAnalitics() {
@@ -310,46 +271,36 @@ const gameScene = (params) => {
         }
     };
     const filesFoldersPos = () => k.vec2(0, 0);
-
-    /* const awmp_text = k.add([
-         k.anchor("center"),
-         k.pos(k.width() * 0.4, k.height() * 0.02),
-         k.text("AWPM: ", {
-             size: 32,
-         }),
-         k.color(k.YELLOW),
-         k.z(50),
-     ]);*/
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.4, k.height() * 0.025),
+        k.pos(k.width() * 0.3+ 20, k.height() * 0.025),
         k.text("0", {
             size: 18,
         }),
         k.color(k.YELLOW),
-        k.z(50),
+        k.z(21),
     ]);
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.6, k.height() * 0.025),
+        k.pos(k.width() * 0.4+ 20, k.height() * 0.025),
         k.text("time: ", {
             size: 18,
         }),
         k.color(k.YELLOW),
-        k.z(50),
+        k.z(22),
     ]);
 
     k.add([
-        k.sprite("BG_analitycs7"),
-        k.pos(k.width() * 0.3, k.height() * 0.023),
+        k.sprite("BG_WPM_IN_GAME"),
+        k.pos(k.width() * 0.3, k.height() * 0.02+5),
         k.anchor("center"),
-        k.z(51),
+        k.z(20),
     ]);
     k.add([
-        k.sprite("BG_analitycs8"),
-        k.pos(k.width() * 0.5, k.height() * 0.023),
+        k.sprite("BG_TIME_IN_GAME"),
+        k.pos(k.width() * 0.4, k.height() * 0.02+5),
         k.anchor("center"),
-        k.z(51),
+        k.z(20),
     ]);
     k.add([
         resizablePos(filesFoldersPos),
@@ -471,15 +422,6 @@ const gameScene = (params) => {
         music.stop();
         resetGameStats();
         k.go("game", {
-            rivalSpeed: EASY_RIVAL_SPEED,
-        });
-    });
-
-    k.onKeyPress(["up"], () => {
-        StatsforAnalitics();
-        resetGameStats();
-        music.stop();
-        k.go("endgame", {
             rivalSpeed: EASY_RIVAL_SPEED,
         });
     });
@@ -647,7 +589,17 @@ const gameScene = (params) => {
             k.go("endgame");
             return;
         }
-       // rivalSpeed -= 0.02;update rival speed
+        const startSpeed = EASY_RIVAL_SPEED; 
+        const endSpeed   = 0.22;           
+        const steps      = 4;               
+        if (completedBlocks > 0) {
+       
+          const t = Math.min(completedBlocks, steps) / steps;
+          rivalSpeed = startSpeed * Math.pow(endSpeed / startSpeed, t);
+        } else {
+          rivalSpeed = startSpeed;
+        }
+        k.play
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);

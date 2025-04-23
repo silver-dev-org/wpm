@@ -1,47 +1,71 @@
 import { k } from "../kaplay.js";
-import { getMute, saveMute, getPlay } from "../systems/saves.js";
+import { getMute, saveMute } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export const settings = { 
-    mute: false, 
-    rivalSpeed: 0.3 
+    mute: false,  
 };
+function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
+        .test(navigator.userAgent);
+}
 k.scene("selection", () => {
-    //testing options
-    k.onKeyPress("up", () => {
-        settings.rivalSpeed = Math.min(2, settings.rivalSpeed + 0.01);
-        k.debug.log(` ${settings.rivalSpeed.toFixed(2)}`);
-    });
-
-    k.onKeyPress("down", () => {
-        settings.rivalSpeed = Math.max(0, settings.rivalSpeed - 0.01);
-        k.debug.log(` ${settings.rivalSpeed.toFixed(2)}`);
-    });
-    //
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
     const commands = ["about", "github", "start with sound", "start muted"];
     let fontsize = 18;
-
-    function calcNewTarget(input) {
-        if (input === "") return "Start with sound";
-        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
-        return found ? found : "Start with sound";
-    }
-    const playData = getPlay();
-    if (playData) {
-        console.log("Data:", playData.wpm, playData.acc);
-    }
-    settings.mute = getMute();
-    k.volume(settings.mute ? 0 : 0.5);
-
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
         k.anchor("center"),
         k.z(18),
     ]);
+    k.add([
+        k.anchor("center"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
+        k.text("Get faster and better at technical interviewing ", {
+            size: 22,
+        }),
+        k.color(k.WHITE),
+        k.z(21),
+    ]);
+    k.add([
+        k.anchor("center"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.90)),
+        k.text("by practicing typing code.", {
+            size: 22,
+        }),
+        k.color(k.WHITE),
+        k.z(21),
+    ]);
+    const title = k.add([
+        k.sprite("WPM"),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
+        k.anchor("center"),
+        k.z(18),
+    ]);
+    if (isMobile()) {
+        k.add([
+            k.text("WPM is a desktop-only experience", { size: 32 }),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
+            k.anchor("center"),
+            k.color(k.YELLOW),
+            k.z(18),
+        ]);
+        return;
+    }
+    isMobile();
+
+    function calcNewTarget(input) {
+        if (input === "") return "Start with sound";
+        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
+        return found ? found : "Start with sound";
+    }
+    settings.mute = getMute();
+    k.volume(settings.mute ? 0 : 0.5);
+
+
     const outsideBox = k.add([
         k.rect(800, 260, { radius: 2 }),
         k.pos(k.width() * 0.30 - 10, k.height() * 0.50),
@@ -93,7 +117,6 @@ k.scene("selection", () => {
         k.opacity(0),
         k.z(22),
     ]);
-
     const arrowMute = k.add([
         k.text("←", { size: fontsize }),
         resizablePos(() => k.vec2(muteText.pos.x + muteText.text.length * 14 + 10, muteText.pos.y)),
@@ -102,31 +125,6 @@ k.scene("selection", () => {
         k.opacity(0),
         k.z(22),
     ]);
-    k.add([
-        k.anchor("center"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.85)),
-        k.text("Get faster and better at technical interviewing ", {
-            size: 22,
-        }),
-        k.color(k.WHITE),
-        k.z(21),
-    ]);
-    k.add([
-        k.anchor("center"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.90)),
-        k.text("by practicing typing code.", {
-            size: 22,
-        }),
-        k.color(k.WHITE),
-        k.z(21),
-    ]);
-    const title = k.add([
-        k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
-        k.anchor("center"),
-        k.z(18),
-    ]);
-
     const button_muteON = k.add([
         k.sprite("muteON"),
         k.pos(k.width() * 0.9, k.height() * 0),
@@ -154,9 +152,7 @@ k.scene("selection", () => {
     function moveArrow(targetObj) {
         const newY = targetObj.pos.y;
         const newX = targetObj.pos.x + targetObj.text.length * 16;
-
         commandArrow.pos = k.vec2(newX, newY);
-
         commandArrow.animate("pos", [k.vec2(newX, newY), k.vec2(newX + 10, newY)], {
             duration: 0.5,
             loop: true,
@@ -295,7 +291,9 @@ k.scene("selection", () => {
         if (localErrorCount > lastErrorCount) {
             preventError();
         }
+        
         lastErrorCount = localErrorCount;
+        
         if (input.length > previousInput.length && localErrorCount >= 3) {
             name.text = previousInput;
             preventError();

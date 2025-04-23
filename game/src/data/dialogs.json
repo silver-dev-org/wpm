@@ -59,33 +59,6 @@
   },
   {
     "id": 6,
-    "title": "validParenthesis",
-    "language": "js",
-    "blocks": [
-      "var isValid = function(s) {\n",
-      "    const stack = [];\n",
-      "    const mapping = {\n",
-      "        ):(,\n",
-      "        }:{,\n",
-      "        ]:[,\n",
-      "    };\n",
-      "    \n",
-      "    for (const c of s) {\n",
-      "        if (Object.values(mapping).includes(c)) {\n",
-      "            stack.push(c);\n",
-      "        } else if (mapping.hasOwnProperty(c)) {\n",
-      "            if (!stack.length || mapping[c] !== stack.pop()) {\n",
-      "                return false;\n",
-      "            }\n",
-      "        }\n",
-      "    }\n",
-      "    \n",
-      "    return stack.length === 0;\n",
-      "};\n"
-    ]
-  },
-  {
-    "id": 7,
     "title": "mergeTwoLists",
     "language": "js",
     "blocks": [
@@ -111,7 +84,7 @@
     ]
   },
   {
-    "id": 8,
+    "id": 7,
     "title": "removeDuplicates",
     "language": "js",
     "blocks": [
@@ -130,7 +103,7 @@
     ]
   },
   {
-    "id": 9,
+    "id": 8,
     "title": "strStr",
     "language": "js",
     "blocks": [
@@ -150,7 +123,7 @@
     ]
   },
   {
-    "id": 10,
+    "id": 9,
     "title": "searchInsert",
     "language": "js",
     "blocks": [
@@ -175,7 +148,7 @@
     ]
   },
   {
-    "id": 11,
+    "id": 10,
     "title": "lengthOfLastWord",
     "language": "js",
     "blocks": [
@@ -194,7 +167,7 @@
     ]
   },
   {
-    "id": 12,
+    "id": 11,
     "title": "plusOne",
     "language": "js",
     "blocks": [
@@ -214,7 +187,7 @@
     ]
   },
   {
-    "id": 13,
+    "id": 12,
     "title": "addBinary",
     "language": "js",
     "blocks": [
@@ -241,7 +214,7 @@
     ]
   },
   {
-    "id": 14,
+    "id": 13,
     "title": "mySqrt",
     "language": "js",
     "blocks": [
@@ -267,7 +240,7 @@
     ]
   },
   {
-    "id": 15,
+    "id": 14,
     "title": "climbStairs",
     "language": "js",
     "blocks": [
@@ -289,7 +262,7 @@
     ]
   },
   {
-    "id": 16,
+    "id": 15,
     "title": "deleteDuplicates",
     "language": "js",
     "blocks": [
@@ -309,7 +282,7 @@
     ]
   },
   {
-    "id": 17,
+    "id": 16,
     "title": "mergeSortedArray",
     "language": "js",
     "blocks": [
@@ -322,7 +295,7 @@
     ]
   },
   {
-    "id": 18,
+    "id": 17,
     "title": "inorderTraversal",
     "language": "js",
     "blocks": [
@@ -344,7 +317,7 @@
     ]
   },
   {
-    "id": 19,
+    "id": 17,
     "title": "isSameTree",
     "language": "js",
     "blocks": [
@@ -362,7 +335,7 @@
     ]
   },
   {
-    "id": 20,
+    "id": 18,
     "title": "isSymmetric",
     "language": "js",
     "blocks": [

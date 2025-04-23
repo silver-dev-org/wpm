@@ -6,12 +6,6 @@ k.loadFont("jetbrains", "/fonts/jetbrains.ttf", {
         color: k.rgb(8, 8, 8)
     },
 });
-k.loadFont("thaleahFat", "/fonts/thaleahFat.ttf", {
-    outline: {
-        width: 1,
-        color: k.rgb(255, 255, 255)
-    },
-});
 k.loadSprite("bg4", "/sprites/bg4.png");
 k.loadSprite("bg2", "/sprites/bg2.png");
 k.loadSound("code_sound", "/sounds/code_sound.mp3");

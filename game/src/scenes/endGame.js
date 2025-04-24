@@ -105,9 +105,9 @@ k.scene("endgame", () => {
     const outsideBoxLeft = k.add([
         k.rect(290, 280, { radius: 36 }),
         pos(-offsetX-145, -offsetY+130),
-        k.color(k.rgb(7, 8, 9)),
+        k.color(k.rgb(53, 53, 71)),
         k.z(10),
-        k.opacity(0.8),
+        k.opacity(0.3),
         
     ]);
    /* const insideBoxLeft = k.add([
@@ -121,9 +121,9 @@ k.scene("endgame", () => {
     const outsideBoxRight = k.add([
         k.rect(290, 280, { radius: 36 }),
         pos(+offsetX-145, -offsetY+130),
-        k.color(k.rgb(7, 8, 9)),
+        k.color(k.rgb(53, 53, 71)),
         k.z(10),
-        k.opacity(0.8),
+        k.opacity(0.3),
         
     ]);
     /*const insideBoxRight = k.add([
@@ -213,7 +213,7 @@ k.scene("endgame", () => {
     ]);
     k.add([
       k.text("ChallengeSet:", { size: fontsize +4 }),
-      pos(0, +offsetY+15),
+      pos(0, +offsetY+25),
       k.anchor("center"),
       k.color(k.YELLOW),
       k.z(18),

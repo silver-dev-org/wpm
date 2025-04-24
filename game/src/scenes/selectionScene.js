@@ -2,12 +2,15 @@ import { k } from "../kaplay.js";
 import { getMute, saveMute } from "../systems/saves.js";
 import { resizablePos } from "../components/resizablePos.js";
 
-export const settings = { 
-    mute: false,  
+export const settings = {
+    mute: false,
 };
 function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
         .test(navigator.userAgent);
+}
+function escapeBackslashes(str) {
+    return str.replace(/\\/g, "\\\\");
 }
 k.scene("selection", () => {
     k.loadSprite("icon_02", "/sprites/icon_02.png");
@@ -15,6 +18,20 @@ k.scene("selection", () => {
     k.loadMusic("videogame", "/sounds/videogame.mp3");
     const commands = ["about", "github", "start with sound", "start muted"];
     let fontsize = 18;
+    if (isMobile()) {
+        k.add([
+            k.text("WPM is a desktop-only experience", { size: 32 }),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
+            k.anchor("center"),
+            k.color(k.YELLOW),
+            k.z(18),
+        ]);
+        return;
+    }
+    isMobile();
+
+    settings.mute = getMute();
+    k.volume(settings.mute ? 0 : 0.5);
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -45,27 +62,6 @@ k.scene("selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-    if (isMobile()) {
-        k.add([
-            k.text("WPM is a desktop-only experience", { size: 32 }),
-            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
-            k.anchor("center"),
-            k.color(k.YELLOW),
-            k.z(18),
-        ]);
-        return;
-    }
-    isMobile();
-
-    function calcNewTarget(input) {
-        if (input === "") return "Start with sound";
-        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
-        return found ? found : "Start with sound";
-    }
-    settings.mute = getMute();
-    k.volume(settings.mute ? 0 : 0.5);
-
-
     const outsideBox = k.add([
         k.rect(800, 260, { radius: 2 }),
         k.pos(k.width() * 0.30 - 10, k.height() * 0.50),
@@ -73,7 +69,6 @@ k.scene("selection", () => {
         k.z(20),
         k.opacity(0.3),
     ]);
-
     const outerBox = k.add([
         k.rect(790, 230, { radius: 1 }),
         k.pos(k.width() * 0.30 - 5, k.height() * 0.52),
@@ -149,6 +144,12 @@ k.scene("selection", () => {
         k.animate(),
     ]);
 
+    function calcNewTarget(input) {
+        if (input === "") return "Start with sound";
+        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
+        return found ? found : "Start with sound";
+    }
+
     function moveArrow(targetObj) {
         const newY = targetObj.pos.y;
         const newX = targetObj.pos.x + targetObj.text.length * 16;
@@ -160,18 +161,20 @@ k.scene("selection", () => {
         });
     }
 
-    let targetText = "start with sound";
+    let targetText = "Start with sound";
     let maxLength = targetText.length;
     const letterSpacing = 14;
     const fixedStartX = k.width() / 2.5 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
+    updateTextColors();
 
     function createLetterObjects() {
         letterObjects.forEach(obj => k.destroy(obj));
         underscoreObjects.forEach(obj => k.destroy(obj));
         letterObjects = [];
         underscoreObjects = [];
+
         for (let i = 0; i < maxLength; i++) {
             const letter = k.add([
                 k.text(targetText[i], { size: fontsize }),
@@ -181,13 +184,15 @@ k.scene("selection", () => {
                 k.z(22),
                 k.animate(),
             ]);
+
             letterObjects.push(letter);
 
             const underscore = k.add([
                 k.text("_", { size: fontsize + 4 }),
                 k.pos(fixedStartX + i * letterSpacing, k.height() / 1.45),
                 k.anchor("center"),
-                k.color(k.WHITE),
+                k.color(k.rgb(3, 255, 87)),
+                k.opacity(i === 0 ? 1 : 0),
                 k.z(20),
             ]);
             underscoreObjects.push(underscore);
@@ -225,13 +230,11 @@ k.scene("selection", () => {
 
     settings.mute = getMute();
     k.volume(settings.mute ? 0 : 0.5);
-    
     button_muteON.opacity = settings.mute ? 0 : 1;
     button_muteOFF.opacity = settings.mute ? 1 : 0;
 
     const name = k.add([
         k.text("", { size: fontsize }),
-        k.textInput(true, 20),
         k.pos(fixedStartX, k.height() / 1.48),
         k.anchor("left"),
         k.color(k.YELLOW),
@@ -245,34 +248,28 @@ k.scene("selection", () => {
         k.color(k.rgb(3, 255, 87)),
         k.z(21),
     ]);
+
+    button_muteON.opacity = settings.mute ? 0 : 1;
+    button_muteOFF.opacity = settings.mute ? 1 : 0;
+
+    let isPreventingError = false;
     let previousInput = "";
     let lastErrorCount = 0;
-
-    name.onUpdate(() => {
-        if (k.isKeyDown("escape")) {
-            name.text = "";
-            previousInput = "";
-            return;
+    let rawInput = "";
+    function preventError() {
+        if (isPreventingError) return;
+        isPreventingError = true;
+        k.shake(2);
+        if (!settings.mute) {
+            k.play("wrong_typing");
         }
-        const input = name.text;
+        k.wait(0.3, () => { isPreventingError = false; });
+    }
 
-        if (input.length === maxLength) {
-            let anyError = false;
-            for (let i = 0; i < maxLength; i++) {
-                if (input[i].toLowerCase() !== targetText[i]?.toLowerCase()) {
-                    anyError = true;
-                    break;
-                }
-            }
-            if (anyError) {
-                name.text = input.substring(0, maxLength - 1);
-                preventError();
-                return;
-            }
-        }
+    function handleInputUpdate(input) {
 
         const candidate = calcNewTarget(input);
-        if (input === "" || candidate.toLowerCase().startsWith(input.toLowerCase())) {
+        if (!input || candidate.toLowerCase().startsWith(input.toLowerCase())) {
             if (candidate !== targetText) {
                 targetText = candidate;
                 maxLength = targetText.length;
@@ -288,53 +285,53 @@ k.scene("selection", () => {
                 lastErrorIndex = i;
             }
         }
-        if (localErrorCount > lastErrorCount) {
+
+        const maxError = 3;
+        const isTooLongTotal = input.length > targetText.length;
+        const isGrowingWithErrors = input.length > previousInput.length && localErrorCount >= maxError;
+        const hasAdvancedPastError = localErrorCount >= 2 && input.length > lastErrorIndex + 1;
+
+        //check long and max error count
+        if (isTooLongTotal || isGrowingWithErrors) {
             preventError();
-        }
-        
-        lastErrorCount = localErrorCount;
-        
-        if (input.length > previousInput.length && localErrorCount >= 3) {
-            name.text = previousInput;
-            preventError();
-            return;
-        }
-        if (localErrorCount >= 2 && input.length > lastErrorIndex + 1) {
-            name.text = input.slice(0, lastErrorIndex + 1);
-            preventError();
+            rawInput = previousInput;
+            name.text = escapeBackslashes(rawInput);
             return;
         }
 
-        previousInput = name.text;
+        if (localErrorCount > lastErrorCount) {
+            preventError();
+        }
+        lastErrorCount = localErrorCount;
+
+        if (hasAdvancedPastError) {
+            rawInput = input.slice(0, lastErrorIndex + 1);
+            name.text = escapeBackslashes(rawInput);
+            return;
+        }
+
+        rawInput = input;
+        previousInput = rawInput;
 
         letterObjects.forEach((letterObj, i) => {
             const correct = targetText[i];
             const char = input[i];
-            let displayChar;
-            if (!char) {
-                displayChar = correct;
-            } else if (char === " " && correct !== " ") {
-                displayChar = "_";
-            } else {
-                displayChar = char;
-            }
-            let color;
-            if (!char) {
-                color = k.rgb(128, 128, 128);
-            } else if (char.toLowerCase() !== correct.toLowerCase() || (char === " " && correct !== " ")) {
-                color = k.rgb(255, 0, 0);
-            } else {
-                color = k.rgb(3, 255, 87);
-            }
-            letterObj.text = displayChar;
-            letterObj.color = color;
+            const displayChar = !char
+                ? correct
+                : (char === " " && correct !== " " ? "_" : char);
+
+            letterObj.text = escapeBackslashes(displayChar);
+            letterObj.color = !char
+                ? k.rgb(128, 128, 128)
+                : (char.toLowerCase() !== correct.toLowerCase() || (char === " " && correct !== " "))
+                    ? k.rgb(255, 0, 0)
+                    : k.rgb(3, 255, 87);
         });
 
         underscoreObjects.forEach((uObj, i) => {
             if (i === input.length) {
                 uObj.color = k.rgb(3, 255, 87);
-                const blink = Math.abs(Math.sin(k.time() * 5));
-                uObj.opacity = blink;
+                uObj.opacity = Math.abs(Math.sin(k.time() * 5));
             } else {
                 uObj.opacity = 0;
             }
@@ -343,55 +340,76 @@ k.scene("selection", () => {
         switch (input.toLowerCase()) {
             case "github":
                 window.open("https://github.com/conanbatt/wpm", "_blank");
-                name.text = "";
+                ResetGame();
                 break;
             case "about":
-                name.text = "";
+                ResetGame();
                 break;
             case "start with sound":
-                settings.mute = false;
-                k.volume(0.5);
-                button_muteON.opacity = 1;
-                button_muteOFF.opacity = 0;
-                saveMute(false);
-                name.text = "";
-                k.go("game");
+                settings.mute = false; saveMute(false);
+                k.volume(0.5); k.go("game");
+                ResetGame();
                 break;
             case "start muted":
-                settings.mute = true;
-                k.volume(0);
-                button_muteON.opacity = 0;
-                button_muteOFF.opacity = 1;
-                saveMute(true);
-                name.text = "";
-                k.go("game");
+                settings.mute = true; saveMute(true);
+                k.volume(0); k.go("game");
+                ResetGame();
                 break;
         }
-
         updateTextColors();
-    });
-
-    button_muteON.opacity = settings.mute ? 0 : 1;
-    button_muteOFF.opacity = settings.mute ? 1 : 0;
-
-    let isPreventingError = false;
-    function preventError() {
-        if (isPreventingError) return;
-        isPreventingError = true;
-        k.shake(2);
-        if (!settings.mute) {
-            k.play("wrong_typing");
-        }
-        k.wait(0.3, () => {
-            isPreventingError = false;
-        });
+    }
+    function ResetGame()
+    {
+        rawInput = "";
+        previousInput = "";
+        lastErrorCount = 0;
+        targetText = "Start with sound";
+        maxLength = targetText.length;
+        createLetterObjects();
+        updateTextColors();
+        name.text = "";
     }
 
-    k.onKeyPress((keyPressed) => {
-        if (keyPressed !== "backspace") {
-            if (!settings.mute) {
-                k.play("code_sound");
-            }
+    k.onKeyPress((ch) => {
+        if (ch.length !== 1) return;
+        const shifting = k.isKeyDown("shift");
+        const char = shifting ? ch.toUpperCase() : ch;
+        previousInput = rawInput;
+        rawInput += char;
+        name.text = escapeBackslashes(rawInput);
+        handleInputUpdate(rawInput);
+
+        if (char !== ' ' && !settings.mute) {
+            k.play('code_sound');
         }
+    });
+
+    k.onKeyPress('backspace', () => {
+        if (!rawInput) return;
+        rawInput = rawInput.slice(0, -1);
+        name.text = escapeBackslashes(rawInput);
+        handleInputUpdate(rawInput);
+    });
+
+    k.onKeyPress("space", () => {
+        previousInput = rawInput;
+        rawInput += " ";
+        name.text = escapeBackslashes(rawInput);
+        handleInputUpdate(rawInput);
+    });
+
+    k.onKeyDown("escape", () => {
+        ResetGame();
+    });
+
+    k.onUpdate(() => {
+        underscoreObjects.forEach((uObj, i) => {
+            if (i === rawInput.length) {
+                uObj.color = k.rgb(3, 255, 87);
+                uObj.opacity = Math.abs(Math.sin(k.time() * 5));
+            } else {
+                uObj.opacity = 0;
+            }
+        });
     });
 });

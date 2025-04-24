@@ -13,7 +13,7 @@ export const k = kaplay({
     letterbox: true,
     pixelDensity: 3,
     crisp: false,
-    texFilter: "nearest",
+    texFilter: "linear",
 });
 k.onLoading((progress) => {
 });

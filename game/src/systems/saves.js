@@ -6,17 +6,19 @@
  * @property {number} lpm
  * @property {number} acc
  * @property {number} bestWpm
+ * @property {string} blockNames
  * @property {string} loadDate
  */
 /**
- * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number }} stats
+  * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string }} stats
  */
-export const savePlay = ({ wpm, lpm, acc, bestWpm }) => {
+export const savePlay = ({ wpm, lpm, acc, bestWpm,blockNames,}) => {
   const payload = {
     wpm,
     lpm,
     acc,
     bestWpm,
+    blockNames,
     loadDate: new Date().toISOString(),
   };
   const encoded = encodeURIComponent(JSON.stringify(payload));

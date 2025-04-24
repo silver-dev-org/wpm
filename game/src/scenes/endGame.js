@@ -1,12 +1,12 @@
 import { k } from "../kaplay";
-import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks, lastChallenge, startTime, goal_time } from "./game.js";
+import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks, lastChallenge, blockNamesString, goal_time } from "./game.js";
 import { savePlay, getPlay, saveMute } from "../systems/saves.js";
 import { settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";
 import { MAX_BLOCKS, goalBlocks } from "../constants.js";
 k.scene("endgame", () => {
-    let fontsize = 20;
+    let fontsize = 18;
     let record_blocks = goalCompletedBlocks;
     let record_challenges = lastChallenge;
     let awpm = goal_awpm;
@@ -26,9 +26,9 @@ k.scene("endgame", () => {
 
     let reciveprevdata = 0;
     let prevdata = 0;
-    wpm = parseFloat((wpm  || 0).toFixed(2));
-    lpm = parseFloat((lpm  || 0).toFixed(2));
-    acc = parseFloat((acc  || 0).toFixed(2));
+    wpm = parseFloat((wpm || 0).toFixed(0));
+    lpm = parseFloat((lpm || 0).toFixed(0));
+    acc = parseFloat((acc || 0).toFixed(0));
 
     const currentResults = {
         wpm: wpm,
@@ -82,108 +82,160 @@ k.scene("endgame", () => {
         best_acc = acc;
     }
     const saved = getPlay();
-if (saved) {
-  k.add([
-    k.text(
-      `Best WPM (${new Date(saved.loadDate).toLocaleDateString()}): ${(saved.bestWpm || 0).toFixed(2)}`,
-      { size: 22 }
-    ),
-    resizablePos(() => k.vec2(k.width()*0.5, k.height()*0.80)),
-    k.anchor("center"),
-    k.color(k.YELLOW),
-    k.z(20),
-  ]);
-}
-    const background = k.add([
-        k.sprite("bg2"),
-        k.pos(k.width() / 2, k.height() / 2),
+
+    const center = () => k.vec2(k.width() / 2, k.height() / 2);
+    const offsetX = k.width() * 0.10;
+    const offsetY = k.height() * 0.20;
+    const pos = (dx, dy) => resizablePos(() => center().add(k.vec2(dx, dy)));
+    
+    k.add([
+      k.sprite("bg2"),
+      k.pos(center()),
+      k.anchor("center"),
+      k.z(10),
+    ]);
+    const BackBoxCenter = k.add([
+        k.rect(1080, 925, { radius: 36 }),
+        k.pos(center()),
         k.anchor("center"),
+        k.color(k.rgb(53, 53, 71)),
         k.z(10),
+        k.opacity(0.3),
+    ]);
+    const outsideBoxLeft = k.add([
+        k.rect(290, 280, { radius: 36 }),
+        pos(-offsetX-145, -offsetY+130),
+        k.color(k.rgb(7, 8, 9)),
+        k.z(10),
+        k.opacity(0.8),
+        
+    ]);
+   /* const insideBoxLeft = k.add([
+        k.rect(280, 230, { radius: 36 }),
+        pos(-offsetX-140+5, -offsetY+150+5),
+        k.color(k.rgb(7, 8, 9)),
+        k.z(11),
+        k.opacity(1),
+    ]);*/
+
+    const outsideBoxRight = k.add([
+        k.rect(290, 280, { radius: 36 }),
+        pos(+offsetX-145, -offsetY+130),
+        k.color(k.rgb(7, 8, 9)),
+        k.z(10),
+        k.opacity(0.8),
+        
+    ]);
+    /*const insideBoxRight = k.add([
+        k.rect(280, 230, { radius: 36 }),
+        pos(+offsetX-140+5, -offsetY+150+5),
+        k.color(k.rgb(7, 8, 9)),
+        k.z(11),
+        k.opacity(1),
+    ]);*/
+
+    k.add([
+      k.sprite("WPM"),
+      resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
+      k.anchor("center"),
+      k.z(18),
     ]);
 
-    const title = k.add([
-        k.sprite("WPM"),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.30)),
+    if (saved) {
+      k.add([
+        k.text(
+          `${(saved.bestWpm || wpm).toFixed(0)}`,
+          { size: fontsize }
+        ),
+        pos(-offsetX+50, +offsetY * 0.45),
         k.anchor("center"),
-        k.z(18),
-    ]);
-
+        k.color(k.WHITE),
+        k.z(20),
+      ]);
+    }
     k.add([
-        k.text("WPM " + wpm.toFixed(2), {
-            size: 32,
-        }),
-        resizablePos(() => k.vec2(k.width() * 0.35, k.height() * 0.50+20)),
-        k.anchor("left"),
-        k.color(k.YELLOW),
-        k.opacity(1),
+        k.text("best WPM", { size: fontsize }),
+        pos(-offsetX-30, +offsetY * 0.45),
+        k.anchor("center"),
+        k.color(k.WHITE),
         k.z(19),
+      ]);
+    k.add([
+      k.text("WPM", { size: 32 }),
+      pos(-offsetX, -offsetY / 10),
+      k.anchor("center"),
+      k.color(k.WHITE),
+      k.z(19),
     ]);
     k.add([
-        k.text("ACC " + acc.toFixed(2) + "%", {
-            size: 32,
-        }),
-        resizablePos(() => k.vec2(k.width() * 0.55, k.height() * 0.5+20)),
-        k.color(k.YELLOW),
-        k.anchor("left"),
-        k.opacity(1),
-        k.z(19),
+      k.text(wpm.toFixed(0), { size: 42 }),
+      pos(-offsetX, +offsetY * 0.2),
+      k.anchor("center"),
+      k.color(k.YELLOW),
+      k.z(19),
     ]);
     k.add([
-        k.text("Challenges " + record_blocks + " / " + goalBlocks, { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.9)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
+      k.text(`accuracy ${acc.toFixed(0)}%`, { size: fontsize }),
+      pos(-offsetX, +offsetY * 0.4+50),
+      k.anchor("center"),
+      k.color(k.YELLOW),
+      k.z(19),
+    ]);
+    
+    k.add([
+      k.text("SCORE", { size: 32 }),
+      pos(+offsetX, -offsetY / 10),
+      k.anchor("center"),
+      k.color(k.WHITE),
+      k.z(19),
     ]);
     k.add([
-        k.text("Last Challenge", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.7-70)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
+      k.text(`${record_blocks}/${goalBlocks}`, { size: 42 }),
+      pos(+offsetX, +offsetY * 0.2),
+      k.anchor("center"),
+      k.color(k.YELLOW),
+      k.z(18),
+    ]);
+    
+    k.add([
+      k.text("last challenge", { size: fontsize }),
+      pos(+offsetX, +offsetY * 0.45),
+      k.anchor("center"),
+      k.color(k.WHITE),
+      k.z(18),
     ]);
     k.add([
-        k.text(record_challenges, { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.30, k.height() * 0.75-70)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
+      k.text(record_challenges, { size: fontsize }),
+      pos(+offsetX, +offsetY * 0.4+50),
+      k.anchor("center"),
+      k.color(k.YELLOW),
+      k.z(18),
     ]);
     k.add([
-        k.text("Time elapsed", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.7-70)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
+      k.text("ChallengeSet:", { size: fontsize +4 }),
+      pos(0, +offsetY+15),
+      k.anchor("center"),
+      k.color(k.YELLOW),
+      k.z(18),
     ]);
     k.add([
-        k.text(goal_time.toFixed(2) + " seg", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.75-70)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
+      k.text(blockNamesString, {
+        size: fontsize,
+        wrap: false,
+        lineSpacing: 12,
+      }),
+      pos(0, +offsetY + 130),
+      k.anchor("center"),
+      k.color(k.WHITE),
+      k.z(18),
     ]);
     k.add([
-        k.text("Last 60s WPM", { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.7-70)),
-        k.anchor("center"),
-        k.color(k.WHITE),
-        k.z(18),
-    ]);
-    k.add([
-        k.text(awpm, { size: fontsize }),
-        resizablePos(() => k.vec2(k.width() * 0.7, k.height() * 0.75-70)),
-        k.anchor("center"),
-        k.color(k.YELLOW),
-        k.z(18),
-    ]);
-    const textPressEnd = k.add([
-        k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1+20, k.height() * 0.9)),
-        k.anchor("center"),
-        k.color(k.rgb(127, 134, 131)),
-        k.animate(),
-        k.z(19),
+      k.text("ESC to retry", { size: 20 }),
+      resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.9)),
+      k.anchor("center"),
+      k.color(k.rgb(127, 134, 131)),
+      k.animate(),
+      k.z(19),
     ]);
 
     savePlay({
@@ -191,8 +243,9 @@ if (saved) {
         lpm: best_lpm,
         acc: best_acc,
         bestWpm: best_wpm,
+        blockNames:blockNamesString
     });
-    
+
     saveMute(settings.mute);
 
     const button_muteON = k.add([

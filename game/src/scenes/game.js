@@ -6,6 +6,7 @@ import {
     lineHeight,
     MAX_TIME,
     EASY_RIVAL_SPEED,
+    HARD_RIVAL_SPEED,
     JUMP_AFTER,
     TEXT_START_Y,
     SPACING,
@@ -27,6 +28,10 @@ let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
 let completedBlocks = -1;
+let fontSize = 18;
+let fontWidth = 16.4;
+let errorCharsIndexes = [];
+let errorCharsReplaces = {};
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -43,11 +48,7 @@ export let goal_acc = actual_acc;
 export let goal_time = startTime;
 export let goalCompletedBlocks = completedBlocks;
 export let lastChallenge = "";
-
-let fontSize = 18;
-let fontWidth = 16.4;
-let errorCharsIndexes = [];
-let errorCharsReplaces = {};
+export let blockNamesString = "";
 
 /**
  * Text taken from the dialogs.json file
@@ -65,6 +66,7 @@ let fixedText = "";
 /**
  * @param {GameParams} params
  */
+
 const gameScene = (params) => {
 
     k.loadMusic("endgame", "/sounds/endgame.mp3");
@@ -226,7 +228,7 @@ const gameScene = (params) => {
             } else {
                 music.stop();
                 StatsforAnalitics();
-                k.go("endgame", { rivalSpeed: settings.rivalSpeed });
+                k.go("endgame");
                 resetGameStats();
             }
         }
@@ -235,7 +237,16 @@ const gameScene = (params) => {
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
     });
+    function escapeForRender(str) {
 
+        return str
+            .replace(/\\/g, "\\\\")
+            .replace(/\[/g, "\\[")
+            .replace(/\]/g, "\\]")
+            .replace(/\{/g, "\\{")
+            .replace(/\}/g, "\\}")
+            .replace(/'/g, "\\'");
+    }
     function StatsforAnalitics() {
         goal_wpm = actual_wpm;
         goal_awpm = actual_awpm;
@@ -273,7 +284,7 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
     const wmp_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.3+ 20, k.height() * 0.025),
+        k.pos(k.width() * 0.3 + 20, k.height() * 0.025),
         k.text("0", {
             size: 18,
         }),
@@ -282,7 +293,7 @@ const gameScene = (params) => {
     ]);
     const time_text = k.add([
         k.anchor("center"),
-        k.pos(k.width() * 0.4+ 20, k.height() * 0.025),
+        k.pos(k.width() * 0.4 + 20, k.height() * 0.025),
         k.text("time: ", {
             size: 18,
         }),
@@ -292,13 +303,13 @@ const gameScene = (params) => {
 
     k.add([
         k.sprite("BG_WPM_IN_GAME"),
-        k.pos(k.width() * 0.3, k.height() * 0.02+5),
+        k.pos(k.width() * 0.3, k.height() * 0.02 + 5),
         k.anchor("center"),
         k.z(20),
     ]);
     k.add([
         k.sprite("BG_TIME_IN_GAME"),
-        k.pos(k.width() * 0.4, k.height() * 0.02+5),
+        k.pos(k.width() * 0.4, k.height() * 0.02 + 5),
         k.anchor("center"),
         k.z(20),
     ]);
@@ -333,7 +344,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1+20, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),
@@ -365,9 +376,14 @@ const gameScene = (params) => {
         language: item.language || "default",
     }));
 
-    texts.slice(0, MAX_BLOCKS).forEach(({ title, language }, index) => {
-        const spriteKey = languageIconMap[language] ?? languageIconMap.default;
+    const visibleTexts = texts.slice(0, MAX_BLOCKS);
 
+    blockNamesString = visibleTexts
+        .map(item => `- ${item.title}`)
+        .join("\n");
+
+    visibleTexts.forEach(({ title, language }, index) => {
+        const spriteKey = (languageIconMap[language] ?? languageIconMap.default);
         const spriteAsset = k.getSprite(spriteKey);
         let scaleFactor = 1;
         const desiredWidth = k.width() * 0.025;
@@ -377,7 +393,6 @@ const gameScene = (params) => {
         } else {
             console.warn(`Sprite "${spriteKey}" undefined assets`);
         }
-
         k.add([
             k.sprite(spriteKey),
             k.scale(scaleFactor),
@@ -421,9 +436,7 @@ const gameScene = (params) => {
     k.onKeyPress(["escape"], () => {
         music.stop();
         resetGameStats();
-        k.go("game", {
-            rivalSpeed: EASY_RIVAL_SPEED,
-        });
+        k.go("game");
     });
 
     const arrow = k.add([
@@ -575,7 +588,6 @@ const gameScene = (params) => {
             "color: inherit;",
         );
     };
-
     function updateDialog() {
         currentBlockIndex++;
         completedBlocks++;
@@ -589,15 +601,15 @@ const gameScene = (params) => {
             k.go("endgame");
             return;
         }
-        const startSpeed = EASY_RIVAL_SPEED; 
-        const endSpeed   = 0.22;           
-        const steps      = 4;               
+        const startSpeed = EASY_RIVAL_SPEED;
+        const endSpeed = HARD_RIVAL_SPEED;
+        const steps = 4;
         if (completedBlocks > 0) {
-       
-          const t = Math.min(completedBlocks, steps) / steps;
-          rivalSpeed = startSpeed * Math.pow(endSpeed / startSpeed, t);
+
+            const t = Math.min(completedBlocks, steps) / steps;
+            rivalSpeed = startSpeed * Math.pow(endSpeed / startSpeed, t);
         } else {
-          rivalSpeed = startSpeed;
+            rivalSpeed = startSpeed;
         }
         k.play
         playerState.reset();
@@ -621,10 +633,11 @@ const gameScene = (params) => {
         curBlockData.lineCount = currentBlocks.length;
 
         originalText = currentBlocks.join("");
-        const fixedGroup = originalText
-            .replace(/\[/g, "\\[")
-            .replace(/\]/g, "\\]")
-            .replace(/▯/g, " ");
+        const fixedGroup = escapeForRender(originalText);
+        renderedText = fixedGroup;
+        textboxText.text = renderedText;
+
+
         fixedText = originalText.replace(/▯/g, " ");
         renderedText = fixedGroup;
         textboxText.text = renderedText;
@@ -640,6 +653,7 @@ const gameScene = (params) => {
     function updateMusic() {
         music.speed = musicRate;
     }
+
     function updateDialogErrors() {
         renderedText = fixedText
             .split("")
@@ -652,9 +666,7 @@ const gameScene = (params) => {
                 }
             })
             .join("")
-            .replace(/\[/g, "\\[")
-            .replace(/\]/g, "\\]");
-
+        renderedText = escapeForRender(renderedText);
         textboxText.text = renderedText;
     }
 

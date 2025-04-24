@@ -18,20 +18,9 @@ k.scene("selection", () => {
     k.loadMusic("videogame", "/sounds/videogame.mp3");
     const commands = ["about", "github", "start with sound", "start muted"];
     let fontsize = 18;
-    if (isMobile()) {
-        k.add([
-            k.text("WPM is a desktop-only experience", { size: 32 }),
-            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
-            k.anchor("center"),
-            k.color(k.YELLOW),
-            k.z(18),
-        ]);
-        return;
-    }
-    isMobile();
-
     settings.mute = getMute();
     k.volume(settings.mute ? 0 : 0.5);
+
     const background = k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -62,6 +51,18 @@ k.scene("selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
+    if (isMobile()) {
+        k.add([
+            k.text("WPM is a desktop-only experience", { size: 32 }),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.6)),
+            k.anchor("center"),
+            k.color(k.YELLOW),
+            k.z(18),
+        ]);
+        return;
+    }
+    isMobile();
+
     const outsideBox = k.add([
         k.rect(800, 260, { radius: 2 }),
         k.pos(k.width() * 0.30 - 10, k.height() * 0.50),

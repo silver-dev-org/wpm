@@ -32,6 +32,7 @@ let fontSize = 18;
 let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
+let playerStartedTyping = false;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -220,16 +221,18 @@ const gameScene = (params) => {
         startTime += k.dt();
         analitycs_calculate();
 
-        rivalTimer += k.dt();
-        if (rivalTimer >= rivalSpeed) {
-            rivalTimer -= rivalSpeed;
-            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
-                rivalWrite();
-            } else {
-                music.stop();
-                StatsforAnalitics();
-                k.go("endgame");
-                resetGameStats();
+        if (playerStartedTyping) {
+            rivalTimer += k.dt();
+            if (rivalTimer >= rivalSpeed) {
+                rivalTimer -= rivalSpeed;
+                if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                    rivalWrite();
+                } else {
+                    music.stop();
+                    StatsforAnalitics();
+                    k.go("endgame");
+                    resetGameStats();
+                }
             }
         }
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
@@ -257,6 +260,7 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
+        playerStartedTyping =false;
         completedBlocks = 0;
         startTime = 0;
         actual_wpm = 0;
@@ -342,7 +346,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.9)),
+        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.94)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),
@@ -366,6 +370,9 @@ const gameScene = (params) => {
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
+        go: "icon_03",
+        react: "icon_04",
+        py: "icon_05",
         default: "icon_02",
     };
 
@@ -462,7 +469,7 @@ const gameScene = (params) => {
 
     const textPadding = k.vec2(50, 103);
 
-    k.volume(0.5);
+    k.setVolume(0.5);
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
@@ -768,9 +775,7 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
-
         if (prevChar === "\n") return;
-
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
@@ -804,6 +809,9 @@ const gameScene = (params) => {
             nextChar();
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
+        }
+        if (!playerStartedTyping && (totalTypedCharacters > 0 || totalIcorrectCorrectChars > 0)) {
+            playerStartedTyping = true;
         }
     });
     // Line jump

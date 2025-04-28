@@ -93,12 +93,4 @@ k.scene("about", () => {
         k.animate(),
         k.z(19),
     ]);
-    const atributions = k.add([
-        k.text("Design by Leonel Orrut and Daniel Báez in KAPLAY ", { size: 16 }),
-        resizablePos(() => k.vec2(k.width() * 0.8, k.height() * 0.98)),
-        k.anchor("center"),
-        k.color(k.rgb(127, 134, 131)),
-        k.animate(),
-        k.z(19),
-    ]);
 });

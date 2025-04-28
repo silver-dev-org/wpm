@@ -37,7 +37,7 @@ k.scene("endgame", () => {
     });
 
     saveMute(settings.mute);
-    k.setVolume(1);
+    k.volume(1);
     const music = k.play("endgame");
     music.loop = true;
     music.volume = 0;
@@ -133,7 +133,7 @@ k.scene("endgame", () => {
     }
     const rest_text = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.94)),
+        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),

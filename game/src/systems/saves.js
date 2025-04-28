@@ -8,12 +8,11 @@
  * @property {number} bestWpm
  * @property {string} blockNames
  * @property {string} loadDate
- * @property {boolean} mute
  */
 /**
- * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string, mute: boolean }} stats
+  * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string }} stats
  */
-export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames, mute }) => {
+export const savePlay = ({ wpm, lpm, acc, bestWpm,blockNames,}) => {
   const payload = {
     wpm,
     lpm,
@@ -21,7 +20,6 @@ export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames, mute }) => {
     bestWpm,
     blockNames,
     loadDate: new Date().toISOString(),
-    mute,
   };
   const encoded = encodeURIComponent(JSON.stringify(payload));
   const maxAge  = 60 * 60 * 24 * 30;
@@ -55,22 +53,17 @@ export const getPlay = () => {
 };
 
 /**
+ * save mute preference in localStorage
  * @param {boolean} mute
  */
 export const saveMute = (mute) => {
-  const current = getPlay() || {
-    wpm: 0, lpm: 0, acc: 0, bestWpm: 0, blockNames: '', loadDate: new Date().toISOString()
-  };
-  savePlay({ 
-    ...current, 
-    mute 
-  });
+  localStorage.setItem('playMute', JSON.stringify(mute));
 };
 
 /**
  * @returns {boolean}
  */
 export const getMute = () => {
-  const play = getPlay();
-  return play ? play.mute : false;
+  const item = localStorage.getItem('playMute');
+  return item ? JSON.parse(item) : false;
 };

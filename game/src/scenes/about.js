@@ -87,15 +87,7 @@ k.scene("about", () => {
     }
     const rest_text = k.add([
         k.text("ESC to return", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.94)),
-        k.anchor("center"),
-        k.color(k.rgb(127, 134, 131)),
-        k.animate(),
-        k.z(19),
-    ]);
-    const atributions = k.add([
-        k.text("Design by Leonel Orrut and Daniel Báez in KAPLAY ", { size: 16 }),
-        resizablePos(() => k.vec2(k.width() * 0.8, k.height() * 0.98)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.91)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),

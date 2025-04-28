@@ -346,7 +346,7 @@ const gameScene = (params) => {
     ]);
     const rest_text = k.add([
         k.text("ESC to retry", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.94)),
+        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.9)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),
@@ -469,7 +469,7 @@ const gameScene = (params) => {
 
     const textPadding = k.vec2(50, 103);
 
-    k.setVolume(0.5);
+    k.volume(0.5);
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
@@ -775,6 +775,9 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
+        if (!playerStartedTyping && keyPressed !== "escape") {
+            playerStartedTyping = true;
+        }
         if (prevChar === "\n") return;
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
@@ -809,9 +812,6 @@ const gameScene = (params) => {
             nextChar();
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
-        }
-        if (!playerStartedTyping && (totalTypedCharacters > 0 || totalIcorrectCorrectChars > 0)) {
-            playerStartedTyping = true;
         }
     });
     // Line jump

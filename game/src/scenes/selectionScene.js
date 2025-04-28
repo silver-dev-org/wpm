@@ -33,7 +33,7 @@ k.scene("selection", () => {
     const buttonTopY = boxY + 80;
     const buttonGap = 50;
     settings.mute = getMute();
-    k.setVolume(settings.mute ? 0 : 0.5);
+    k.volume(settings.mute ? 0 : 0.5);
 
     k.add([
         k.sprite("bg2"),
@@ -189,7 +189,7 @@ k.scene("selection", () => {
     }
 
     settings.mute = getMute();
-    k.setVolume(settings.mute ? 0 : 0.5);
+    k.volume(settings.mute ? 0 : 0.5);
     button_muteON.opacity = settings.mute ? 0 : 1;
     button_muteOFF.opacity = settings.mute ? 1 : 0;
 
@@ -308,13 +308,13 @@ k.scene("selection", () => {
                 break;
             case "start with sound":
                 settings.mute = false; saveMute(false);
-                k.setVolume(0.5); 
+                k.volume(0.5); 
                 k.go("game");
                 ResetGame();
                 break;
             case "start muted":
                 settings.mute = true; saveMute(true);
-                k.setVolume(0); 
+                k.volume(0); 
                 k.go("game");
                 ResetGame();
                 break;

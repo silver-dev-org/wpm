@@ -13,13 +13,16 @@ function escapeBackslashes(str) {
     return str.replace(/\\/g, "\\\\");
 }
 k.scene("selection", () => {
+    k.loadSprite("icon_05", "/sprites/icon_04.png");
+    k.loadSprite("icon_04", "/sprites/icon_04.png");
+    k.loadSprite("icon_03", "/sprites/icon_03.png");
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
     const commands = ["about", "github", "start with sound", "start muted"];
     let fontsize = 18;
     settings.mute = getMute();
-    k.volume(settings.mute ? 0 : 0.5);
+    k.setVolume(settings.mute ? 0 : 0.5);
 
     const background = k.add([
         k.sprite("bg2"),
@@ -230,7 +233,7 @@ k.scene("selection", () => {
     }
 
     settings.mute = getMute();
-    k.volume(settings.mute ? 0 : 0.5);
+    k.setVolume(settings.mute ? 0 : 0.5);
     button_muteON.opacity = settings.mute ? 0 : 1;
     button_muteOFF.opacity = settings.mute ? 1 : 0;
 
@@ -348,12 +351,12 @@ k.scene("selection", () => {
                 break;
             case "start with sound":
                 settings.mute = false; saveMute(false);
-                k.volume(0.5); k.go("game");
+                k.setVolume(0.5); k.go("game");
                 ResetGame();
                 break;
             case "start muted":
                 settings.mute = true; saveMute(true);
-                k.volume(0); k.go("game");
+                k.setVolume(0); k.go("game");
                 ResetGame();
                 break;
         }

@@ -37,7 +37,7 @@ k.scene("endgame", () => {
         acc: acc,
     };
 
-    k.volume(1);
+    k.setVolume(1);
     const music = k.play("endgame");
     music.loop = true;
     music.volume = 0;

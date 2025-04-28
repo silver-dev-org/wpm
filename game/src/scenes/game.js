@@ -27,11 +27,12 @@ let titles = dialogsData.map((item) => item.title);
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
 let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
-let completedBlocks = -1;
+let completedBlocks = 0;
 let fontSize = 18;
 let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
+let playerStartedTyping = false;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -48,7 +49,7 @@ export let goal_acc = actual_acc;
 export let goal_time = startTime;
 export let goalCompletedBlocks = completedBlocks;
 export let lastChallenge = "";
-export let blockNamesString = "";
+export let blockNamesString = [];
 
 /**
  * Text taken from the dialogs.json file
@@ -220,23 +221,25 @@ const gameScene = (params) => {
         startTime += k.dt();
         analitycs_calculate();
 
-        rivalTimer += k.dt();
-        if (rivalTimer >= rivalSpeed) {
-            rivalTimer -= rivalSpeed;
-            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
-                rivalWrite();
-            } else {
-                music.stop();
-                StatsforAnalitics();
-                k.go("endgame");
-                resetGameStats();
+        if (playerStartedTyping) {
+            rivalTimer += k.dt();
+            if (rivalTimer >= rivalSpeed) {
+                rivalTimer -= rivalSpeed;
+                if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                    rivalWrite();
+                } else {
+                    music.stop();
+                    StatsforAnalitics();
+                    k.go("endgame");
+                    resetGameStats();
+                }
             }
         }
-
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
     });
+    
     function escapeForRender(str) {
 
         return str
@@ -257,7 +260,8 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
-        completedBlocks = -1;
+        playerStartedTyping =false;
+        completedBlocks = 0;
         startTime = 0;
         actual_wpm = 0;
         actual_awpm = 0;
@@ -283,8 +287,8 @@ const gameScene = (params) => {
     };
     const filesFoldersPos = () => k.vec2(0, 0);
     const wmp_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.3 + 20, k.height() * 0.025),
+        k.anchor("left"),
+        k.pos(k.width() * 0.25+90, k.height() * 0.025),
         k.text("0", {
             size: 18,
         }),
@@ -292,8 +296,8 @@ const gameScene = (params) => {
         k.z(21),
     ]);
     const time_text = k.add([
-        k.anchor("center"),
-        k.pos(k.width() * 0.4 + 20, k.height() * 0.025),
+        k.anchor("left"),
+        k.pos(k.width() * 0.35+90, k.height() * 0.025),
         k.text("time: ", {
             size: 18,
         }),
@@ -303,14 +307,14 @@ const gameScene = (params) => {
 
     k.add([
         k.sprite("BG_WPM_IN_GAME"),
-        k.pos(k.width() * 0.3, k.height() * 0.02 + 5),
-        k.anchor("center"),
+        k.pos(k.width() * 0.25, k.height() * 0.02 + 5),
+        k.anchor("left"),
         k.z(20),
     ]);
     k.add([
         k.sprite("BG_TIME_IN_GAME"),
-        k.pos(k.width() * 0.4, k.height() * 0.02 + 5),
-        k.anchor("center"),
+        k.pos(k.width() * 0.35, k.height() * 0.02 + 5),
+        k.anchor("left"),
         k.z(20),
     ]);
     k.add([
@@ -320,19 +324,17 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.pos(k.width() * 0.01, k.height() * 0.01),
+        k.pos(k.width() * 0.01+10, k.height() * 0.01-10),
         k.sprite("SilverDevs"),
         k.anchor("topleft"),
         k.opacity(1),
         k.z(51),
     ]);
     const textboxBack = k.add([
+        k.rect(2000, 54, { radius: 0 }),
         k.pos(1000, 0),
-        k.sprite("bg4", {
-            tiled: true,
-            width: 2000,
-            height: 54,
-        }),
+        k.color(k.rgb(7, 7, 7)),
+        k.outline(2),
         k.anchor("top"),
         k.z(10),
     ]);
@@ -352,14 +354,14 @@ const gameScene = (params) => {
     ]);
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height() * 0),
+        k.pos(k.width() * 0.9, k.height() * 0+5),
         k.opacity(1),
         k.animate(),
         k.z(50),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height() * 0),
+        k.pos(k.width() * 0.9, k.height() * 0+5),
         k.opacity(0),
         k.animate(),
         k.z(50),
@@ -368,6 +370,9 @@ const gameScene = (params) => {
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
+        go: "icon_03",
+        react: "icon_04",
+        py: "icon_05",
         default: "icon_02",
     };
 
@@ -377,25 +382,12 @@ const gameScene = (params) => {
     }));
 
     const visibleTexts = texts.slice(0, MAX_BLOCKS);
-
-    blockNamesString = visibleTexts
-        .map(item => `- ${item.title}`)
-        .join("\n");
-
+    blockNamesString = visibleTexts.map(item => item.title);
     visibleTexts.forEach(({ title, language }, index) => {
-        const spriteKey = (languageIconMap[language] ?? languageIconMap.default);
-        const spriteAsset = k.getSprite(spriteKey);
-        let scaleFactor = 1;
-        const desiredWidth = k.width() * 0.025;
-
-        if (spriteAsset?.data?.width) {
-            scaleFactor = desiredWidth / spriteAsset.data.width;
-        } else {
-            console.warn(`Sprite "${spriteKey}" undefined assets`);
-        }
+        const spriteKey = languageIconMap[language] ?? languageIconMap.default;
+    
         k.add([
             k.sprite(spriteKey),
-            k.scale(scaleFactor),
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.02,
@@ -406,7 +398,7 @@ const gameScene = (params) => {
             k.z(55),
             "challengeIcon",
         ]);
-
+    
         k.add([
             k.text(title, { size: 20 }),
             resizablePos(() =>
@@ -477,7 +469,7 @@ const gameScene = (params) => {
 
     const textPadding = k.vec2(50, 103);
 
-    k.volume(0.5);
+    k.setVolume(0.5);
 
     const textbox = k.add([
         k.rect(1920, 1080, { radius: 8 }),
@@ -590,7 +582,10 @@ const gameScene = (params) => {
     };
     function updateDialog() {
         currentBlockIndex++;
-        completedBlocks++;
+        if(currentBlockIndex>0)
+        {
+            completedBlocks++;
+        }
         musicRate += 0.05;
         updateMusic();
         if (completedBlocks === goalBlocks) {
@@ -780,9 +775,10 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
-
+        if (!playerStartedTyping && keyPressed !== "escape") {
+            playerStartedTyping = true;
+        }
         if (prevChar === "\n") return;
-
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;

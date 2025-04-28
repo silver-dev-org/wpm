@@ -775,9 +775,6 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
-        if (!playerStartedTyping && keyPressed !== "escape") {
-            playerStartedTyping = true;
-        }
         if (prevChar === "\n") return;
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
@@ -812,6 +809,9 @@ const gameScene = (params) => {
             nextChar();
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
+        }
+        if (!playerStartedTyping && (totalCorrectChars > 0 || totalIcorrectCorrectChars > 0)) {
+            playerStartedTyping = true;
         }
     });
     // Line jump

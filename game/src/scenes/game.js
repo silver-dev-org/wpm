@@ -218,7 +218,10 @@ const gameScene = (params) => {
     let rivalTimer = 0;
 
     k.onUpdate(() => {
-        startTime += k.dt();
+        if (playerStartedTyping) {
+            startTime += k.dt();
+        } 
+
         analitycs_calculate();
 
         if (playerStartedTyping) {
@@ -239,7 +242,7 @@ const gameScene = (params) => {
         const awpm = totalEventsLast60 / 5;
         actual_awpm = awpm;
     });
-    
+
     function escapeForRender(str) {
 
         return str
@@ -260,7 +263,7 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
-        playerStartedTyping =false;
+        playerStartedTyping = false;
         completedBlocks = 0;
         startTime = 0;
         actual_wpm = 0;
@@ -288,7 +291,7 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
     const wmp_text = k.add([
         k.anchor("left"),
-        k.pos(k.width() * 0.25+90, k.height() * 0.025),
+        k.pos(k.width() * 0.25 + 90, k.height() * 0.025),
         k.text("0", {
             size: 18,
         }),
@@ -297,7 +300,7 @@ const gameScene = (params) => {
     ]);
     const time_text = k.add([
         k.anchor("left"),
-        k.pos(k.width() * 0.35+90, k.height() * 0.025),
+        k.pos(k.width() * 0.35 + 90, k.height() * 0.025),
         k.text("time: ", {
             size: 18,
         }),
@@ -324,7 +327,7 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.pos(k.width() * 0.01+10, k.height() * 0.01-10),
+        k.pos(k.width() * 0.01 + 10, k.height() * 0.01 - 10),
         k.sprite("SilverDevs"),
         k.anchor("topleft"),
         k.opacity(1),
@@ -354,14 +357,14 @@ const gameScene = (params) => {
     ]);
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.pos(k.width() * 0.9, k.height() * 0 + 5),
         k.opacity(1),
         k.animate(),
         k.z(50),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.pos(k.width() * 0.9, k.height() * 0 + 5),
         k.opacity(0),
         k.animate(),
         k.z(50),
@@ -385,7 +388,7 @@ const gameScene = (params) => {
     blockNamesString = visibleTexts.map(item => item.title);
     visibleTexts.forEach(({ title, language }, index) => {
         const spriteKey = languageIconMap[language] ?? languageIconMap.default;
-    
+
         k.add([
             k.sprite(spriteKey),
             resizablePos(() =>
@@ -398,7 +401,7 @@ const gameScene = (params) => {
             k.z(55),
             "challengeIcon",
         ]);
-    
+
         k.add([
             k.text(title, { size: 20 }),
             resizablePos(() =>
@@ -582,8 +585,7 @@ const gameScene = (params) => {
     };
     function updateDialog() {
         currentBlockIndex++;
-        if(currentBlockIndex>0)
-        {
+        if (currentBlockIndex > 0) {
             completedBlocks++;
         }
         musicRate += 0.05;

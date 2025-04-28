@@ -10,13 +10,14 @@ export const lineHeight = 28;
 export const startmoveline = 3;
 export const marginvisiblebox = 1;
 export const dialogsData = dialogs;
-export const ICON_START_Y = 0.14;
+export const ICON_START_Y = 0.15;
 export const TEXT_START_Y = 0.15;
 export const SPACING = 0.05;
 export const MAX_BLOCKS = 5;
 /**
  * @type {number}
  */
+// reduce for a jump line after x lines
 export const JUMP_AFTER = 40;
 
 /**

@@ -87,7 +87,7 @@ k.scene("about", () => {
     }
     const rest_text = k.add([
         k.text("ESC to return", { size: 20 }),
-        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.91)),
+        resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.94)),
         k.anchor("center"),
         k.color(k.rgb(127, 134, 131)),
         k.animate(),

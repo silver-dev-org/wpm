@@ -71,10 +71,7 @@ let fixedText = "";
 const gameScene = (params) => {
 
     k.loadMusic("endgame", "/sounds/endgame.mp3");
-    k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
-    k.loadSprite("BG_WPM_IN_GAME", "/sprites/BG_WPM_IN_GAME.png");
-    k.loadSprite("BG_TIME_IN_GAME", "/sprites/BG_TIME_IN_GAME.png");
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
@@ -218,10 +215,9 @@ const gameScene = (params) => {
     let rivalTimer = 0;
 
     k.onUpdate(() => {
-        startTime += k.dt();
         analitycs_calculate();
-
         if (playerStartedTyping) {
+            startTime += k.dt();
             rivalTimer += k.dt();
             if (rivalTimer >= rivalSpeed) {
                 rivalTimer -= rivalSpeed;

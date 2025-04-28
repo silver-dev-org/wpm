@@ -18,7 +18,11 @@ k.scene("selection", () => {
     k.loadSprite("icon_03", "/sprites/icon_03.png");
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
+    k.loadSprite("BG_WPM_IN_GAME", "/sprites/BG_WPM_IN_GAME.png");
+    k.loadSprite("BG_TIME_IN_GAME", "/sprites/BG_TIME_IN_GAME.png");
+    k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
+    
     const commands = ["about", "github", "start with sound", "start muted"];
     const fontsize = 18;
     const boxWidth = 800;
@@ -304,19 +308,16 @@ k.scene("selection", () => {
                 break;
             case "about":
                 k.go("about");
-                ResetGame();
                 break;
             case "start with sound":
                 settings.mute = false; saveMute(false);
                 k.setVolume(0.5); 
                 k.go("game");
-                ResetGame();
                 break;
             case "start muted":
                 settings.mute = true; saveMute(true);
                 k.setVolume(0); 
                 k.go("game");
-                ResetGame();
                 break;
         }
         updateTextColors();

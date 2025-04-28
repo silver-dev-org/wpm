@@ -32,6 +32,7 @@ let fontSize = 18;
 let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
+let playerStartedTyping = false;
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -220,16 +221,18 @@ const gameScene = (params) => {
         startTime += k.dt();
         analitycs_calculate();
 
-        rivalTimer += k.dt();
-        if (rivalTimer >= rivalSpeed) {
-            rivalTimer -= rivalSpeed;
-            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
-                rivalWrite();
-            } else {
-                music.stop();
-                StatsforAnalitics();
-                k.go("endgame");
-                resetGameStats();
+        if (playerStartedTyping) {
+            rivalTimer += k.dt();
+            if (rivalTimer >= rivalSpeed) {
+                rivalTimer -= rivalSpeed;
+                if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                    rivalWrite();
+                } else {
+                    music.stop();
+                    StatsforAnalitics();
+                    k.go("endgame");
+                    resetGameStats();
+                }
             }
         }
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
@@ -257,6 +260,7 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
+        playerStartedTyping =false;
         completedBlocks = 0;
         startTime = 0;
         actual_wpm = 0;
@@ -366,6 +370,9 @@ const gameScene = (params) => {
     const languageIconMap = {
         js: "icon_02",
         ts: "icon_01",
+        go: "icon_03",
+        react: "icon_04",
+        py: "icon_05",
         default: "icon_02",
     };
 
@@ -768,9 +775,10 @@ const gameScene = (params) => {
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
-
+        if (!playerStartedTyping && keyPressed !== "escape") {
+            playerStartedTyping = true;
+        }
         if (prevChar === "\n") return;
-
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;

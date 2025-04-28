@@ -1,5 +1,5 @@
 import { k } from "../kaplay.js";
-import { getMute, saveMute } from "../systems/saves.js";
+import { getMute, saveMute } from "../systems/preferences.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export const settings = {
@@ -13,9 +13,6 @@ function escapeBackslashes(str) {
     return str.replace(/\\/g, "\\\\");
 }
 k.scene("selection", () => {
-    k.loadSprite("icon_05", "/sprites/icon_04.png");
-    k.loadSprite("icon_04", "/sprites/icon_04.png");
-    k.loadSprite("icon_03", "/sprites/icon_03.png");
     k.loadSprite("icon_02", "/sprites/icon_02.png");
     k.loadSprite("icon_01", "/sprites/icon_01.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");

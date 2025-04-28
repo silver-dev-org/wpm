@@ -1,6 +1,7 @@
 import { k } from "../kaplay";
 import { goal_acc, goal_lpm, goal_wpm, goal_awpm, goalCompletedBlocks, lastChallenge, blockNamesString, goal_time } from "./game.js";
-import { savePlay, getPlay, saveMute } from "../systems/saves.js";
+import { savePlay, getPlay,} from "../systems/saves.js";
+import { saveMute } from "../systems/preferences.js";
 import { settings } from "./selectionScene.js";
 import { resizablePos } from "../components/resizablePos.js";
 import "../types.js";

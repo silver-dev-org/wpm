@@ -72,6 +72,7 @@ const gameScene = (params) => {
 
     k.loadMusic("endgame", "/sounds/endgame.mp3");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
+    
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
@@ -226,8 +227,8 @@ const gameScene = (params) => {
                 } else {
                     music.stop();
                     StatsforAnalitics();
-                    k.go("endgame");
                     resetGameStats();
+                    k.go("endgame");
                 }
             }
         }

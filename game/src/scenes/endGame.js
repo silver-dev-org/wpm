@@ -93,7 +93,7 @@ k.scene("endgame", () => {
   k.add([k.text(record_challenges, { size: fontsize }), pos(+offsetX, +offsetY * 0.4 + 50), k.anchor("center"), k.color(k.YELLOW), k.z(18)]);
   k.add([k.text("ChallengeSet:", { size: fontsize + 2 }), k.pos(k.width() * 0.45, k.height() * 0.74), k.anchor("left"), k.color(k.YELLOW), k.z(18)]);
 
-  const lineHeight = fontsize + 12;
+  const lineHeight = fontsize + 15;
   blockNamesString.forEach((title, i) => {
     k.add([
       k.text(title, { size: fontsize + 2 }),
@@ -101,12 +101,6 @@ k.scene("endgame", () => {
       k.anchor("left"), k.color(k.WHITE), k.z(18)
     ]);
   });
-
-  onKeyPress("escape", () => {
-    music.stop();
-    k.go("game");
-  });
-
   const button_muteON = k.add([
     k.sprite("muteON"),
     k.pos(k.width() * 0.9, k.height() * 0 + 5),

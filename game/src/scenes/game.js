@@ -6,22 +6,50 @@ import {
     lineHeight,
     MAX_TIME,
     EASY_RIVAL_SPEED,
+    HARD_RIVAL_SPEED,
+    JUMP_AFTER,
+    TEXT_START_Y,
+    SPACING,
+    MAX_BLOCKS,
+    goalBlocks,
+    maxMistakes,
+    ICON_START_Y
 } from "../constants.js";
+import { savePlay, getPlay } from "../systems/saves.js";
 import { k } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
+import { settings } from "./selectionScene.js";
 
-let COLOR_TEXT_DEFAULT = k.Color.fromHex("#553d4d");
-let COLOR_TEXT_RIVAL = k.Color.fromHex("#718703");
+let titles = dialogsData.map((item) => item.title);
+
+let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
+let COLOR_TEXT_RIVAL = k.YELLOW;
 let COLOR_TEXT_INCORRECT = k.Color.RED;
-
 let completedBlocks = 0;
-export let totalCorrectChars = 0;
-let fontSize = 24;
-let fontWidth = 12;
+let fontSize = 18;
+let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
+let playerStartedTyping = false;
+export let actual_wpm = 0;
+export let actual_lpm = 0;
+export let actual_acc = 0;
+export let actual_awpm = 0;
+export let totalCorrectChars = 0;
+export let totalIcorrectCorrectChars = 0;
+export let totalTypedCharacters = 0;
+export let totalCorrectlines = 0;
+export let startTime = 0;
+export let goal_wpm = actual_wpm;
+export let goal_awpm = actual_awpm;
+export let goal_lpm = actual_lpm;
+export let goal_acc = actual_acc;
+export let goal_time = startTime;
+export let goalCompletedBlocks = completedBlocks;
+export let lastChallenge = "";
+export let blockNamesString = [];
 
 /**
  * Text taken from the dialogs.json file
@@ -39,18 +67,49 @@ let fixedText = "";
 /**
  * @param {GameParams} params
  */
+
 const gameScene = (params) => {
-    const BG_SPEED_X = 0.1;
-    const BG_SPEED_Y = 0.3;
+
+    k.loadMusic("endgame", "/sounds/endgame.mp3");
+    k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
+    
+    let jumpCount = 0;
     let theme = themes[0];
-    let offsetX = 0;
-    let offsetY = 0;
     let currentBlockIndex = -1;
-    let rivalSpeed = params.rivalSpeed ?? EASY_RIVAL_SPEED;
+    let rivalSpeed = settings.rivalSpeed;
     let curBlockData = {
         lineCount: 0,
     };
-    let defaultTime = params.time ?? MAX_TIME;
+
+    // Music
+    const music = k.play("videogame");
+    let musicRate = 0.95;
+    music.loop = true;
+    music.volume = 0;
+    const maxVolume = 0.3;
+    const volumeStep = 0.01;
+    const intervalTime = 100;
+    let volumeIncrease;
+
+    function updateMusicVolume() {
+        clearInterval(volumeIncrease);
+
+        if (settings.mute) {
+            music.volume = 0.0;
+        } else {
+            let currentVolume = 0.0;
+            volumeIncrease = setInterval(() => {
+                if (currentVolume < maxVolume) {
+                    currentVolume += volumeStep;
+                    music.volume = Math.min(currentVolume, maxVolume);
+                } else {
+                    clearInterval(volumeIncrease);
+                }
+            }, intervalTime);
+        }
+    }
+
+    titles = shuffle(dialogsData);
 
     // #region PLAYER  & RIVAL VARIABLES
 
@@ -58,6 +117,7 @@ const gameScene = (params) => {
      * @type {PlayerState}
      */
     const playerState = {
+
         cursorPos: 0,
         line: "",
         curLineCount: 0,
@@ -100,107 +160,322 @@ const gameScene = (params) => {
 
     // #endregion
 
-    animateBackground();
-
+    /**
+     * @param {number} i
+     */
     /**
      * @param {number} i
      */
     const matchColorToken = (i, ch) => {
-        const themeTokens = theme.tokens;
-        const themeAssociations = theme.associations;
-
-        if (ch === " ") return COLOR_TEXT_DEFAULT;
-        if (playerState.cursorPos - 1 < i) {
-            if (rivalState.cursorPos + 1 > i) {
-                return COLOR_TEXT_RIVAL;
-            }
-            return COLOR_TEXT_DEFAULT;
-        }
-
-        let charColor = COLOR_TEXT_DEFAULT;
-
-        const words = originalText.split(" ");
-        let wordCharsIndex = 0;
-        const word =
-            words.find((w) => {
-                const found = w.length + wordCharsIndex >= i;
-                wordCharsIndex += w.length + 1;
-                return found;
-            }) || "";
+        const T = theme.tokens;
+        const A = theme.associations;
 
         if (errorCharsIndexes.includes(i)) {
-            charColor = COLOR_TEXT_INCORRECT;
-        } else if (ch.match(themeAssociations.brackets)) {
-            charColor = k.Color.fromHex(themeTokens.brackets);
-        } else if (ch.match(themeAssociations.punctuation)) {
-            charColor = k.Color.fromHex(themeTokens.punctuation);
-        } else if (word.match(themeAssociations.classes)) {
-            charColor = k.Color.fromHex(themeTokens.classes);
-        } else if (word.match(themeAssociations.functions)) {
-            charColor = k.Color.fromHex(themeTokens.functions);
-        } else if (word.match(themeAssociations.keywords)) {
-            charColor = k.Color.fromHex(themeTokens.keywords);
-        } else if (word.match(themeAssociations.strings)) {
-            charColor = k.Color.fromHex(themeTokens.strings);
-        } else {
-            charColor = k.Color.fromHex(themeTokens.text);
+            return COLOR_TEXT_INCORRECT;
+        }
+        if (i === rivalState.cursorPos) {
+            return COLOR_TEXT_RIVAL;
+        }
+        if (ch === " ") {
+            return COLOR_TEXT_DEFAULT;
+        }
+        if (i > playerState.cursorPos - 1) {
+            return i < rivalState.cursorPos + 1
+                ? COLOR_TEXT_RIVAL
+                : COLOR_TEXT_DEFAULT;
+        }
+        if (ch.match(A.brackets)) return k.Color.fromHex(T.brackets);
+        if (ch.match(A.operators)) return k.Color.fromHex(T.operators);
+        if (ch.match(A.punctuation)) return k.Color.fromHex(T.punctuation);
+        if (ch === '"' || ch === "'") return k.Color.fromHex(T.strings);
+
+        const tokenPattern = /[\w$]+|[^\s\w]/g;
+        const matches = Array.from(originalText.matchAll(tokenPattern));
+        let token = "";
+        for (const m of matches) {
+            const start = m.index;
+            const end = start + m[0].length;
+            if (i >= start && i < end) {
+                token = m[0];
+                break;
+            }
         }
 
-        if (
-            rivalState.cursorPos < playerState.cursorPos &&
-            rivalState.cursorPos > i
-        ) {
-            return charColor.darken(80);
+        if (A.tags.test(token)) return k.Color.fromHex(T.tags);
+        if (A.numbers.test(token)) return k.Color.fromHex(T.numbers);
+        if (A.classes.test(token)) return k.Color.fromHex(T.classes);
+        if (A.functions.test(token)) return k.Color.fromHex(T.functions);
+        if (A.keywords.test(token)) return k.Color.fromHex(T.keywords);
+        if (A.strings.test(token)) return k.Color.fromHex(T.strings);
+        if (/^[A-Za-z_$][\w$]*$/.test(token)) {
+            return k.Color.fromHex(T.variables);
         }
-
-        return charColor;
+        return k.Color.fromHex(T.text);
     };
 
-    function animateBackground() {
-        offsetX += BG_SPEED_X;
-        offsetY += BG_SPEED_Y;
-        document.body.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
+    let rivalTimer = 0;
 
-        requestAnimationFrame(animateBackground);
+    k.onUpdate(() => {
+        analitycs_calculate();
+        if (playerStartedTyping) {
+            startTime += k.dt();
+            rivalTimer += k.dt();
+            if (rivalTimer >= rivalSpeed) {
+                rivalTimer -= rivalSpeed;
+                if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                    rivalWrite();
+                } else {
+                    music.stop();
+                    StatsforAnalitics();
+                    resetGameStats();
+                    k.go("endgame");
+                }
+            }
+        }
+        const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
+        const awpm = totalEventsLast60 / 5;
+        actual_awpm = awpm;
+    });
+    
+    function escapeForRender(str) {
+
+        return str
+            .replace(/\\/g, "\\\\")
+            .replace(/\[/g, "\\[")
+            .replace(/\]/g, "\\]")
+            .replace(/\{/g, "\\{")
+            .replace(/\}/g, "\\}")
+            .replace(/'/g, "\\'");
+    }
+    function StatsforAnalitics() {
+        goal_wpm = actual_wpm;
+        goal_awpm = actual_awpm;
+        goal_lpm = actual_lpm;
+        goal_acc = actual_acc;
+        goal_time = startTime;
+        goalCompletedBlocks = completedBlocks;
+    }
+
+    function resetGameStats() {
+        playerStartedTyping =false;
+        completedBlocks = 0;
+        startTime = 0;
+        actual_wpm = 0;
+        actual_awpm = 0;
+        actual_lpm = 0;
+        actual_acc = 0;
+        totalCorrectChars = 0;
+        totalIcorrectCorrectChars = 0;
+        totalTypedCharacters = 0;
+        totalCorrectlines = 0;
+        rivalSpeed = EASY_RIVAL_SPEED;
+        errorCharsIndexes = [];
+        errorCharsReplaces = {};
     }
 
     // background
     // Files & Folders
     const filesFoldersSize = () => {
         if (k.width() > 1080) {
-            return k.vec2(323, k.height());
+            return k.vec2(328, k.height());
         } else {
             return k.vec2(k.width() * 0.3, k.height());
         }
     };
     const filesFoldersPos = () => k.vec2(0, 0);
+    const wmp_text = k.add([
+        k.anchor("left"),
+        k.pos(k.width() * 0.25+90, k.height() * 0.025),
+        k.text("0", {
+            size: 18,
+        }),
+        k.color(k.YELLOW),
+        k.z(21),
+    ]);
+    const time_text = k.add([
+        k.anchor("left"),
+        k.pos(k.width() * 0.35+90, k.height() * 0.025),
+        k.text("time: ", {
+            size: 18,
+        }),
+        k.color(k.YELLOW),
+        k.z(22),
+    ]);
 
     k.add([
-        resizableRect(filesFoldersSize),
-        resizablePos(filesFoldersPos),
-        k.anchor("topleft"),
-        k.color(k.RED),
-        k.opacity(0.5),
+        k.sprite("BG_WPM_IN_GAME"),
+        k.pos(k.width() * 0.25, k.height() * 0.02 + 5),
+        k.anchor("left"),
+        k.z(20),
     ]);
+    k.add([
+        k.sprite("BG_TIME_IN_GAME"),
+        k.pos(k.width() * 0.35, k.height() * 0.02 + 5),
+        k.anchor("left"),
+        k.z(20),
+    ]);
+    k.add([
+        resizablePos(filesFoldersPos),
+        k.sprite("bg2"),
+        k.anchor("topleft"),
+        k.opacity(1),
+    ]);
+    k.add([
+        k.pos(k.width() * 0.01+10, k.height() * 0.01-10),
+        k.sprite("SilverDevs"),
+        k.anchor("topleft"),
+        k.opacity(1),
+        k.z(51),
+    ]);
+    const textboxBack = k.add([
+        k.rect(2000, 54, { radius: 0 }),
+        k.pos(1000, 0),
+        k.color(k.rgb(7, 7, 7)),
+        k.outline(2),
+        k.anchor("top"),
+        k.z(10),
+    ]);
+    const text_challenge = k.add([
+        k.text("Challenges", { size: 20 }),
+        resizablePos(() => k.vec2(k.width() * 0.05, k.height() * 0.1)),
+        k.color(k.WHITE),
+        k.opacity(1),
+    ]);
+    const rest_text = k.add([
+        k.text("ESC to retry", { size: 20 }),
+        resizablePos(() => k.vec2(k.width() * 0.1 + 20, k.height() * 0.94)),
+        k.anchor("center"),
+        k.color(k.rgb(127, 134, 131)),
+        k.animate(),
+        k.z(19),
+    ]);
+    const button_muteON = k.add([
+        k.sprite("muteON"),
+        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.opacity(1),
+        k.animate(),
+        k.z(50),
+    ]);
+    const button_muteOFF = k.add([
+        k.sprite("muteOff"),
+        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.opacity(0),
+        k.animate(),
+        k.z(50),
+    ]);
+
+    const languageIconMap = {
+        js: "icon_02",
+        ts: "icon_01",
+        go: "icon_03",
+        react: "icon_04",
+        py: "icon_05",
+        default: "icon_02",
+    };
+
+    const texts = dialogsData.map(item => ({
+        title: item.title,
+        language: item.language || "default",
+    }));
+
+    const visibleTexts = texts.slice(0, MAX_BLOCKS);
+    blockNamesString = visibleTexts.map(item => item.title);
+    visibleTexts.forEach(({ title, language }, index) => {
+        const spriteKey = languageIconMap[language] ?? languageIconMap.default;
+    
+        k.add([
+            k.sprite(spriteKey),
+            resizablePos(() =>
+                k.vec2(
+                    k.width() * 0.02,
+                    k.height() * (ICON_START_Y + SPACING * index)
+                )
+            ),
+            k.opacity(1),
+            k.z(55),
+            "challengeIcon",
+        ]);
+    
+        k.add([
+            k.text(title, { size: 20 }),
+            resizablePos(() =>
+                k.vec2(
+                    k.width() * 0.05,
+                    k.height() * (TEXT_START_Y + SPACING * index)
+                )
+            ),
+            k.color(k.WHITE),
+            k.opacity(1),
+            "menuItem",
+            { menuIndex: index },
+        ]);
+    });
+
+    if (settings.mute) {
+        button_muteON.opacity = 0;
+        button_muteOFF.opacity = 1;
+        updateMusicVolume();
+    }
+    else {
+        button_muteON.opacity = 1;
+        button_muteOFF.opacity = 0;
+        updateMusicVolume();
+    }
+
+    k.onKeyPress(["escape"], () => {
+        music.stop();
+        resetGameStats();
+        k.go("game");
+    });
+
+    const arrow = k.add([
+        k.sprite("arrow_yellow"),
+        k.pos(k.width() * 0.1, k.height() * (TEXT_START_Y - SPACING * 0.5)),
+        k.opacity(1),
+        k.animate(),
+    ]);
+
+    let currentIndex = -1;
+    let arrow_ypos = arrow.pos.y;
+
+    function moveArrow() {
+        const newY = k.height() * (TEXT_START_Y + SPACING * currentIndex);
+        arrow.pos = k.vec2(arrow.pos.x, newY);
+        arrow.animate("pos", [k.vec2(10, newY), k.vec2(20, newY)], {
+            duration: 0.5,
+            direction: "ping-pong",
+        });
+
+        k.get("menuItem").forEach((item) => {
+            if (item.menuIndex === currentIndex) {
+                item.color = k.YELLOW;
+            } else {
+                item.color = k.WHITE;
+            }
+        });
+    }
 
     const textboxSize = () => k.vec2(k.width(), k.height());
     const textboxPos = () => {
         if (k.width() > 1080) {
-            return k.vec2(323, 0);
+            return k.vec2(450, 0);
         }
 
         return k.vec2(k.width() * 0.3, 0);
     };
-    const textPadding = k.vec2(12, 12);
+
+    const textPadding = k.vec2(50, 103);
+
+    k.setVolume(0.5);
 
     const textbox = k.add([
-        resizableRect(textboxSize),
+        k.rect(1920, 1080, { radius: 8 }),
+        k.color(k.rgb(53, 53, 71)),
         resizablePos(textboxPos),
         k.anchor("topleft"),
-        k.color(23, 9, 39),
-        k.opacity(0.5),
+        k.opacity(0.3),
+        k.z(0),
     ]);
-
     const textboxBackParent = k.add([
         resizableRect(textboxSize),
         resizablePos(textboxPos),
@@ -212,42 +487,46 @@ const gameScene = (params) => {
         k.opacity(0),
     ]);
 
+
+    const textboxTextPos = () => {
+        matchColorToken
+        return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
+    }
+
     const textboxText = textboxBackParent.add([
         k.text("", {
             size: fontSize,
+            lineSpacing: 12,
+            letterSpacing: 2,
             transform: (idx, ch) => ({
                 color: matchColorToken(idx, ch),
             }),
         }),
-        resizablePos(() => k.vec2(textPadding)),
+        k.pos(0, 0),
+        resizablePos(textboxTextPos),
     ]);
 
-    const timerLabel = k.add([
-        k.text(String(gameState.timeLeft), {
-            size: 48,
-            font: "monogram",
-        }),
-        resizablePos(() => k.vec2(k.width(), k.height())),
-        k.anchor("botright"),
-    ]);
+    const lineSpacing = 12;
+    const actualLineHeight = fontSize + lineSpacing;
+    const cursorVerticalOffset = (actualLineHeight - fontSize) / 2;
+    const CURSOR_EXTRA_OFFSET = 10;
 
     const cursorPos = (rival = false) => {
         const player = rival ? rivalState : playerState;
-
-        return k.vec2(
-            textboxBackParent.pos
-                .add(textboxText.pos)
-                .add(
-                    player.curCharInLine * fontWidth,
-                    (player.curLineCount + 1) * lineHeight,
-                ),
-        );
+        const displayLine = player.curLineCount - jumpCount * JUMP_AFTER;
+        const x = player.curCharInLine * fontWidth;
+        const y = displayLine * actualLineHeight
+            + cursorVerticalOffset
+            + CURSOR_EXTRA_OFFSET;
+        return textboxBackParent.pos
+            .add(textboxText.pos)
+            .add(x, y);
     };
 
     const cursorPointer = k.add([
         k.text("_", { size: 16 }),
         resizablePos(() => cursorPos()),
-        k.opacity(0.6),
+        k.opacity(1),
         k.anchor("left"),
         k.color(255, 255, 255),
         k.z(10),
@@ -256,11 +535,19 @@ const gameScene = (params) => {
     const rivalPointer = k.add([
         k.text("_", { size: 16 }),
         resizablePos(() => cursorPos(true)),
-        k.opacity(0.6),
+        k.opacity(1),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
     ]);
 
+    makeBlink(cursorPointer);
+    makeBlink(rivalPointer);
+
+    function makeBlink(entity) {
+        k.loop(0.5, () => {
+            entity.opacity = entity.opacity === 0 ? 0.8 : 0;
+        });
+    }
     playerState.cursorPointer = cursorPointer;
     rivalState.cursorPointer = rivalPointer;
 
@@ -290,38 +577,73 @@ const gameScene = (params) => {
             "color: inherit;",
         );
     };
-
     function updateDialog() {
         currentBlockIndex++;
-        completedBlocks++;
+        if(currentBlockIndex>0)
+        {
+            completedBlocks++;
+        }
+        musicRate += 0.05;
+        updateMusic();
+        if (completedBlocks === goalBlocks) {
+            completedBlocks = goalBlocks;
+            StatsforAnalitics();
+            resetGameStats();
+            music.stop();
+            k.go("endgame");
+            return;
+        }
+        const startSpeed = EASY_RIVAL_SPEED;
+        const endSpeed = HARD_RIVAL_SPEED;
+        const steps = 4;
+        if (completedBlocks > 0) {
+
+            const t = Math.min(completedBlocks, steps) / steps;
+            rivalSpeed = startSpeed * Math.pow(endSpeed / startSpeed, t);
+        } else {
+            rivalSpeed = startSpeed;
+        }
+        k.play
         playerState.reset();
         rivalState.reset();
+        arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
+
+        if (currentIndex < Math.min(texts.length, MAX_BLOCKS) - 1) {
+            currentIndex++;
+            moveArrow();
+        }
 
         gameState.timeLeft = MAX_TIME;
+        jumpCount = 0;
+        textboxText.updatePos();
+
         const currentDialog = getCurrentDialog();
 
-        // theme
-        theme = themes[0];
-
-        // the sentences
+        const lang = currentDialog.language ?? "default";
+        theme = themes.find(t => t.name === lang) || themes[0];
         const currentBlocks = currentDialog.blocks;
         curBlockData.lineCount = currentBlocks.length;
 
-        // we replace [] characters with \[ and \] to avoid them being interpreted as tags
-        // also ▯ is replaced with a space
         originalText = currentBlocks.join("");
-
-        const fixedGroup = currentBlocks
-            .join("")
-            .replace(/\[/g, "\\[")
-            .replace(/\]/g, "\\]")
-            .replace(/▯/g, " ");
-
-        fixedText = currentBlocks.join("").replace(/▯/g, " ");
+        const fixedGroup = escapeForRender(originalText);
         renderedText = fixedGroup;
         textboxText.text = renderedText;
+
+
+        fixedText = originalText.replace(/▯/g, " ");
+        renderedText = fixedGroup;
+        textboxText.text = renderedText;
+
         playerState.line = fixedText.split("\n")[0];
-        rivalState.line = fixedText.split("\n")[0];
+        rivalState.line = playerState.line;
+
+        lastChallenge = currentDialog.title;
+        cursorPointer.updatePos();
+        rivalPointer.updatePos();
+    }
+
+    function updateMusic() {
+        music.speed = musicRate;
     }
 
     function updateDialogErrors() {
@@ -336,9 +658,7 @@ const gameScene = (params) => {
                 }
             })
             .join("")
-            .replace(/\[/g, "\\[")
-            .replace(/\]/g, "\\]");
-
+        renderedText = escapeForRender(renderedText);
         textboxText.text = renderedText;
     }
 
@@ -363,15 +683,25 @@ const gameScene = (params) => {
     }
 
     function preventError() {
-        k.shake(5);
+        k.shake(2);
+        if (!settings.mute) {
+            k.play("wrong_typing");
+        }
     }
 
-    function nextLine(rival = false) {
-        const player = rival ? rivalState : playerState;
+    function nextLine(isRival = false) {
+        const player = isRival ? rivalState : playerState;
         if (!player.cursorPointer) return;
-
         player.curLineCount++;
-
+        if (JUMP_AFTER == 1) {
+            jumpCount++;
+        }
+        else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
+            jumpCount++;
+        }
+        if (!isRival) {
+            totalCorrectlines++;
+        }
         const line = fixedText.split("\n")[player.curLineCount];
         if (!line) return;
         const lineIdent = line.match(/^\s+/)?.[0].length || 0;
@@ -381,7 +711,10 @@ const gameScene = (params) => {
         player.curIdentSize = lineIdent;
         player.curCharInLine = lineIdent;
 
-        player.cursorPointer.pos = cursorPos(rival);
+        textboxText.updatePos();
+        player.cursorPointer.pos = cursorPos(isRival);
+        cursorPointer.updatePos();
+        rivalPointer.updatePos();
     }
 
     function rivalWrite() {
@@ -395,58 +728,89 @@ const gameScene = (params) => {
         }
     }
 
-    function startTimer() {
-        k.loop(1, () => {
-            gameState.timeLeft--;
-            timerLabel.text = String(gameState.timeLeft);
-            if (gameState.timeLeft <= 0) {
-                k.go("endgame");
-            }
-        });
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
 
-        k.loop(rivalSpeed, () => {
-            rivalWrite();
-        });
+    function analitycs_calculate() {
+        time_text.text = startTime.toFixed(1);
+        if (startTime > 0 && totalCorrectChars > 5) {
+            actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
+            actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
+            actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
+
+            if (isNaN(actual_acc)) {
+                actual_acc = 100;
+            }
+
+            wmp_text.text = Math.round(actual_wpm || 0).toString();
+        }
+
+    }
+
+    const BUFFER_SIZE = 60;
+    let eventBuffer = new Array(BUFFER_SIZE).fill(0);
+    let lastSecond = Math.floor(k.time());
+
+    function addCorrectEvent() {
+        let currentSec = Math.floor(k.time());
+        if (currentSec !== lastSecond) {
+            for (let sec = lastSecond + 1; sec <= currentSec; sec++) {
+                let index = sec % BUFFER_SIZE;
+                eventBuffer[index] = 0;
+            }
+            lastSecond = currentSec;
+        }
+        let idx = currentSec % BUFFER_SIZE;
+        eventBuffer[idx]++;
     }
 
     k.onKeyPress((keyPressed) => {
+        const curChar = fixedText[playerState.cursorPos];
+        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
+        if (prevChar === "\n") return;
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
         let errorKey = key;
         let isCorrect = false;
 
-        if (key == "enter" || key == "backspace") {
-            return;
-        }
+        if (key === "backspace" || key === "enter" || key === "shift") return;
 
-        if (errorCharsIndexes.length > 1) {
-            return preventError();
-        }
-
-        // Setting key
-        if (key.length == 1) {
+        if (key.length === 1) {
             key = shifting ? key.toUpperCase() : key;
-        } else if (key == "space") {
+        } else if (key === "space") {
             key = " ";
             errorKey = "_";
         } else {
             return;
         }
-
+        totalTypedCharacters++;
         isCorrect = key === correctChar;
 
         if (isCorrect) {
+            if (!settings.mute) k.play("code_sound");
             totalCorrectChars++;
+            addCorrectEvent();
             nextChar();
         } else {
+            if (errorCharsIndexes.length > maxMistakes) return preventError();
+
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
+            if (!settings.mute) k.play("wrong_typing");
+            totalIcorrectCorrectChars++;
+        }
+        if (!playerStartedTyping && (totalCorrectChars > 0 || totalIcorrectCorrectChars > 0)) {
+            playerStartedTyping = true;
         }
     });
-
     // Line jump
     k.onKeyPress("enter", () => {
         const correctChar = fixedText[playerState.cursorPos];
@@ -459,6 +823,7 @@ const gameScene = (params) => {
         if (playerState.curLineCount >= curBlockData.lineCount - 1) {
             return updateDialog();
         }
+        // totalCorrectlines++;
 
         nextChar();
         nextLine();
@@ -471,7 +836,7 @@ const gameScene = (params) => {
             playerState.curCharInLine === playerState.curIdentSize &&
             playerState.curLineCount > 0
         ) {
-            return k.shake(5);
+            return k.shake(2);
         } else {
             prevChar();
         }
@@ -492,7 +857,6 @@ const gameScene = (params) => {
         }
     });
 
-    startTimer();
     updateDialog();
 };
 

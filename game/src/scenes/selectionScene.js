@@ -1,5 +1,5 @@
 import { k } from "../kaplay.js";
-import { getMute, saveMute } from "../systems/saves.js";
+import { getMute, saveMute } from "../systems/preferences.js";
 import { resizablePos } from "../components/resizablePos.js";
 
 export const settings = {
@@ -322,6 +322,7 @@ k.scene("selection", () => {
         }
         updateTextColors();
     }
+    
     function ResetGame() {
         rawInput = "";
         previousInput = "";

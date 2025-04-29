@@ -9,20 +9,22 @@
  * @property {string} blockNames
  * @property {string} loadDate
  */
+
 /**
-  * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string }} stats
+ * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string }} stats
  */
-export const savePlay = ({ wpm, lpm, acc, bestWpm,blockNames,}) => {
+export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames }) => {
+  const previousSave = getPlay();
   const payload = {
     wpm,
     lpm,
     acc,
-    bestWpm,
+    bestWpm: Math.max(bestWpm, previousSave?.bestWpm || 0),
     blockNames,
     loadDate: new Date().toISOString(),
   };
   const encoded = encodeURIComponent(JSON.stringify(payload));
-  const maxAge  = 60 * 60 * 24 * 30;
+  const maxAge = 60 * 60 * 24 * 30;
 
   document.cookie =
     `playerData=${encoded}; ` +
@@ -50,20 +52,4 @@ export const getPlay = () => {
     console.error('Error parsing playerData cookie:', e);
     return null;
   }
-};
-
-/**
- * save mute preference in localStorage
- * @param {boolean} mute
- */
-export const saveMute = (mute) => {
-  localStorage.setItem('playMute', JSON.stringify(mute));
-};
-
-/**
- * @returns {boolean}
- */
-export const getMute = () => {
-  const item = localStorage.getItem('playMute');
-  return item ? JSON.parse(item) : false;
 };

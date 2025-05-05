@@ -768,7 +768,7 @@ const gameScene = (params) => {
         let idx = currentSec % BUFFER_SIZE;
         eventBuffer[idx]++;
     }
-
+    let errorKey;
     k.onKeyPress((keyPressed) => {
         const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
@@ -776,13 +776,14 @@ const gameScene = (params) => {
         const correctChar = fixedText[playerState.cursorPos];
         const shifting = k.isKeyDown("shift");
         let key = keyPressed;
-        let errorKey = key;
+        let errorKey;
         let isCorrect = false;
 
         if (key === "backspace" || key === "enter" || key === "shift") return;
 
         if (key.length === 1) {
             key = shifting ? key.toUpperCase() : key;
+            errorKey = key;
         } else if (key === "space") {
             key = " ";
             errorKey = "_";

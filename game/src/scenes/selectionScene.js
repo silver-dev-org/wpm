@@ -38,7 +38,12 @@ k.scene("selection", () => {
     const buttonGap = 50;
     settings.mute = getMute();
     k.setVolume(settings.mute ? 0 : 0.5);
-
+    k.add([
+        k.sprite("bg2"),
+        k.pos(k.width() / 2, k.height() / 2),
+        k.anchor("center"),
+        k.z(18),
+    ]);
     if (isMobile()) {
         k.add([
             k.text("WPM is a desktop-only experience", { size: 18 }),
@@ -57,12 +62,6 @@ k.scene("selection", () => {
         return;
     }
     isMobile();
-    k.add([
-        k.sprite("bg2"),
-        k.pos(k.width() / 2, k.height() / 2),
-        k.anchor("center"),
-        k.z(18),
-    ]);
     k.add([
         k.pos(boxCenterX, k.height() * 0.50),
         k.anchor("center"),

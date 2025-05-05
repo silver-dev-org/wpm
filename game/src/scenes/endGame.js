@@ -89,7 +89,7 @@ k.scene("endgame", () => {
   k.add([k.text(`${acc.toFixed(0)}%`, { size: fontsize }), pos(labelX + labelOffset + 20, baseY + textSpacing), k.anchor("left"), k.color(k.YELLOW), k.z(19)]);
   k.add([k.text("SCORE", { size: 32 }), pos(+offsetX, -offsetY / 10), k.anchor("center"), k.color(k.WHITE), k.z(19)]);
   k.add([k.text(`${record_blocks}/${goalBlocks}`, { size: 42 }), pos(+offsetX, +offsetY * 0.2), k.anchor("center"), k.color(k.YELLOW), k.z(18)]);
-  k.add([k.text("last challenge", { size: fontsize }), pos(+offsetX, +offsetY * 0.45), k.anchor("center"), k.color(k.WHITE), k.z(18)]);
+  k.add([k.text("Last challenge", { size: fontsize }), pos(+offsetX, +offsetY * 0.45), k.anchor("center"), k.color(k.WHITE), k.z(18)]);
   k.add([k.text(record_challenges, { size: fontsize }), pos(+offsetX, +offsetY * 0.4 + 50), k.anchor("center"), k.color(k.YELLOW), k.z(18)]);
   k.add([k.text("ChallengeSet:", { size: fontsize + 2 }), k.pos(k.width() * 0.45, k.height() * 0.74), k.anchor("left"), k.color(k.YELLOW), k.z(18)]);
 

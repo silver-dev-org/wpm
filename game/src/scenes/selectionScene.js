@@ -39,6 +39,24 @@ k.scene("selection", () => {
     settings.mute = getMute();
     k.setVolume(settings.mute ? 0 : 0.5);
 
+    if (isMobile()) {
+        k.add([
+            k.text("WPM is a desktop-only experience", { size: 18 }),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.5)),
+            k.anchor("center"),
+            k.color(k.YELLOW),
+            k.z(18),
+        ]);
+        const title = k.add([
+            k.sprite("WPM"),
+            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.25)),
+            k.anchor("center"),
+            k.scale(0.5),
+            k.z(18),
+        ]);
+        return;
+    }
+    isMobile();
     k.add([
         k.sprite("bg2"),
         k.pos(k.width() / 2, k.height() / 2),
@@ -65,17 +83,6 @@ k.scene("selection", () => {
         k.anchor("center"),
         k.z(18),
     ]);
-    if (isMobile()) {
-        k.add([
-            k.text("WPM is a desktop-only experience", { size: 32 }),
-            resizablePos(() => k.vec2(k.width() * 0.5, k.height() * 0.8)),
-            k.anchor("center"),
-            k.color(k.YELLOW),
-            k.z(18),
-        ]);
-        return;
-    }
-    isMobile();
 
     const outsideBox = k.add([k.rect(810, 260, { radius: 0 }), k.pos(k.width() * 0.30 - 15, boxY), k.color(k.rgb(52, 53, 54)), k.z(20), k.opacity(0.3)]);
     const outerBox = k.add([k.rect(790, 230, { radius: 1 }), k.pos(k.width() * 0.30 - 5, boxY + 20), k.color(0, 0, 0), k.z(20), k.opacity(1)]);

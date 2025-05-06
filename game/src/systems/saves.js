@@ -28,6 +28,7 @@ export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames }) => {
 
   document.cookie =
     `playerData=${encoded}; ` +
+    `domain=silver.dev; ` +
     `path=/; ` +
     `max-age=${maxAge}; ` +
     `domain=.silver.dev; ` + 

@@ -30,6 +30,7 @@ export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames }) => {
     `playerData=${encoded}; ` +
     `path=/; ` +
     `max-age=${maxAge}; ` +
+    `domain=.silver.dev; ` + 
     `SameSite=Lax`;
 };
 

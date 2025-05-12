@@ -31,6 +31,7 @@ k.scene("endgame", () => {
   };
   savePlay({
     wpm: wpm,
+    bestLvl: record_blocks,
     bestWpm: best_wpm,
     lpm: lpm,
     acc: acc,

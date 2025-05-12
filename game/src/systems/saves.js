@@ -11,14 +11,15 @@
  */
 
 /**
- * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string }} stats
+ * @param {{ wpm: number, lpm: number, acc: number, bestWpm: number, blockNames: string, bestLvl: number }} stats
  */
-export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames }) => {
+export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames, bestLvl }) => {
   const previousSave = getPlay();
   const payload = {
     wpm,
     lpm,
     acc,
+    bestLvl,
     bestWpm: Math.max(bestWpm, previousSave?.bestWpm || 0),
     blockNames,
     loadDate: new Date().toISOString(),
@@ -28,9 +29,9 @@ export const savePlay = ({ wpm, lpm, acc, bestWpm, blockNames }) => {
 
   document.cookie =
     `playerData=${encoded}; ` +
+    `domain=silver.dev; ` +
     `path=/; ` +
     `max-age=${maxAge}; ` +
-    `domain=.silver.dev; ` + 
     `SameSite=Lax`;
 };
 

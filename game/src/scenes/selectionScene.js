@@ -126,13 +126,13 @@ k.scene("selection", () => {
                 break;
             case 1:
                 commands = ["yes", "no"];
-                StartText.text = "Play with Audio";
+                StartText.text = "Play with Audio?";
                 gitText.text = "Yes";
                 aboutText.text = "No";
                 break;
             case 2:
                 commands = ["interview", "practice"];
-                StartText.text = "Mode";
+                StartText.text = "Game Mode";
                 gitText.text = "Interview";
                 aboutText.text = "Practice";
                 break;

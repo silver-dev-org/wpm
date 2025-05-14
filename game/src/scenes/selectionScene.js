@@ -1,9 +1,10 @@
-import { k } from "../kaplay.js";
 import { getMute, saveMute } from "../systems/preferences.js";
 import { resizablePos } from "../components/resizablePos.js";
-
+import { k } from "../kaplay.js";
 export const settings = {
     mute: false,
+    practiceMode: false,
+    rivalSpeed: 0,
 };
 function isMobile() {
     return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
@@ -12,6 +13,7 @@ function isMobile() {
 function escapeBackslashes(str) {
     return str.replace(/\\/g, "\\\\");
 }
+
 k.scene("selection", () => {
     k.loadSprite("icon_05", "/sprites/icon_04.png");
     k.loadSprite("icon_04", "/sprites/icon_04.png");
@@ -22,8 +24,7 @@ k.scene("selection", () => {
     k.loadSprite("BG_TIME_IN_GAME", "/sprites/BG_TIME_IN_GAME.png");
     k.loadSprite("SilverDevs", "/sprites/SilverDev_logo.png");
     k.loadMusic("videogame", "/sounds/videogame.mp3");
-    
-    const commands = ["about", "github", "start with sound", "start muted"];
+    let commands = [];
     const fontsize = 18;
     const boxWidth = 800;
     const textY = k.height() * 0.85;
@@ -35,7 +36,8 @@ k.scene("selection", () => {
     const buttonLeftX = k.width() * 0.35 - 40;
     const buttonRightX = k.width() * 0.6 - 40;
     const buttonTopY = boxY + 80;
-    const buttonGap = 50;
+    const buttonGap = 30;
+    let stage = 0;
     settings.mute = getMute();
     k.setVolume(settings.mute ? 0 : 0.5);
     k.add([
@@ -85,10 +87,9 @@ k.scene("selection", () => {
 
     const outsideBox = k.add([k.rect(810, 260, { radius: 0 }), k.pos(k.width() * 0.30 - 15, boxY), k.color(k.rgb(52, 53, 54)), k.z(20), k.opacity(0.3)]);
     const outerBox = k.add([k.rect(790, 230, { radius: 1 }), k.pos(k.width() * 0.30 - 5, boxY + 20), k.color(0, 0, 0), k.z(20), k.opacity(1)]);
-    const StartText = k.add([k.anchor("left"), k.text("Start with sound", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY)), k.opacity(1), k.z(21)]);
-    const muteText = k.add([k.anchor("left"), k.text("Start muted", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap)), k.opacity(1), k.z(21)]);
-    const gitText = k.add([k.anchor("left"), k.text("Github", { size: fontsize }), resizablePos(() => k.vec2(buttonRightX, buttonTopY)), k.opacity(1), k.z(21)]);
-    const aboutText = k.add([k.anchor("left"), k.text("About", { size: fontsize }), resizablePos(() => k.vec2(buttonRightX, buttonTopY + buttonGap)), k.opacity(1), k.z(21)]);
+    const StartText = k.add([k.anchor("left"), k.text("Start", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY)), k.opacity(1), k.z(21)]);
+    const gitText = k.add([k.anchor("left"), k.text("Github", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap)), k.opacity(1), k.z(21)]);
+    const aboutText = k.add([k.anchor("left"), k.text("About", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap * 2)), k.opacity(1), k.z(21)]);
 
     const button_muteON = k.add([
         k.sprite("muteON"),
@@ -104,6 +105,8 @@ k.scene("selection", () => {
         k.animate(),
         k.z(50),
     ]);
+    audioUpadte();
+
     const commandArrow = k.add([
         k.text("←", { size: 22 }),
         resizablePos(() => k.vec2(0, 0)),
@@ -113,13 +116,54 @@ k.scene("selection", () => {
         k.z(22),
         k.animate(),
     ]);
+    function updateStageCommands() {
+        switch (stage) {
+            case 0:
+                commands = ["about", "github", "start"];
+                StartText.text = "Start";
+                gitText.text = "Github";
+                aboutText.text = "About";
+                break;
+            case 1:
+                commands = ["yes", "no"];
+                StartText.text = "Play with Audio";
+                gitText.text = "Yes";
+                aboutText.text = "No";
+                break;
+            case 2:
+                commands = ["interview", "practice"];
+                StartText.text = "Mode";
+                gitText.text = "Interview";
+                aboutText.text = "Practice";
+                break;
+        }
 
-    function calcNewTarget(input) {
-        if (input === "") return "Start with sound";
-        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
-        return found ? found : "Start with sound";
+        updateTextColors();
     }
+    function calcNewTarget(input) {
+        if (input === "") {
+            switch (stage) {
+                case 1:
+                    return "Yes";
+                case 2:
+                    return "Interview";
+                default:
+                    return "Start";
+            }
+        }
 
+        const found = commands.find(cmd => cmd.startsWith(input.toLowerCase()));
+        if (found) return found;
+
+        switch (stage) {
+            case 1:
+                return "Yes";
+            case 2:
+                return "Interview";
+            default:
+                return "Start";
+        }
+    }
     function moveArrow(targetObj) {
         const newY = targetObj.pos.y + arrowYOffset;
         const newX = targetObj.pos.x + targetObj.text.length * 16;
@@ -131,10 +175,10 @@ k.scene("selection", () => {
         });
     }
 
-    let targetText = "Start with sound";
+    let targetText = "Start";
     let maxLength = targetText.length;
     const letterSpacing = 14;
-    const fixedStartX = k.width() / 2.58 - ((maxLength - 1) * letterSpacing) / 2;
+    const fixedStartX = k.width() / 2.88 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
     updateTextColors();
@@ -171,28 +215,45 @@ k.scene("selection", () => {
     createLetterObjects();
 
     function updateTextColors() {
-        const targetLower = targetText.toLowerCase();
-
-        const allCommands = [
-            { textObj: StartText, label: "start with sound" },
-            { textObj: muteText, label: "start muted" },
-            { textObj: gitText, label: "github" },
-            { textObj: aboutText, label: "about" },
-        ];
-
-        let targetObj = null;
-
-        allCommands.forEach(({ textObj, label }) => {
-            const isSelected = targetLower === label.toLowerCase();
-            textObj.color = isSelected ? k.rgb(3, 255, 87) : k.rgb(255, 255, 255);
-            if (isSelected) {
-                targetObj = textObj;
+        StartText.color = k.rgb(255, 255, 255);
+        gitText.color   = k.rgb(255, 255, 255);
+        aboutText.color = k.rgb(255, 255, 255);
+    
+        const cmdLower = targetText.toLowerCase();
+        let commandList;
+    
+        if (stage === 1) {
+            commandList = [
+                { obj: gitText,   label: "yes" },
+                { obj: aboutText, label: "no" }
+            ];
+        } else if (stage === 2) {
+            commandList = [
+                { obj: gitText,   label: "interview" },
+                { obj: aboutText, label: "practice" }
+            ];
+        } else {
+            commandList = [
+                { obj: StartText, label: "start" },
+                { obj: gitText,   label: "github" },
+                { obj: aboutText, label: "about" }
+            ];
+        }
+    
+        let selected = null;
+        commandList.forEach(({ obj, label }) => {
+            if (cmdLower === label) {
+                obj.color = k.rgb(3, 255, 87);
+                selected = obj;
             }
         });
-
-        if (targetObj) {
+    
+        if (selected) {
             commandArrow.opacity = 1;
-            moveArrow(targetObj);
+            moveArrow(selected);
+        } else if (commandList.length) {
+            commandArrow.opacity = 1;
+            moveArrow(commandList[0].obj);
         } else {
             commandArrow.opacity = 0;
         }
@@ -212,15 +273,17 @@ k.scene("selection", () => {
         k.z(21),
     ]);
     const slashChar = k.add([
-        k.text("$-", { size: fontsize }),
-        k.pos(name.pos.x - 40, textY),
+        k.text("-", { size: fontsize }),
+        k.pos(name.pos.x - 30, textY),
         k.anchor("left"),
         k.color(k.rgb(3, 255, 87)),
         k.z(21),
     ]);
 
-    button_muteON.opacity = settings.mute ? 0 : 1;
-    button_muteOFF.opacity = settings.mute ? 1 : 0;
+    function audioUpadte() {
+        button_muteON.opacity = settings.mute ? 0 : 1;
+        button_muteOFF.opacity = settings.mute ? 1 : 0;
+    }
 
     let isPreventingError = false;
     let previousInput = "";
@@ -237,7 +300,6 @@ k.scene("selection", () => {
     }
 
     function handleInputUpdate(input) {
-
         const candidate = calcNewTarget(input);
         if (!input || candidate.toLowerCase().startsWith(input.toLowerCase())) {
             if (candidate !== targetText) {
@@ -261,7 +323,6 @@ k.scene("selection", () => {
         const isGrowingWithErrors = input.length > previousInput.length && localErrorCount >= maxError;
         const hasAdvancedPastError = localErrorCount >= 2 && input.length > lastErrorIndex + 1;
 
-        //check long and max error count
         if (isTooLongTotal || isGrowingWithErrors) {
             preventError();
             rawInput = previousInput;
@@ -309,35 +370,91 @@ k.scene("selection", () => {
 
         switch (input.toLowerCase()) {
             case "github":
-                window.open("https://github.com/conanbatt/wpm", "_blank");
-                ResetGame();
+                if (stage === 0) {
+                    window.open("https://github.com/conanbatt/wpm", "_blank");
+                    ResetGame();
+                }
                 break;
             case "about":
-                k.go("about");
+                if (stage === 0) {
+                    k.go("about");
+                }
                 break;
-            case "start with sound":
-                settings.mute = false; saveMute(false);
-                k.setVolume(0.5); 
-                k.go("game");
+            case "start":
+                if (stage === 0) {
+                    advanceStage();
+                    updateStageCommands();
+                    const candidate = calcNewTarget("");
+                    if (candidate !== targetText) {
+                        targetText = candidate;
+                        maxLength = targetText.length;
+                        createLetterObjects();
+                    }
+                }
                 break;
-            case "start muted":
-                settings.mute = true; saveMute(true);
-                k.setVolume(0); 
-                k.go("game");
+            case "yes":
+                if (stage === 1) {
+                    settings.mute = false;
+                    saveMute(false);
+                    k.setVolume(0.5);
+                    audioUpadte();
+                    advanceStage();
+                }
                 break;
+            case "no":
+                if (stage === 1) {
+                    settings.mute = true;
+                    saveMute(true);
+                    k.setVolume(0);
+                    audioUpadte();
+                    advanceStage();
+                }
+                break;
+            case "interview":
+                if (stage === 2) {
+                    k.go("game");
+                }
+                break;
+            case "practice":
+                if (stage === 2) {
+                    settings.practiceMode = true;
+                    k.go("game");
+                }
+                break;
+
         }
         updateTextColors();
     }
-    
-    function ResetGame() {
+
+    function resetCommon(initialTarget) {
         rawInput = "";
         previousInput = "";
         lastErrorCount = 0;
-        targetText = "Start with sound";
+        updateStageCommands();
+        targetText = initialTarget;
         maxLength = targetText.length;
         createLetterObjects();
         updateTextColors();
         name.text = "";
+    }
+
+    function ResetGame() {
+        stage = 0;
+        resetCommon("Start");
+    }
+    function resetInputUI() {
+        if (stage === 1) {
+            resetCommon("Yes");
+        } else if (stage === 2) {
+            resetCommon("Interview");
+        } else {
+            resetCommon(commands[0]);
+        }
+    }
+
+    function advanceStage() {
+        stage++;
+        resetInputUI();
     }
 
     k.onKeyPress((ch) => {
@@ -382,4 +499,5 @@ k.scene("selection", () => {
             }
         });
     });
+    updateStageCommands();
 });

@@ -16,12 +16,11 @@ import {
     ICON_START_Y
 } from "../constants.js";
 import { savePlay, getPlay } from "../systems/saves.js";
-import { k } from "../kaplay.js";
+import { k, loadGtag, onBlockReached, onGameStart, MEASUREMENT_ID } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./selectionScene.js";
-
 let titles = dialogsData.map((item) => item.title);
 
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
@@ -70,9 +69,13 @@ let fixedText = "";
 
 const gameScene = (params) => {
 
+    loadGtag(MEASUREMENT_ID, () => {
+        onGameStart();
+    });
+
     k.loadMusic("endgame", "/sounds/endgame.mp3");
     k.loadSprite("arrow_yellow", "/sprites/arrow_yellow.png");
-    
+
     let jumpCount = 0;
     let theme = themes[0];
     let currentBlockIndex = -1;
@@ -167,48 +170,48 @@ const gameScene = (params) => {
      * @param {number} i
      */
     const matchColorToken = (i, ch) => {
-        const T = theme.tokens;
-        const A = theme.associations;
+        const { tokens: T, associations: A } = theme;
+        const { cursorPos: pPos } = playerState;
+        const { cursorPos: rPos } = rivalState;
 
-        if (errorCharsIndexes.includes(i)) {
-            return COLOR_TEXT_INCORRECT;
-        }
-        if (i === rivalState.cursorPos) {
+        if (errorCharsIndexes.includes(i)) return COLOR_TEXT_INCORRECT;
+        if (!settings.practiceMode && (i === rPos || (i > pPos - 1 && i < rPos + 1)))
             return COLOR_TEXT_RIVAL;
+        if (ch === " " || i > pPos - 1) return COLOR_TEXT_DEFAULT;
+
+        const singleCharRules = [
+            { test: () => A.brackets.test(ch), color: T.brackets },
+            { test: () => A.operators.test(ch), color: T.operators },
+            { test: () => A.punctuation.test(ch), color: T.punctuation },
+            { test: () => ch === '"' || ch === "'", color: T.strings },
+        ];
+        for (const { test, color } of singleCharRules) {
+            if (test()) return k.Color.fromHex(color);
         }
-        if (ch === " ") {
-            return COLOR_TEXT_DEFAULT;
-        }
-        if (i > playerState.cursorPos - 1) {
-            return i < rivalState.cursorPos + 1
-                ? COLOR_TEXT_RIVAL
-                : COLOR_TEXT_DEFAULT;
-        }
-        if (ch.match(A.brackets)) return k.Color.fromHex(T.brackets);
-        if (ch.match(A.operators)) return k.Color.fromHex(T.operators);
-        if (ch.match(A.punctuation)) return k.Color.fromHex(T.punctuation);
-        if (ch === '"' || ch === "'") return k.Color.fromHex(T.strings);
 
         const tokenPattern = /[\w$]+|[^\s\w]/g;
-        const matches = Array.from(originalText.matchAll(tokenPattern));
         let token = "";
-        for (const m of matches) {
+        for (const m of originalText.matchAll(tokenPattern)) {
+            const [text] = m;
             const start = m.index;
-            const end = start + m[0].length;
+            const end = start + text.length;
             if (i >= start && i < end) {
-                token = m[0];
+                token = text;
                 break;
             }
         }
 
-        if (A.tags.test(token)) return k.Color.fromHex(T.tags);
-        if (A.numbers.test(token)) return k.Color.fromHex(T.numbers);
-        if (A.classes.test(token)) return k.Color.fromHex(T.classes);
-        if (A.functions.test(token)) return k.Color.fromHex(T.functions);
-        if (A.keywords.test(token)) return k.Color.fromHex(T.keywords);
-        if (A.strings.test(token)) return k.Color.fromHex(T.strings);
-        if (/^[A-Za-z_$][\w$]*$/.test(token)) {
-            return k.Color.fromHex(T.variables);
+        const tokenRules = [
+            { test: t => A.tags.test(t), color: T.tags },
+            { test: t => A.numbers.test(t), color: T.numbers },
+            { test: t => A.classes.test(t), color: T.classes },
+            { test: t => A.functions.test(t), color: T.functions },
+            { test: t => A.keywords.test(t), color: T.keywords },
+            { test: t => A.strings.test(t), color: T.strings },
+            { test: t => /^[A-Za-z_$][\w$]*$/.test(t), color: T.variables },
+        ];
+        for (const { test, color } of tokenRules) {
+            if (test(token)) return k.Color.fromHex(color);
         }
         return k.Color.fromHex(T.text);
     };
@@ -217,26 +220,38 @@ const gameScene = (params) => {
 
     k.onUpdate(() => {
         analitycs_calculate();
-        if (playerStartedTyping) {
-            startTime += k.dt();
+        if (!playerStartedTyping) {
+            updateAWPM();
+            return;
+        }
+
+        startTime += k.dt();
+        if (!settings.practiceMode) {
             rivalTimer += k.dt();
-            if (rivalTimer >= rivalSpeed) {
-                rivalTimer -= rivalSpeed;
-                if (rivalState.curLineCount < curBlockData.lineCount - 1) {
-                    rivalWrite();
-                } else {
-                    music.stop();
-                    StatsforAnalitics();
-                    resetGameStats();
-                    k.go("endgame");
-                }
+            if (rivalTimer < rivalSpeed) {
+                updateAWPM();
+                return;
+            }
+            rivalTimer %= rivalSpeed;
+            if (rivalState.curLineCount < curBlockData.lineCount - 1) {
+                rivalWrite();
+            } else {
+                music.stop();
+                StatsforAnalitics();
+                resetGameStats();
+                onBlockReached(completedBlocks, lastChallenge);
+                k.go("endgame");
+                return;
             }
         }
-        const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
-        const awpm = totalEventsLast60 / 5;
-        actual_awpm = awpm;
+        updateAWPM();
     });
-    
+
+    function updateAWPM() {
+        const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
+        actual_awpm = totalEventsLast60 / 5;
+    }
+
     function escapeForRender(str) {
 
         return str
@@ -257,7 +272,7 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
-        playerStartedTyping =false;
+        playerStartedTyping = false;
         completedBlocks = 0;
         startTime = 0;
         actual_wpm = 0;
@@ -285,7 +300,7 @@ const gameScene = (params) => {
     const filesFoldersPos = () => k.vec2(0, 0);
     const wmp_text = k.add([
         k.anchor("left"),
-        k.pos(k.width() * 0.25+90, k.height() * 0.025),
+        k.pos(k.width() * 0.25 + 90, k.height() * 0.025),
         k.text("0", {
             size: 18,
         }),
@@ -294,13 +309,12 @@ const gameScene = (params) => {
     ]);
     const time_text = k.add([
         k.anchor("left"),
-        k.pos(k.width() * 0.35+90, k.height() * 0.025),
-        k.text("time: ", {
-            size: 18,
-        }),
+        k.pos(k.width() * 0.35 + 90, k.height() * 0.025),
+        k.text("time: ", { size: 18 }),
         k.color(k.YELLOW),
         k.z(22),
-    ]);
+        k.opacity(settings.practiceMode ? 0 : 1),
+      ]);
 
     k.add([
         k.sprite("BG_WPM_IN_GAME"),
@@ -313,6 +327,7 @@ const gameScene = (params) => {
         k.pos(k.width() * 0.35, k.height() * 0.02 + 5),
         k.anchor("left"),
         k.z(20),
+        k.opacity(settings.practiceMode ? 0 : 1),
     ]);
     k.add([
         resizablePos(filesFoldersPos),
@@ -321,7 +336,7 @@ const gameScene = (params) => {
         k.opacity(1),
     ]);
     k.add([
-        k.pos(k.width() * 0.01+10, k.height() * 0.01-10),
+        k.pos(k.width() * 0.01 + 10, k.height() * 0.01 - 10),
         k.sprite("SilverDevs"),
         k.anchor("topleft"),
         k.opacity(1),
@@ -351,14 +366,14 @@ const gameScene = (params) => {
     ]);
     const button_muteON = k.add([
         k.sprite("muteON"),
-        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.pos(k.width() * 0.9, k.height() * 0 + 5),
         k.opacity(1),
         k.animate(),
         k.z(50),
     ]);
     const button_muteOFF = k.add([
         k.sprite("muteOff"),
-        k.pos(k.width() * 0.9, k.height() * 0+5),
+        k.pos(k.width() * 0.9, k.height() * 0 + 5),
         k.opacity(0),
         k.animate(),
         k.z(50),
@@ -382,7 +397,7 @@ const gameScene = (params) => {
     blockNamesString = visibleTexts.map(item => item.title);
     visibleTexts.forEach(({ title, language }, index) => {
         const spriteKey = languageIconMap[language] ?? languageIconMap.default;
-    
+
         k.add([
             k.sprite(spriteKey),
             resizablePos(() =>
@@ -395,7 +410,7 @@ const gameScene = (params) => {
             k.z(55),
             "challengeIcon",
         ]);
-    
+
         k.add([
             k.text(title, { size: 20 }),
             resizablePos(() =>
@@ -535,13 +550,16 @@ const gameScene = (params) => {
     const rivalPointer = k.add([
         k.text("_", { size: 16 }),
         resizablePos(() => cursorPos(true)),
-        k.opacity(1),
+        k.opacity(settings.practiceMode ? 0 : 1),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
-    ]);
+      ]);
 
     makeBlink(cursorPointer);
-    makeBlink(rivalPointer);
+    
+    if (!settings.practiceMode) {
+        makeBlink(rivalPointer);
+      }
 
     function makeBlink(entity) {
         k.loop(0.5, () => {
@@ -579,8 +597,7 @@ const gameScene = (params) => {
     };
     function updateDialog() {
         currentBlockIndex++;
-        if(currentBlockIndex>0)
-        {
+        if (currentBlockIndex > 0) {
             completedBlocks++;
         }
         musicRate += 0.05;
@@ -618,7 +635,6 @@ const gameScene = (params) => {
         textboxText.updatePos();
 
         const currentDialog = getCurrentDialog();
-
         const lang = currentDialog.language ?? "default";
         theme = themes.find(t => t.name === lang) || themes[0];
         const currentBlocks = currentDialog.blocks;
@@ -629,14 +645,12 @@ const gameScene = (params) => {
         renderedText = fixedGroup;
         textboxText.text = renderedText;
 
-
         fixedText = originalText.replace(/▯/g, " ");
         renderedText = fixedGroup;
         textboxText.text = renderedText;
 
         playerState.line = fixedText.split("\n")[0];
         rivalState.line = playerState.line;
-
         lastChallenge = currentDialog.title;
         cursorPointer.updatePos();
         rivalPointer.updatePos();
@@ -805,6 +819,7 @@ const gameScene = (params) => {
             errorCharsReplaces[playerState.cursorPos] = errorKey;
             updateDialogErrors();
             nextChar();
+            k.shake(2);
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
         }

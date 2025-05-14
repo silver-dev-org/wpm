@@ -1,6 +1,6 @@
 // @ts-check
 
-import dialogs from "./data/dialogs.json";
+import dialogs from "./data/CodeBlocks.json";
 export const EASY_RIVAL_SPEED = 0.35;
 export const HARD_RIVAL_SPEED = 0.18;
 export const MAX_TIME = 60;

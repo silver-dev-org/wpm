@@ -1,7 +1,7 @@
 // kaplay.js
 
 import kaplay from 'kaplay';
-export const MEASUREMENT_ID = 'G-6CCP4C6VS7';
+export const MEASUREMENT_ID = 'G-2GKHT76YTG';
 
 /**
  * @param {string} measurementId

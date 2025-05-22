@@ -2,7 +2,7 @@
   {
     "id": 1,
     "title": "twoSum",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var twoSum = function(nums, target) {\n",
       "    let map = {};\n",
@@ -24,7 +24,7 @@
   {
     "id": 2,
     "title": "isPalindrome",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var isPalindrome = function(x) {\n",
       "    if (x < 0) {\n",
@@ -44,9 +44,9 @@
     ]
   },
   {
-    "id": 5,
+    "id": 3,
     "title": "longestCommonPrefix",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var longestCommonPrefix = function(strs) {\n",
       "    return strs.reduce((prev, next) => {\n",
@@ -58,9 +58,9 @@
     ]
   },
   {
-    "id": 6,
+    "id": 4,
     "title": "mergeTwoLists",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var mergeTwoLists = function(list1, list2) {\n",
       "    let dummy = new ListNode();\n",
@@ -84,9 +84,9 @@
     ]
   },
   {
-    "id": 7,
+    "id": 5,
     "title": "removeDuplicates",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var removeDuplicates = function(nums) {\n",
       "    let i = 1;\n",
@@ -103,9 +103,9 @@
     ]
   },
   {
-    "id": 8,
+    "id": 6,
     "title": "strStr",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var strStr = function(haystack, needle) {\n",
       "    if (haystack.length < needle.length) {\n",
@@ -123,9 +123,9 @@
     ]
   },
   {
-    "id": 9,
+    "id": 7,
     "title": "searchInsert",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var searchInsert = function(nums, target) {\n",
       "    let left = 0;\n",
@@ -148,9 +148,9 @@
     ]
   },
   {
-    "id": 10,
+    "id": 8,
     "title": "lengthOfLastWord",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var lengthOfLastWord = function(s) {\n",
       "    let length = 0;\n",
@@ -167,9 +167,9 @@
     ]
   },
   {
-    "id": 11,
+    "id": 9,
     "title": "plusOne",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var plusOne = function(digits) {\n",
       "    for (let i = digits.length - 1; i >= 0; i--) {\n",
@@ -187,9 +187,9 @@
     ]
   },
   {
-    "id": 12,
+    "id": 10,
     "title": "addBinary",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var addBinary = function(a, b) {\n",
       "    let carry = 0;\n",
@@ -214,9 +214,9 @@
     ]
   },
   {
-    "id": 13,
+    "id": 11,
     "title": "mySqrt",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var mySqrt = function(x) {\n",
       "    var left = 1;\n",
@@ -240,9 +240,9 @@
     ]
   },
   {
-    "id": 14,
+    "id": 12,
     "title": "climbStairs",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var climbStairs = function(n) {\n",
       "    if (n <= 3) return n;\n",
@@ -262,9 +262,9 @@
     ]
   },
   {
-    "id": 15,
+    "id": 13,
     "title": "deleteDuplicates",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var deleteDuplicates = function(head) {\n",
       "    let res = head;\n",
@@ -282,9 +282,9 @@
     ]
   },
   {
-    "id": 16,
+    "id": 14,
     "title": "mergeSortedArray",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var merge = function(nums1, m, nums2, n) {\n",
       "    for (let i = m, j = 0; j < n; i++, j++) {\n",
@@ -295,9 +295,9 @@
     ]
   },
   {
-    "id": 17,
+    "id": 15,
     "title": "inorderTraversal",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var inorderTraversal = function(root) {\n",
       "    const res = [];\n",
@@ -317,9 +317,9 @@
     ]
   },
   {
-    "id": 17,
+    "id": 16,
     "title": "isSameTree",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var isSameTree = function(p, q) {\n",
       "    if (!p && !q) {\n",
@@ -335,9 +335,9 @@
     ]
   },
   {
-    "id": 18,
+    "id": 17,
     "title": "isSymmetric",
-    "language": "js",
+    "language": "javascript",
     "blocks": [
       "var isSymmetric = function(root) {\n",
       "    const isMirror = (n1, n2) => {\n",
@@ -355,6 +355,618 @@
       "    \n",
       "    return isMirror(root.left, root.right);\n",
       "};\n"
+    ]
+  },
+  {
+    "id": 18,
+    "title": "twoSum",
+    "language": "golang",
+    "blocks": [
+      "func twoSum(nums []int, target int) []int {\n",
+      "    m := map[int]int{}\n",
+      "    for i, n := range nums {\n",
+      "        if j, ok := m[target-n]; ok {\n",
+      "            return []int{j, i}\n",
+      "        }\n",
+      "        m[n] = i\n",
+      "    }\n",
+      "    return nil\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 19,
+    "title": "isPalindrome",
+    "language": "golang",
+    "blocks": [
+      "func isPalindrome(x int) bool {\n",
+      "    if x < 0 {\n",
+      "        return false\n",
+      "    }\n",
+      "    orig, rev := x, 0\n",
+      "    for x > 0 {\n",
+      "        rev = rev*10 + x%10\n",
+      "        x /= 10\n",
+      "    }\n",
+      "    return rev == orig\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 20,
+    "title": "longestCommonPrefix",
+    "language": "golang",
+    "blocks": [
+      "func longestCommonPrefix(strs []string) string {\n",
+      "    if len(strs) == 0 {\n",
+      "        return \"\"\n",
+      "    }\n",
+      "    pref := strs[0]\n",
+      "    for _, s := range strs[1:] {\n",
+      "        i := 0\n",
+      "        for i < len(pref) && i < len(s) && pref[i] == s[i] {\n",
+      "            i++\n",
+      "        }\n",
+      "        pref = pref[:i]\n",
+      "        if pref == \"\" {\n",
+      "            break\n",
+      "        }\n",
+      "    }\n",
+      "    return pref\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 21,
+    "title": "mergeTwoLists",
+    "language": "golang",
+    "blocks": [
+      "func mergeTwoLists(l1, l2 *ListNode) *ListNode {\n",
+      "    d := &ListNode{}\n",
+      "    cur := d\n",
+      "    for l1 != nil && l2 != nil {\n",
+      "        if l1.Val < l2.Val {\n",
+      "            cur.Next, l1 = l1, l1.Next\n",
+      "        } else {\n",
+      "            cur.Next, l2 = l2, l2.Next\n",
+      "        }\n",
+      "        cur = cur.Next\n",
+      "    }\n",
+      "    if l1 != nil {\n",
+      "        cur.Next = l1\n",
+      "    } else {\n",
+      "        cur.Next = l2\n",
+      "    }\n",
+      "    return d.Next\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 22,
+    "title": "removeDuplicates",
+    "language": "golang",
+    "blocks": [
+      "func removeDuplicates(nums []int) int {\n",
+      "    i := 1\n",
+      "    for j := 1; j < len(nums); j++ {\n",
+      "        if nums[j] != nums[i-1] {\n",
+      "            nums[i], i = nums[j], i+1\n",
+      "        }\n",
+      "    }\n",
+      "    return i\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 23,
+    "title": "strStr",
+    "language": "golang",
+    "blocks": [
+      "func strStr(haystack, needle string) int {\n",
+      "    if len(needle) == 0 {\n",
+      "        return 0\n",
+      "    }\n",
+      "    for i := 0; i+len(needle) <= len(haystack); i++ {\n",
+      "        if haystack[i:i+len(needle)] == needle {\n",
+      "            return i\n",
+      "        }\n",
+      "    }\n",
+      "    return -1\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 24,
+    "title": "searchInsert",
+    "language": "golang",
+    "blocks": [
+      "func searchInsert(nums []int, target int) int {\n",
+      "    l, r := 0, len(nums)-1\n",
+      "    for l <= r {\n",
+      "        m := (l + r) / 2\n",
+      "        if nums[m] == target {\n",
+      "            return m\n",
+      "        }\n",
+      "        if nums[m] < target {\n",
+      "            l = m + 1\n",
+      "        } else {\n",
+      "            r = m - 1\n",
+      "        }\n",
+      "    }\n",
+      "    return l\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 25,
+    "title": "lengthOfLastWord",
+    "language": "golang",
+    "blocks": [
+      "func lengthOfLastWord(s string) int {\n",
+      "    l := 0\n",
+      "    for i := len(s) - 1; i >= 0; i-- {\n",
+      "        if s[i] != ' ' {\n",
+      "            l++\n",
+      "        } else if l > 0 {\n",
+      "            break\n",
+      "        }\n",
+      "    }\n",
+      "    return l\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 26,
+    "title": "plusOne",
+    "language": "golang",
+    "blocks": [
+      "func plusOne(digits []int) []int {\n",
+      "    for i := len(digits) - 1; i >= 0; i-- {\n",
+      "        digits[i]++\n",
+      "        if digits[i] < 10 {\n",
+      "            return digits\n",
+      "        }\n",
+      "        digits[i] = 0\n",
+      "    }\n",
+      "    return append([]int{1}, digits...)\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 27,
+    "title": "addBinary",
+    "language": "golang",
+    "blocks": [
+      "func addBinary(a, b string) string {\n",
+      "    i, j, carry := len(a)-1, len(b)-1, 0\n",
+      "    res := \"\"\n",
+      "    for i >= 0 || j >= 0 || carry > 0 {\n",
+      "        sum := carry\n",
+      "        if i >= 0 {\n",
+      "            sum += int(a[i] - '0')\n",
+      "            i--\n",
+      "        }\n",
+      "        if j >= 0 {\n",
+      "            sum += int(b[j] - '0')\n",
+      "            j--\n",
+      "        }\n",
+      "        res = string('0'+sum%2) + res\n",
+      "        carry = sum / 2\n",
+      "    }\n",
+      "    return res\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 28,
+    "title": "mySqrt",
+    "language": "golang",
+    "blocks": [
+      "func mySqrt(x int) int {\n",
+      "    l, r := 0, x\n",
+      "    for l <= r {\n",
+      "        m := (l + r) / 2\n",
+      "        if m*m <= x {\n",
+      "            l = m + 1\n",
+      "        } else {\n",
+      "            r = m - 1\n",
+      "        }\n",
+      "    }\n",
+      "    return r\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 29,
+    "title": "climbStairs",
+    "language": "golang",
+    "blocks": [
+      "func climbStairs(n int) int {\n",
+      "    if n <= 3 {\n",
+      "        return n\n",
+      "    }\n",
+      "    a, b := 2, 3\n",
+      "    for i := 4; i <= n; i++ {\n",
+      "        a, b = b, a+b\n",
+      "    }\n",
+      "    return b\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 30,
+    "title": "deleteDuplicatesList",
+    "language": "golang",
+    "blocks": [
+      "func deleteDuplicatesList(head *ListNode) *ListNode {\n",
+      "    cur := head\n",
+      "    for cur != nil && cur.Next != nil {\n",
+      "        if cur.Val == cur.Next.Val {\n",
+      "            cur.Next = cur.Next.Next\n",
+      "        } else {\n",
+      "            cur = cur.Next\n",
+      "        }\n",
+      "    }\n",
+      "    return head\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 31,
+    "title": "mergeSortedArray",
+    "language": "golang",
+    "blocks": [
+      "func merge(nums1 []int, m int, nums2 []int, n int) {\n",
+      "    i, j, k := m-1, n-1, m+n-1\n",
+      "    for j >= 0 {\n",
+      "        if i >= 0 && nums1[i] > nums2[j] {\n",
+      "            nums1[k] = nums1[i]\n",
+      "            i--\n",
+      "        } else {\n",
+      "            nums1[k] = nums2[j]\n",
+      "            j--\n",
+      "        }\n",
+      "        k--\n",
+      "    }\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 32,
+    "title": "inorderTraversal",
+    "language": "golang",
+    "blocks": [
+      "func inorderTraversal(root *TreeNode) []int {\n",
+      "    res := []int{}\n",
+      "    var dfs func(*TreeNode)\n",
+      "    dfs = func(n *TreeNode) {\n",
+      "        if n == nil {\n",
+      "            return\n",
+      "        }\n",
+      "        dfs(n.Left)\n",
+      "        res = append(res, n.Val)\n",
+      "        dfs(n.Right)\n",
+      "    }\n",
+      "    dfs(root)\n",
+      "    return res\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 33,
+    "title": "isSameTree",
+    "language": "golang",
+    "blocks": [
+      "func isSameTree(p, q *TreeNode) bool {\n",
+      "    if p == nil || q == nil {\n",
+      "        return p == q\n",
+      "    }\n",
+      "    if p.Val != q.Val {\n",
+      "        return false\n",
+      "    }\n",
+      "    return isSameTree(p.Left, q.Left) && isSameTree(p.Right, q.Right)\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 34,
+    "title": "isSymmetric",
+    "language": "golang",
+    "blocks": [
+      "func isSymmetric(root *TreeNode) bool {\n",
+      "    var check func(a, b *TreeNode) bool\n",
+      "    check = func(a, b *TreeNode) bool {\n",
+      "        if a == nil || b == nil {\n",
+      "            return a == b\n",
+      "        }\n",
+      "        if a.Val != b.Val {\n",
+      "            return false\n",
+      "        }\n",
+      "        return check(a.Left, b.Right) && check(a.Right, b.Left)\n",
+      "    }\n",
+      "    if root == nil {\n",
+      "        return true\n",
+      "    }\n",
+      "    return check(root.Left, root.Right)\n",
+      "}\n"
+    ]
+  },
+    {
+    "id": 35,
+    "title": "twoSum",
+    "language": "python",
+    "blocks": [
+      "def twoSum(nums, target):\n",
+      "    lookup = {}\n",
+      "    for i, num in enumerate(nums):\n",
+      "        other = target - num\n",
+      "        if other in lookup:\n",
+      "            return [lookup[other], i]\n",
+      "        lookup[num] = i\n",
+      "    return []\n"
+    ]
+  },
+  {
+    "id": 36,
+    "title": "isPalindrome",
+    "language": "python",
+    "blocks": [
+      "def isPalindrome(x):\n",
+      "    if x < 0:\n",
+      "        return False\n",
+      "    original, rev = x, 0\n",
+      "    while x > 0:\n",
+      "        rev = rev * 10 + (x % 10)\n",
+      "        x //= 10\n",
+      "    return rev == original\n"
+    ]
+  },
+  {
+    "id": 37,
+    "title": "longestCommonPrefix",
+    "language": "python",
+    "blocks": [
+      "def longestCommonPrefix(strs):\n",
+      "    if not strs: return \"\"\n",
+      "    prefix = strs[0]\n",
+      "    for s in strs[1:]:\n",
+      "        i = 0\n",
+      "        while i < len(prefix) and i < len(s) and prefix[i] == s[i]:\n",
+      "            i += 1\n",
+      "        prefix = prefix[:i]\n",
+      "        if not prefix:\n",
+      "            break\n",
+      "    return prefix\n"
+    ]
+  },
+  {
+    "id": 38,
+    "title": "mergeTwoLists",
+    "language": "python",
+    "blocks": [
+      "def mergeTwoLists(l1, l2):\n",
+      "    dummy = ListNode()\n",
+      "    cur = dummy\n",
+      "    while l1 and l2:\n",
+      "        if l1.val <= l2.val:\n",
+      "            cur.next, l1 = l1, l1.next\n",
+      "        else:\n",
+      "            cur.next, l2 = l2, l2.next\n",
+      "        cur = cur.next\n",
+      "    cur.next = l1 or l2\n",
+      "    return dummy.next\n"
+    ]
+  },
+  {
+    "id": 39,
+    "title": "removeDuplicates",
+    "language": "python",
+    "blocks": [
+      "def removeDuplicates(nums):\n",
+      "    if not nums: return 0\n",
+      "    i = 1\n",
+      "    for j in range(1, len(nums)):\n",
+      "        if nums[j] != nums[i - 1]:\n",
+      "            nums[i] = nums[j]\n",
+      "            i += 1\n",
+      "    return i\n"
+    ]
+  },
+  {
+    "id": 40,
+    "title": "strStr",
+    "language": "python",
+    "blocks": [
+      "def strStr(haystack, needle):\n",
+      "    if len(needle) == 0:\n",
+      "        return 0\n",
+      "    for i in range(len(haystack) - len(needle) + 1):\n",
+      "        if haystack[i:i + len(needle)] == needle:\n",
+      "            return i\n",
+      "    return -1\n"
+    ]
+  },
+  {
+    "id": 41,
+    "title": "searchInsert",
+    "language": "python",
+    "blocks": [
+      "def searchInsert(nums, target):\n",
+      "    left, right = 0, len(nums) - 1\n",
+      "    while left <= right:\n",
+      "        mid = (left + right) // 2\n",
+      "        if nums[mid] == target:\n",
+      "            return mid\n",
+      "        elif nums[mid] < target:\n",
+      "            left = mid + 1\n",
+      "        else:\n",
+      "            right = mid - 1\n",
+      "    return left\n"
+    ]
+  },
+  {
+    "id": 42,
+    "title": "lengthOfLastWord",
+    "language": "python",
+    "blocks": [
+      "def lengthOfLastWord(s):\n",
+      "    length = 0\n",
+      "    for i in range(len(s) - 1, -1, -1):\n",
+      "        if s[i] != ' ':\n",
+      "            length += 1\n",
+      "        elif length > 0:\n",
+      "            break\n",
+      "    return length\n"
+    ]
+  },
+  {
+    "id": 43,
+    "title": "plusOne",
+    "language": "python",
+    "blocks": [
+      "def plusOne(digits):\n",
+      "    n = len(digits)\n",
+      "    for i in range(n - 1, -1, -1):\n",
+      "        if digits[i] < 9:\n",
+      "            digits[i] += 1\n",
+      "            return digits\n",
+      "        digits[i] = 0\n",
+      "    return [1] + digits\n"
+    ]
+  },
+  {
+    "id": 44,
+    "title": "addBinary",
+    "language": "python",
+    "blocks": [
+      "def addBinary(a, b):\n",
+      "    i, j, carry = len(a) - 1, len(b) - 1, 0\n",
+      "    res = []\n",
+      "    while i >= 0 || j >= 0 || carry:\n",
+      "        s = carry\n",
+      "        if i >= 0:\n",
+      "            s += int(a[i])\n",
+      "            i -= 1\n",
+      "        if j >= 0:\n",
+      "            s += int(b[j])\n",
+      "            j -= 1\n",
+      "        res.append(str(s % 2))\n",
+      "        carry = s // 2\n",
+      "    return ''.join(reversed(res))\n"
+    ]
+  },
+  {
+    "id": 45,
+    "title": "mySqrt",
+    "language": "python",
+    "blocks": [
+      "def mySqrt(x):\n",
+      "    left, right = 0, x\n",
+      "    ans = 0\n",
+      "    while left <= right:\n",
+      "        mid = (left + right) // 2\n",
+      "        if mid * mid <= x:\n",
+      "            ans = mid\n",
+      "            left = mid + 1\n",
+      "        else:\n",
+      "            right = mid - 1\n",
+      "    return ans\n"
+    ]
+  },
+  {
+    "id": 46,
+    "title": "climbStairs",
+    "language": "python",
+    "blocks": [
+      "def climbStairs(n):\n",
+      "    if n <= 3:\n",
+      "        return n\n",
+      "    prev2, prev1 = 2, 3\n",
+      "    for _ in range(4, n + 1):\n",
+      "        next_val = prev1 + prev2\n",
+      "        prev2 = prev1\n",
+      "        prev1 = next_val\n",
+      "    return prev1\n"
+    ]
+  },
+    {
+    "id": 47,
+    "title": "deleteDuplicates",
+    "language": "python",
+    "blocks": [
+      "def deleteDuplicates(head):\n",
+      "    cur = head\n",
+      "    while cur and cur.next:\n",
+      "        if cur.val == cur.next.val:\n",
+      "            cur.next = cur.next.next\n",
+      "        else:\n",
+      "            cur = cur.next\n",
+      "    return head\n"
+    ]
+  },
+  {
+    "id": 48,
+    "title": "mergeSortedArray",
+    "language": "python",
+    "blocks": [
+      "def merge(nums1, m, nums2, n):\n",
+      "    # Modifica nums1 en sitio\n",
+      "    i, j, k = m - 1, n - 1, m + n - 1\n",
+      "    while j >= 0:\n",
+      "        if i >= 0 and nums1[i] > nums2[j]:\n",
+      "            nums1[k] = nums1[i]\n",
+      "            i -= 1\n",
+      "        else:\n",
+      "            nums1[k] = nums2[j]\n",
+      "            j -= 1\n",
+      "        k -= 1\n"
+    ]
+  },
+  {
+    "id": 49,
+    "title": "inorderTraversal",
+    "language": "python",
+    "blocks": [
+      "def inorderTraversal(root):\n",
+      "    res = []\n",
+      "    def dfs(node):\n",
+      "        if not node:\n",
+      "            return\n",
+      "        dfs(node.left)\n",
+      "        res.append(node.val)\n",
+      "        dfs(node.right)\n",
+      "    dfs(root)\n",
+      "    return res\n"
+    ]
+  },
+  {
+    "id": 50,
+    "title": "isSameTree",
+    "language": "python",
+    "blocks": [
+      "def isSameTree(p, q):\n",
+      "    if not p and not q:\n",
+      "        return True\n",
+      "    if not p or not q or p.val != q.val:\n",
+      "        return False\n",
+      "    return isSameTree(p.left, q.left) and isSameTree(p.right, q.right)\n"
+    ]
+  },
+  {
+    "id": 51,
+    "title": "isSymmetric",
+    "language": "python",
+    "blocks": [
+      "def isSymmetric(root):\n",
+      "    def isMirror(a, b):\n",
+      "        if not a and not b:\n",
+      "            return True\n",
+      "        if not a or not b or a.val != b.val:\n",
+      "            return False\n",
+      "        return isMirror(a.left, b.right) and isMirror(a.right, b.left)\n",
+      "    if not root:\n",
+      "        return True\n",
+      "    return isMirror(root.left, root.right)\n"
     ]
   }
 ]

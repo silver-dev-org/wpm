@@ -29,7 +29,7 @@ export const themes = [
         classes: /\b(?:class|interface|enum)\s+[A-Z]\w*\b/,
         brackets: /[\(\)\[\]\{\}<>]/,
         keywords:
-          /\b(?:let|const|var|if|else|for|while|do|switch|case|break|continue|return|import|export|default|from|as|class|extends|super|this|new|try|catch|finally|throw|typeof|instanceof|void|delete|in|of|with|yield|async|await|constructor|interface|type|enum|implements|namespace|abstract|readonly)\b/,
+         /\b(?:let|const|var|if|else|for|while|do|switch|case|break|continue|return|import|export|default|from|as|class|extends|super|this|new|try|catch|finally|throw|typeof|instanceof|void|delete|in|of|with|yield|async|await|constructor|interface|type|enum|implements|namespace|abstract|readonly|def|pass|lambda|nonlocal|global|assert|del|is|not|and|or|True|False|None|elif|except|raise|finally|continue|break|with|as|in|try|yield|await)\b/,
         types: /:\s*[A-Za-z_$][\w$<>, ]*/,
         decorators: /@\w+/,
         regex: /\/(\\\/|[^\/\n])+\/[gimsuy]*/,

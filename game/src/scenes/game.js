@@ -15,13 +15,19 @@ import {
     maxMistakes,
     ICON_START_Y
 } from "../constants.js";
-import { savePlay, getPlay } from "../systems/saves.js";
+import {
+    toggleCapsLock,
+    shouldUppercase,
+    preventError,
+    shuffle,
+    makeBlink
+} from "../data/utilities.js";
+
 import { k, loadGtag, onBlockReached, onGameStart, MEASUREMENT_ID } from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
 import { settings } from "./selectionScene.js";
-let titles = dialogsData.map((item) => item.title);
 
 let COLOR_TEXT_DEFAULT = k.Color.fromHex("#6a717d");
 let COLOR_TEXT_RIVAL = k.YELLOW;
@@ -32,6 +38,7 @@ let fontWidth = 16.4;
 let errorCharsIndexes = [];
 let errorCharsReplaces = {};
 let playerStartedTyping = false;
+
 export let actual_wpm = 0;
 export let actual_lpm = 0;
 export let actual_acc = 0;
@@ -62,7 +69,7 @@ let renderedText = "";
  * Text for comparison with user input
  */
 let fixedText = "";
-
+let cachedTokens = [];
 /**
  * @param {GameParams} params
  */
@@ -94,26 +101,13 @@ const gameScene = (params) => {
     const intervalTime = 100;
     let volumeIncrease;
 
-    function updateMusicVolume() {
-        clearInterval(volumeIncrease);
+    const filteredDialogs = dialogsData.filter(
+        item => (item.language || "default") === settings.language
+    );
+    const shuffledDialogs = shuffle([...filteredDialogs]);
 
-        if (settings.mute) {
-            music.volume = 0.0;
-        } else {
-            let currentVolume = 0.0;
-            volumeIncrease = setInterval(() => {
-                if (currentVolume < maxVolume) {
-                    currentVolume += volumeStep;
-                    music.volume = Math.min(currentVolume, maxVolume);
-                } else {
-                    clearInterval(volumeIncrease);
-                }
-            }, intervalTime);
-        }
-    }
-
-    titles = shuffle(dialogsData);
-
+    //save for analiytics
+    blockNamesString = shuffledDialogs.slice(0, MAX_BLOCKS).map(item => item.title);
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
@@ -162,10 +156,6 @@ const gameScene = (params) => {
     };
 
     // #endregion
-
-    /**
-     * @param {number} i
-     */
     /**
      * @param {number} i
      */
@@ -189,14 +179,10 @@ const gameScene = (params) => {
             if (test()) return k.Color.fromHex(color);
         }
 
-        const tokenPattern = /[\w$]+|[^\s\w]/g;
         let token = "";
-        for (const m of originalText.matchAll(tokenPattern)) {
-            const [text] = m;
-            const start = m.index;
-            const end = start + text.length;
-            if (i >= start && i < end) {
-                token = text;
+        for (const t of cachedTokens) {
+            if (i >= t.start && i < t.end) {
+                token = t.text;
                 break;
             }
         }
@@ -224,7 +210,6 @@ const gameScene = (params) => {
             updateAWPM();
             return;
         }
-
         startTime += k.dt();
         if (!settings.practiceMode) {
             rivalTimer += k.dt();
@@ -247,6 +232,23 @@ const gameScene = (params) => {
         updateAWPM();
     });
 
+    function updateMusicVolume() {
+        clearInterval(volumeIncrease);
+
+        if (settings.mute) {
+            music.volume = 0.0;
+        } else {
+            let currentVolume = 0.0;
+            volumeIncrease = setInterval(() => {
+                if (currentVolume < maxVolume) {
+                    currentVolume += volumeStep;
+                    music.volume = Math.min(currentVolume, maxVolume);
+                } else {
+                    clearInterval(volumeIncrease);
+                }
+            }, intervalTime);
+        }
+    }
     function updateAWPM() {
         const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
         actual_awpm = totalEventsLast60 / 5;
@@ -261,6 +263,18 @@ const gameScene = (params) => {
             .replace(/\{/g, "\\{")
             .replace(/\}/g, "\\}")
             .replace(/'/g, "\\'");
+    }
+
+    function prepareTokenCache(text) {
+        const tokenPattern = /[\w$]+|[^\s\w]/g;
+        cachedTokens = [];
+        for (const m of text.matchAll(tokenPattern)) {
+            cachedTokens.push({
+                text: m[0],
+                start: m.index,
+                end: m.index + m[0].length,
+            });
+        }
     }
     function StatsforAnalitics() {
         goal_wpm = actual_wpm;
@@ -287,7 +301,19 @@ const gameScene = (params) => {
         errorCharsIndexes = [];
         errorCharsReplaces = {};
     }
+    function updateTitleTexts() {
+        const titleTexts = k.get("menuItem");
+        for (let i = 0; i < titleTexts.length; i++) {
+            const textObj = titleTexts[i];
+            if (shuffledDialogs[currentBlockIndex + i]) {
+                textObj.text = shuffledDialogs[currentBlockIndex + i].title;
+                textObj.color = (currentBlockIndex + i) <= currentBlockIndex ? k.rgb(127, 134, 131) : k.WHITE;
 
+            } else {
+                textObj.text = "";
+            }
+        }
+    }
     // background
     // Files & Folders
     const filesFoldersSize = () => {
@@ -314,7 +340,7 @@ const gameScene = (params) => {
         k.color(k.YELLOW),
         k.z(22),
         k.opacity(settings.practiceMode ? 0 : 1),
-      ]);
+    ]);
 
     k.add([
         k.sprite("BG_WPM_IN_GAME"),
@@ -380,21 +406,23 @@ const gameScene = (params) => {
     ]);
 
     const languageIconMap = {
-        js: "icon_02",
+        javascript: "icon_02",
         ts: "icon_01",
-        go: "icon_03",
+        golang: "icon_03",
         react: "icon_04",
-        py: "icon_05",
+        python: "icon_05",
         default: "icon_02",
     };
 
-    const texts = dialogsData.map(item => ({
-        title: item.title,
-        language: item.language || "default",
-    }));
+    const texts = dialogsData
+        .filter(item => (item.language || "default") === settings.language)
+        .map(item => ({
+            title: item.title,
+            language: item.language || "default",
+        }));
 
     const visibleTexts = texts.slice(0, MAX_BLOCKS);
-    blockNamesString = visibleTexts.map(item => item.title);
+
     visibleTexts.forEach(({ title, language }, index) => {
         const spriteKey = languageIconMap[language] ?? languageIconMap.default;
 
@@ -504,7 +532,6 @@ const gameScene = (params) => {
 
 
     const textboxTextPos = () => {
-        matchColorToken
         return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
     }
 
@@ -553,28 +580,23 @@ const gameScene = (params) => {
         k.opacity(settings.practiceMode ? 0 : 1),
         k.anchor("left"),
         k.color(COLOR_TEXT_RIVAL),
-      ]);
+    ]);
 
-    makeBlink(cursorPointer);
-    
+    makeBlink(k, cursorPointer);
+
     if (!settings.practiceMode) {
-        makeBlink(rivalPointer);
-      }
-
-    function makeBlink(entity) {
-        k.loop(0.5, () => {
-            entity.opacity = entity.opacity === 0 ? 0.8 : 0;
-        });
+        makeBlink(k, rivalPointer);
     }
+
     playerState.cursorPointer = cursorPointer;
     rivalState.cursorPointer = rivalPointer;
 
     function getCurrentDialog() {
-        if (dialogsData && dialogsData[currentBlockIndex]) {
-            return dialogsData[currentBlockIndex];
+        if (shuffledDialogs[currentBlockIndex]) {
+            return shuffledDialogs[currentBlockIndex];
         } else {
-            console.error("dialogs.json is undefined or out of range");
-            return dialogsData[0];
+            console.error("No dialogs found for the selected language");
+            return shuffledDialogs[0];
         }
     }
 
@@ -613,6 +635,7 @@ const gameScene = (params) => {
         const startSpeed = EASY_RIVAL_SPEED;
         const endSpeed = HARD_RIVAL_SPEED;
         const steps = 4;
+
         if (completedBlocks > 0) {
 
             const t = Math.min(completedBlocks, steps) / steps;
@@ -620,7 +643,6 @@ const gameScene = (params) => {
         } else {
             rivalSpeed = startSpeed;
         }
-        k.play
         playerState.reset();
         rivalState.reset();
         arrow.pos = k.vec2(arrow.pos.x, arrow_ypos);
@@ -639,12 +661,11 @@ const gameScene = (params) => {
         theme = themes.find(t => t.name === lang) || themes[0];
         const currentBlocks = currentDialog.blocks;
         curBlockData.lineCount = currentBlocks.length;
-
         originalText = currentBlocks.join("");
-        const fixedGroup = escapeForRender(originalText);
-        renderedText = fixedGroup;
-        textboxText.text = renderedText;
 
+        prepareTokenCache(originalText);
+
+        const fixedGroup = escapeForRender(originalText);
         fixedText = originalText.replace(/▯/g, " ");
         renderedText = fixedGroup;
         textboxText.text = renderedText;
@@ -696,13 +717,6 @@ const gameScene = (params) => {
         logGroupWithColor(fixedText);
     }
 
-    function preventError() {
-        k.shake(2);
-        if (!settings.mute) {
-            k.play("wrong_typing");
-        }
-    }
-
     function nextLine(isRival = false) {
         const player = isRival ? rivalState : playerState;
         if (!player.cursorPointer) return;
@@ -742,14 +756,6 @@ const gameScene = (params) => {
         }
     }
 
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
     function analitycs_calculate() {
         time_text.text = startTime.toFixed(1);
         if (startTime > 0 && totalCorrectChars > 5) {
@@ -782,13 +788,19 @@ const gameScene = (params) => {
         let idx = currentSec % BUFFER_SIZE;
         eventBuffer[idx]++;
     }
-    let errorKey;
+
+    let capsLockActive = false;
+    k.onKeyPress("capslock", () => {
+        toggleCapsLock();
+    });
+
     k.onKeyPress((keyPressed) => {
-        const curChar = fixedText[playerState.cursorPos];
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
         if (prevChar === "\n") return;
+
         const correctChar = fixedText[playerState.cursorPos];
-        const shifting = k.isKeyDown("shift");
+        const shouldUpper = shouldUppercase(k);
+
         let key = keyPressed;
         let errorKey;
         let isCorrect = false;
@@ -796,7 +808,7 @@ const gameScene = (params) => {
         if (key === "backspace" || key === "enter" || key === "shift") return;
 
         if (key.length === 1) {
-            key = shifting ? key.toUpperCase() : key;
+            key = shouldUpper ? key.toUpperCase() : key.toLowerCase();
             errorKey = key;
         } else if (key === "space") {
             key = " ";
@@ -804,6 +816,7 @@ const gameScene = (params) => {
         } else {
             return;
         }
+
         totalTypedCharacters++;
         isCorrect = key === correctChar;
 
@@ -813,7 +826,7 @@ const gameScene = (params) => {
             addCorrectEvent();
             nextChar();
         } else {
-            if (errorCharsIndexes.length > maxMistakes) return preventError();
+            if (errorCharsIndexes.length > maxMistakes) return preventError(k, settings);
 
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
@@ -833,7 +846,7 @@ const gameScene = (params) => {
         const isCorrect = "\n" === correctChar;
 
         if (errorCharsIndexes.length > 0 || !isCorrect) {
-            return preventError();
+            return preventError(k, settings);
         }
 
         if (playerState.curLineCount >= curBlockData.lineCount - 1) {
@@ -874,6 +887,8 @@ const gameScene = (params) => {
     });
 
     updateDialog();
+    updateTitleTexts();
+    moveArrow();
 };
 
 k.scene("game", gameScene);

@@ -842,7 +842,7 @@
       "def addBinary(a, b):\n",
       "    i, j, carry = len(a) - 1, len(b) - 1, 0\n",
       "    res = []\n",
-      "    while i >= 0 || j >= 0 || carry:\n",
+      "    while i >= 0 or j >= 0 or carry:\n",
       "        s = carry\n",
       "        if i >= 0:\n",
       "            s += int(a[i])\n",

@@ -691,7 +691,7 @@
       "}\n"
     ]
   },
-    {
+  {
     "id": 35,
     "title": "twoSum",
     "language": "python",
@@ -889,7 +889,7 @@
       "    return prev1\n"
     ]
   },
-    {
+  {
     "id": 47,
     "title": "deleteDuplicates",
     "language": "python",
@@ -967,6 +967,373 @@
       "    if not root:\n",
       "        return True\n",
       "    return isMirror(root.left, root.right)\n"
+    ]
+  },
+  {
+    "id": 52,
+    "title": "Counter",
+    "language": "react",
+    "blocks": [
+      "import { useState, useCallback } from 'react';\n",
+      "export default function App() {\n",
+      "  const [count, setCount] = useState(0);\n",
+      "  const update = useCallback((e) => {\n",
+      "    const change = parseInt(e.currentTarget.dataset.change ?? '0');\n",
+      "    setCount(currentCount => currentCount + change);\n",
+      "  }, []);\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <button data-testid=\"decrement-button\" data-change=\"-1\" onClick={update}>-</button>\n",
+      "      <button data-testid=\"increment-button\" data-change=\"1\" onClick={update}>+</button>\n",
+      "      <p>Clicked: {count}</p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 53,
+    "title": "Submit Form",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function SubmitForm() {\n",
+      "  const [formData, setFormData] = useState({ name: '', email: '' });\n",
+      "  const handleChange = (e) => {\n",
+      "    setFormData({ ...formData, [e.target.name]: e.target.value });\n",
+      "  };\n",
+      "  const handleSubmit = (e) => {\n",
+      "    e.preventDefault();\n",
+      "    alert(`Name: ${formData.name}, Email: ${formData.email}`);\n",
+      "  };\n",
+      "  return (\n",
+      "    <form onSubmit={handleSubmit}>\n",
+      "      <input name=\"name\" value={formData.name} onChange={handleChange} placeholder=\"Name\" />\n",
+      "      <input name=\"email\" value={formData.email} onChange={handleChange} placeholder=\"Email\" />\n",
+      "      <button type=\"submit\">Submit</button>\n",
+      "    </form>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 54,
+    "title": "Toggle Visibility",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function ToggleVisibility() {\n",
+      "  const [isVisible, setIsVisible] = useState(true);\n",
+      "  const toggle = () => setIsVisible(!isVisible);\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <button onClick={toggle}>\n",
+      "        {isVisible ? 'Hide' : 'Show'} Text\n",
+      "      </button>\n",
+      "      {isVisible && <p>Now you see me!</p>}\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 55,
+    "title": "Character Counter",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function CharCounter() {\n",
+      "  const [text, setText] = useState('');\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <textarea \n",
+      "        placeholder=\"Type something...\" \n",
+      "        onChange={(e) => setText(e.target.value)} \n",
+      "      />\n",
+      "      <p>Character Count: {text.length}</p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 56,
+    "title": "Simple To-Do List",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function TodoList() {\n",
+      "  const [todos, setTodos] = useState(['Learn React', 'Build a project']);\n",
+      "  const [input, setInput] = useState('');\n",
+      "  const addTodo = () => {\n",
+      "    if(input) {\n",
+      "       setTodos([...todos, input]);\n",
+      "       setInput('');\n",
+      "    }\n",
+      "  };\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <input value={input} onChange={(e) => setInput(e.target.value)} />\n",
+      "      <button onClick={addTodo}>Add</button>\n",
+      "      <ul>\n",
+      "        {todos.map((todo, index) => <li key={index}>{todo}</li>)}\n",
+      "      </ul>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 57,
+    "title": "Color Picker",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function ColorPicker() {\n",
+      "  const [color, setColor] = useState('black');\n",
+      "  const colors = ['#16a34a', '#2563eb', '#dc2626'];\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <h2 style={{ color: color }}>Colored Text</h2>\n",
+      "      <div>\n",
+      "        {colors.map(c => (\n",
+      "          <button key={c} onClick={() => setColor(c)} style={{ backgroundColor: c, margin: '5px' }}>\n",
+      "            {c}\n",
+      "          </button>\n",
+      "        ))}\n",
+      "      </div>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 58,
+    "title": "Fetch Data",
+    "language": "react",
+    "blocks": [
+      "import { useState, useEffect } from 'react';\n",
+      "export default function FetchData() {\n",
+      "  const [user, setUser] = useState(null);\n",
+      "  useEffect(() => {\n",
+      "    fetch('https://jsonplaceholder.typicode.com/users/1')\n",
+      "      .then(response => response.json())\n",
+      "      .then(data => setUser(data));\n",
+      "  }, []);\n",
+      "  if (!user) return <p>Loading...</p>;\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <p>Name: {user.name}</p>\n",
+      "      <p>Email: {user.email}</p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 59,
+    "title": "Stopwatch Timer",
+    "language": "react",
+    "blocks": [
+      "import { useState, useEffect } from 'react';\n",
+      "export default function Timer() {\n",
+      "  const [seconds, setSeconds] = useState(0);\n",
+      "  useEffect(() => {\n",
+      "    const intervalId = setInterval(() => {\n",
+      "      setSeconds(s => s + 1);\n",
+      "    }, 1000);\n",
+      "    return () => clearInterval(intervalId);\n",
+      "  }, []);\n",
+      "  return <p>Timer: {seconds}s</p>;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 60,
+    "title": "Greeting with Props",
+    "language": "react",
+    "blocks": [
+      "function Greeting({ name }) {\n",
+      "  return <h1>Hello, {name}!</h1>;\n",
+      "}\n",
+      "export default function App() {\n",
+      "  return <Greeting name=\"Alice\" />;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 61,
+    "title": "Font Size Changer",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function FontSizeChanger() {\n",
+      "  const [fontSize, setFontSize] = useState(16);\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <button onClick={() => setFontSize(s => s - 2)}>-</button>\n",
+      "      <button onClick={() => setFontSize(s => s + 2)}>+</button>\n",
+      "      <p style={{ fontSize: `${fontSize}px` }}>\n",
+      "        This text changes size.\n",
+      "      </p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 62,
+    "title": "Light/Dark Mode",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function ThemeToggler() {\n",
+      "  const [theme, setTheme] = useState('light');\n",
+      "  const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');\n",
+      "  const style = {\n",
+      "      backgroundColor: theme === 'light' ? '#fff' : '#333',\n",
+      "      color: theme === 'light' ? '#333' : '#fff',\n",
+      "      padding: '20px',\n",
+      "      height: '100vh'\n",
+      "  };\n",
+      "  return (\n",
+      "    <div style={style}>\n",
+      "      <button onClick={toggleTheme}>Toggle Theme</button>\n",
+      "      <p>Current Theme: {theme}</p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 63,
+    "title": "Display Window Size",
+    "language": "react",
+    "blocks": [
+      "import { useState, useEffect } from 'react';\n",
+      "export default function WindowSize() {\n",
+      "  const [size, setSize] = useState({ w: window.innerWidth, h: window.innerHeight });\n",
+      "  useEffect(() => {\n",
+      "    const handleResize = () => setSize({ w: window.innerWidth, h: window.innerHeight });\n",
+      "    window.addEventListener('resize', handleResize);\n",
+      "    return () => window.removeEventListener('resize', handleResize);\n",
+      "  }, []);\n",
+      "  return <p>Window size: {size.w} x {size.h}</p>;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 64,
+    "title": "Dropdown Select",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "export default function DropdownSelect() {\n",
+      "  const [fruit, setFruit] = useState('Apple');\n",
+      "  const options = ['Apple', 'Banana', 'Cherry'];\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <select value={fruit} onChange={(e) => setFruit(e.target.value)}>\n",
+      "        {options.map(opt => <option key={opt} value={opt}>{opt}</option>)}\n",
+      "      </select>\n",
+      "      <p>Selected fruit: {fruit}</p>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 65,
+    "title": "Filter a List",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "const items = ['Apple', 'Banana', 'Cherry', 'Grape', 'Orange'];\n",
+      "export default function FilterList() {\n",
+      "  const [filter, setFilter] = useState('');\n",
+      "  const filteredItems = items.filter(item => \n",
+      "    item.toLowerCase().includes(filter.toLowerCase())\n",
+      "  );\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <input onChange={(e) => setFilter(e.target.value)} placeholder=\"Filter...\" />\n",
+      "      <ul>\n",
+      "        {filteredItems.map(item => <li key={item}>{item}</li>)}\n",
+      "      </ul>\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 66,
+    "title": "Uncontrolled Login Form",
+    "language": "react",
+    "blocks": [
+      "import { useRef } from 'react';\n",
+      "export default function UncontrolledForm() {\n",
+      "  const usernameRef = useRef(null);\n",
+      "  const handleSubmit = (e) => {\n",
+      "    e.preventDefault();\n",
+      "    alert(`Username: ${usernameRef.current.value}`);\n",
+      "  };\n",
+      "  return (\n",
+      "    <form onSubmit={handleSubmit}>\n",
+      "      <label>Username:</label>\n",
+      "      <input type=\"text\" ref={usernameRef} />\n",
+      "      <button type=\"submit\">Log In</button>\n",
+      "    </form>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 67,
+    "title": "Child-to-Parent Communication",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "function ChildButton({ onClick }) {\n",
+      "  return <button onClick={onClick}>Update Parent</button>;\n",
+      "}\n",
+      "export default function Parent() {\n",
+      "  const [message, setMessage] = useState('Hello from Parent');\n",
+      "  const updateMessage = () => {\n",
+      "    setMessage('Updated by Child!');\n",
+      "  };\n",
+      "  return (\n",
+      "    <div>\n",
+      "      <p>{message}</p>\n",
+      "      <ChildButton onClick={updateMessage} />\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 68,
+    "title": "Simple Accordion",
+    "language": "react",
+    "blocks": [
+      "import { useState } from 'react';\n",
+      "function AccordionItem({ title, children }) {\n",
+      "  const [isOpen, setIsOpen] = useState(false);\n",
+      "  return (\n",
+      "    <div>\n",
+      "       <h3 onClick={() => setIsOpen(!isOpen)} style={{cursor: 'pointer'}}>\n",
+      "         {title}\n",
+      "       </h3>\n",
+      "       {isOpen && <div>{children}</div>}\n",
+      "    </div>\n",
+      "  );\n",
+      "}\n",
+      "export default function App() {\n",
+      "  return (\n",
+      "    <AccordionItem title=\"Click to expand\">\n",
+      "      <p>Some hidden content.</p>\n",
+      "    </AccordionItem>\n",
+      "  );\n",
+      "}\n"
     ]
   }
 ]

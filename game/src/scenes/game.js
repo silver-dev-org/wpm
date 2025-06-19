@@ -16,8 +16,6 @@ import {
     ICON_START_Y
 } from "../constants.js";
 import {
-    toggleCapsLock,
-    shouldUppercase,
     preventError,
     shuffle,
     makeBlink
@@ -286,6 +284,8 @@ const gameScene = (params) => {
     }
 
     function resetGameStats() {
+        errorCharsIndexes.length = 0;
+        Object.keys(errorCharsReplaces).forEach(k => delete errorCharsReplaces[k]);
         playerStartedTyping = false;
         completedBlocks = 0;
         startTime = 0;
@@ -298,8 +298,8 @@ const gameScene = (params) => {
         totalTypedCharacters = 0;
         totalCorrectlines = 0;
         rivalSpeed = EASY_RIVAL_SPEED;
-        errorCharsIndexes = [];
-        errorCharsReplaces = {};
+        currentBlockIndex = -1;
+        window.removeEventListener("keydown", keydownHandler);
     }
     function updateTitleTexts() {
         const titleTexts = k.get("menuItem");
@@ -789,34 +789,33 @@ const gameScene = (params) => {
         eventBuffer[idx]++;
     }
 
-    let capsLockActive = false;
-    k.onKeyPress("capslock", () => {
-        toggleCapsLock();
-    });
+    const keydownHandler = (event) => {
 
-    k.onKeyPress((keyPressed) => {
+        const keyPressed = event.key;
         const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
         if (prevChar === "\n") return;
 
         const correctChar = fixedText[playerState.cursorPos];
-        const shouldUpper = shouldUppercase(k);
 
         let key = keyPressed;
         let errorKey;
         let isCorrect = false;
 
-        if (key === "backspace" || key === "enter" || key === "shift") return;
+        if (key === "Backspace" || key === "Enter" || key === "Shift") return;
 
-        if (key.length === 1) {
-            key = shouldUpper ? key.toUpperCase() : key.toLowerCase();
-            errorKey = key;
-        } else if (key === "space") {
+        if (errorCharsIndexes.length > maxMistakes) {
+            event.preventDefault();
+            return preventError(k, settings);
+        }
+
+        if (key === " ") {
             key = " ";
             errorKey = "_";
+        } else if (key.length === 1) {
+            errorKey = key;
         } else {
             return;
         }
-
         totalTypedCharacters++;
         isCorrect = key === correctChar;
 
@@ -836,9 +835,14 @@ const gameScene = (params) => {
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
         }
+
         if (!playerStartedTyping && (totalCorrectChars > 0 || totalIcorrectCorrectChars > 0)) {
             playerStartedTyping = true;
         }
+    };
+    window.addEventListener("keydown", keydownHandler);
+    k.onDestroy(() => {
+        window.removeEventListener("keydown", keydownHandler);
     });
     // Line jump
     k.onKeyPress("enter", () => {

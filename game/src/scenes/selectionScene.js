@@ -1,7 +1,6 @@
 import {
     escapeBackslashes,
     preventError,
-    setCapsLockActive
 } from "../data/utilities.js";
 import { getMute, saveMute } from "../systems/preferences.js";
 import { resizablePos } from "../components/resizablePos.js";
@@ -431,14 +430,12 @@ k.scene("selection", () => {
             case "interview":
                 if (stage === 3) {
                     window.removeEventListener("keydown", handleKeydown);
-                    setCapsLockActive(settings.isCapsOn);
                     k.go("game");
                 }
                 break;
             case "practice":
                 if (stage === 3) {
                     settings.practiceMode = true;
-                    setCapsLockActive(settings.isCapsOn);
                     window.removeEventListener("keydown", handleKeydown);
                     k.go("game");
                 }
@@ -489,6 +486,7 @@ k.scene("selection", () => {
 
     function setupKeyboardInput() {
         handleKeydown = (e) => {
+            e.preventDefault();
             if (e.getModifierState && typeof e.getModifierState === "function") {
                 settings.isCapsOn = e.getModifierState("CapsLock");
             }
@@ -502,14 +500,6 @@ k.scene("selection", () => {
                     k.play("code_sound");
                 }
             }
-
-            if (e.key === " ") {
-                e.preventDefault();
-                previousInput = rawInput;
-                rawInput += " ";
-                name.text = escapeBackslashes(rawInput);
-                handleInputUpdate(rawInput);
-            }
         };
 
         window.addEventListener("keydown", handleKeydown);
@@ -518,13 +508,6 @@ k.scene("selection", () => {
     k.onKeyPress('backspace', () => {
         if (!rawInput) return;
         rawInput = rawInput.slice(0, -1);
-        name.text = escapeBackslashes(rawInput);
-        handleInputUpdate(rawInput);
-    });
-
-    k.onKeyPress("space", () => {
-        previousInput = rawInput;
-        rawInput += " ";
         name.text = escapeBackslashes(rawInput);
         handleInputUpdate(rawInput);
     });

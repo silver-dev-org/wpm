@@ -225,8 +225,8 @@ k.scene("selection", () => {
             case 0:
                 commandList = [
                     { obj: selecttext, label: "start" },
-                    { obj: selecttext2, label: "github" },
-                    { obj: selecttext3, label: "about" }
+                    { obj: selecttext2, label: "about" },
+                    { obj: selecttext3, label: "github" }
                 ];
                 break;
             case 1:

@@ -135,7 +135,7 @@ k.scene("selection", () => {
                 commands = ["interview", "practice"];
                 break;
         }
-        selecttext.text = stage === 0 ? "Start"
+        selecttext.text = stage === 0 ? "start"
             : stage === 1 ? "Play with Audio?"
                 : stage === 2 ? "Language"
                     : "Game Mode";
@@ -174,7 +174,7 @@ k.scene("selection", () => {
         });
     }
 
-    let targetText = "Start";
+    let targetText = "start";
     let maxLength = targetText.length;
     const letterSpacing = 14;
     const fixedStartX = k.width() / 2.88 - ((maxLength - 1) * letterSpacing) / 2;
@@ -461,7 +461,7 @@ k.scene("selection", () => {
 
     function ResetGame() {
         stage = 0;
-        resetCommon("Start");
+        resetCommon("start");
     }
 
     function resetInputUI() {

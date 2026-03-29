@@ -15,7 +15,7 @@ export const authOptions: NextAuthOptions = {
         .from("users")
         .upsert(
           {
-            github_id: Number(profile?.id),
+            github_id: Number((profile as any)?.id),
             username: (profile as any)?.login,
             avatar_url: user.image,
           },
@@ -37,7 +37,7 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, profile }) {
       if (profile) {
-        token.githubId = Number(profile.id);
+        token.githubId = Number((profile as any).id);
         token.githubUsername = (profile as any).login;
       }
       return token;

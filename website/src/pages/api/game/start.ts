@@ -21,7 +21,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { data, error } = await supabaseAdmin
     .from("game_sessions")
     .insert({
-      user_id: (session.user as any).supabaseId,
+      user_id: (session!.user as any).supabaseId,
       language,
       started_at: new Date().toISOString(),
     })

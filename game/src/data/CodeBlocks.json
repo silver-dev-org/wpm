@@ -1335,5 +1335,364 @@
       "  );\n",
       "}\n"
     ]
+  },
+  {
+    "id": 69,
+    "title": "twoSum",
+    "language": "typescript",
+    "blocks": [
+      "function twoSum(nums: number[], target: number): number[] {\n",
+      "    const map = new Map<number, number>();\n",
+      "    \n",
+      "    for (let i = 0; i < nums.length; i++) {\n",
+      "        const other = target - nums[i];\n",
+      "        \n",
+      "        if (map.has(other)) {\n",
+      "            return [map.get(other)!, i];\n",
+      "        }\n",
+      "        \n",
+      "        map.set(nums[i], i);\n",
+      "    }\n",
+      "    \n",
+      "    return [];\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 70,
+    "title": "isPalindrome",
+    "language": "typescript",
+    "blocks": [
+      "function isPalindrome(x: number): boolean {\n",
+      "    if (x < 0) return false;\n",
+      "    \n",
+      "    let reverse = 0;\n",
+      "    let xcopy = x;\n",
+      "    \n",
+      "    while (x > 0) {\n",
+      "        reverse = reverse * 10 + (x % 10);\n",
+      "        x = Math.floor(x / 10);\n",
+      "    }\n",
+      "    \n",
+      "    return reverse === xcopy;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 71,
+    "title": "longestCommonPrefix",
+    "language": "typescript",
+    "blocks": [
+      "function longestCommonPrefix(strs: string[]): string {\n",
+      "    return strs.reduce((prev, next) => {\n",
+      "        let i = 0;\n",
+      "        while (prev[i] && next[i] && prev[i] === next[i]) i++;\n",
+      "        return prev.slice(0, i);\n",
+      "    });\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 72,
+    "title": "mergeTwoLists",
+    "language": "typescript",
+    "blocks": [
+      "class ListNode {\n",
+      "    val: number;\n",
+      "    next: ListNode | null;\n",
+      "    constructor(val = 0, next: ListNode | null = null) {\n",
+      "        this.val = val;\n",
+      "        this.next = next;\n",
+      "    }\n",
+      "}\n",
+      "\n",
+      "function mergeTwoLists(\n",
+      "    list1: ListNode | null,\n",
+      "    list2: ListNode | null\n",
+      "): ListNode | null {\n",
+      "    const dummy = new ListNode();\n",
+      "    let cur: ListNode = dummy;\n",
+      "    \n",
+      "    while (list1 && list2) {\n",
+      "        if (list1.val > list2.val) {\n",
+      "            cur.next = list2;\n",
+      "            list2 = list2.next;\n",
+      "        } else {\n",
+      "            cur.next = list1;\n",
+      "            list1 = list1.next;\n",
+      "        }\n",
+      "        cur = cur.next!;\n",
+      "    }\n",
+      "    \n",
+      "    cur.next = list1 ?? list2;\n",
+      "    return dummy.next;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 73,
+    "title": "removeDuplicates",
+    "language": "typescript",
+    "blocks": [
+      "function removeDuplicates(nums: number[]): number {\n",
+      "    let i = 1;\n",
+      "    \n",
+      "    for (let j = 1; j < nums.length; j++) {\n",
+      "        if (nums[j] !== nums[i - 1]) {\n",
+      "            nums[i] = nums[j];\n",
+      "            i++;\n",
+      "        }\n",
+      "    }\n",
+      "    \n",
+      "    return i;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 74,
+    "title": "strStr",
+    "language": "typescript",
+    "blocks": [
+      "function strStr(haystack: string, needle: string): number {\n",
+      "    if (haystack.length < needle.length) return -1;\n",
+      "    \n",
+      "    for (let i = 0; i <= haystack.length - needle.length; i++) {\n",
+      "        if (haystack.substring(i, i + needle.length) === needle) {\n",
+      "            return i;\n",
+      "        }\n",
+      "    }\n",
+      "    \n",
+      "    return -1;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 75,
+    "title": "searchInsert",
+    "language": "typescript",
+    "blocks": [
+      "function searchInsert(nums: number[], target: number): number {\n",
+      "    let left = 0;\n",
+      "    let right = nums.length - 1;\n",
+      "    \n",
+      "    while (left <= right) {\n",
+      "        const mid = Math.floor((left + right) / 2);\n",
+      "        \n",
+      "        if (nums[mid] === target) return mid;\n",
+      "        else if (nums[mid] > target) right = mid - 1;\n",
+      "        else left = mid + 1;\n",
+      "    }\n",
+      "    \n",
+      "    return left;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 76,
+    "title": "lengthOfLastWord",
+    "language": "typescript",
+    "blocks": [
+      "function lengthOfLastWord(s: string): number {\n",
+      "    let length = 0;\n",
+      "    \n",
+      "    for (let i = s.length - 1; i >= 0; i--) {\n",
+      "        if (s[i] !== ' ') {\n",
+      "            length++;\n",
+      "        } else if (length > 0) {\n",
+      "            break;\n",
+      "        }\n",
+      "    }\n",
+      "    \n",
+      "    return length;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 77,
+    "title": "plusOne",
+    "language": "typescript",
+    "blocks": [
+      "function plusOne(digits: number[]): number[] {\n",
+      "    for (let i = digits.length - 1; i >= 0; i--) {\n",
+      "        if (digits[i] + 1 !== 10) {\n",
+      "            digits[i] += 1;\n",
+      "            return digits;\n",
+      "        }\n",
+      "        digits[i] = 0;\n",
+      "        if (i === 0) {\n",
+      "            digits.unshift(1);\n",
+      "            return digits;\n",
+      "        }\n",
+      "    }\n",
+      "    return digits;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 78,
+    "title": "addBinary",
+    "language": "typescript",
+    "blocks": [
+      "function addBinary(a: string, b: string): string {\n",
+      "    let carry = 0;\n",
+      "    let res = '';\n",
+      "    let i = a.length - 1;\n",
+      "    let j = b.length - 1;\n",
+      "    \n",
+      "    while (i >= 0 || j >= 0 || carry) {\n",
+      "        let sum = carry;\n",
+      "        if (i >= 0) sum += parseInt(a[i--]);\n",
+      "        if (j >= 0) sum += parseInt(b[j--]);\n",
+      "        \n",
+      "        res = (sum % 2) + res;\n",
+      "        carry = Math.floor(sum / 2);\n",
+      "    }\n",
+      "    \n",
+      "    return res;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 79,
+    "title": "mySqrt",
+    "language": "typescript",
+    "blocks": [
+      "function mySqrt(x: number): number {\n",
+      "    let left = 1;\n",
+      "    let right = Math.floor(x / 2) + 1;\n",
+      "    \n",
+      "    while (left <= right) {\n",
+      "        const mid = Math.floor((left + right) / 2);\n",
+      "        \n",
+      "        if (mid * mid > x) right = mid - 1;\n",
+      "        else if (mid * mid < x) left = mid + 1;\n",
+      "        else return mid;\n",
+      "    }\n",
+      "    \n",
+      "    return right;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 80,
+    "title": "climbStairs",
+    "language": "typescript",
+    "blocks": [
+      "function climbStairs(n: number): number {\n",
+      "    if (n <= 3) return n;\n",
+      "    \n",
+      "    let prev1 = 3;\n",
+      "    let prev2 = 2;\n",
+      "    \n",
+      "    for (let i = 3; i < n; i++) {\n",
+      "        const cur = prev1 + prev2;\n",
+      "        prev2 = prev1;\n",
+      "        prev1 = cur;\n",
+      "    }\n",
+      "    \n",
+      "    return prev1;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 81,
+    "title": "deleteDuplicates",
+    "language": "typescript",
+    "blocks": [
+      "function deleteDuplicates(head: ListNode | null): ListNode | null {\n",
+      "    let cur = head;\n",
+      "    \n",
+      "    while (cur && cur.next) {\n",
+      "        if (cur.val === cur.next.val) {\n",
+      "            cur.next = cur.next.next;\n",
+      "        } else {\n",
+      "            cur = cur.next;\n",
+      "        }\n",
+      "    }\n",
+      "    \n",
+      "    return head;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 82,
+    "title": "mergeSortedArray",
+    "language": "typescript",
+    "blocks": [
+      "function merge(\n",
+      "    nums1: number[], m: number,\n",
+      "    nums2: number[], n: number\n",
+      "): void {\n",
+      "    for (let i = m, j = 0; j < n; i++, j++) {\n",
+      "        nums1[i] = nums2[j];\n",
+      "    }\n",
+      "    nums1.sort((a, b) => a - b);\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 83,
+    "title": "inorderTraversal",
+    "language": "typescript",
+    "blocks": [
+      "class TreeNode {\n",
+      "    val: number;\n",
+      "    left: TreeNode | null;\n",
+      "    right: TreeNode | null;\n",
+      "    constructor(val = 0, left: TreeNode | null = null, right: TreeNode | null = null) {\n",
+      "        this.val = val;\n",
+      "        this.left = left;\n",
+      "        this.right = right;\n",
+      "    }\n",
+      "}\n",
+      "\n",
+      "function inorderTraversal(root: TreeNode | null): number[] {\n",
+      "    const res: number[] = [];\n",
+      "    \n",
+      "    function inorder(node: TreeNode | null): void {\n",
+      "        if (!node) return;\n",
+      "        inorder(node.left);\n",
+      "        res.push(node.val);\n",
+      "        inorder(node.right);\n",
+      "    }\n",
+      "    \n",
+      "    inorder(root);\n",
+      "    return res;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 84,
+    "title": "isSameTree",
+    "language": "typescript",
+    "blocks": [
+      "function isSameTree(p: TreeNode | null, q: TreeNode | null): boolean {\n",
+      "    if (!p && !q) return true;\n",
+      "    if (p && q && p.val === q.val) {\n",
+      "        return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);\n",
+      "    }\n",
+      "    return false;\n",
+      "}\n"
+    ]
+  },
+  {
+    "id": 85,
+    "title": "isSymmetric",
+    "language": "typescript",
+    "blocks": [
+      "function isSymmetric(root: TreeNode | null): boolean {\n",
+      "    const isMirror = (n1: TreeNode | null, n2: TreeNode | null): boolean => {\n",
+      "        if (!n1 && !n2) return true;\n",
+      "        if (!n1 || !n2) return false;\n",
+      "        return (\n",
+      "            n1.val === n2.val &&\n",
+      "            isMirror(n1.left, n2.right) &&\n",
+      "            isMirror(n1.right, n2.left)\n",
+      "        );\n",
+      "    };\n",
+      "    \n",
+      "    return isMirror(root?.left ?? null, root?.right ?? null);\n",
+      "}\n"
+    ]
   }
 ]

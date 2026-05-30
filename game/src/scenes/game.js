@@ -13,17 +13,23 @@ import {
     MAX_BLOCKS,
     goalBlocks,
     maxMistakes,
-    ICON_START_Y
+    ICON_START_Y,
 } from "../constants.js";
 import {
     toggleCapsLock,
     shouldUppercase,
     preventError,
     shuffle,
-    makeBlink
+    makeBlink,
 } from "../data/utilities.js";
 
-import { k, loadGtag, onBlockReached, onGameStart, MEASUREMENT_ID } from "../kaplay.js";
+import {
+    k,
+    loadGtag,
+    onBlockReached,
+    onGameStart,
+    MEASUREMENT_ID,
+} from "../kaplay.js";
 import { themes } from "../data/themes.js";
 import { resizablePos } from "../components/resizablePos.js";
 import { resizableRect } from "../components/resizableRect.js";
@@ -75,7 +81,6 @@ let cachedTokens = [];
  */
 
 const gameScene = (params) => {
-
     loadGtag(MEASUREMENT_ID, () => {
         onGameStart();
     });
@@ -102,19 +107,20 @@ const gameScene = (params) => {
     let volumeIncrease;
 
     const filteredDialogs = dialogsData.filter(
-        item => (item.language || "default") === settings.language
+        (item) => (item.language || "default") === settings.language,
     );
     const shuffledDialogs = shuffle([...filteredDialogs]);
 
     //save for analiytics
-    blockNamesString = shuffledDialogs.slice(0, MAX_BLOCKS).map(item => item.title);
+    blockNamesString = shuffledDialogs
+        .slice(0, MAX_BLOCKS)
+        .map((item) => item.title);
     // #region PLAYER  & RIVAL VARIABLES
 
     /**
      * @type {PlayerState}
      */
     const playerState = {
-
         cursorPos: 0,
         line: "",
         curLineCount: 0,
@@ -165,7 +171,10 @@ const gameScene = (params) => {
         const { cursorPos: rPos } = rivalState;
 
         if (errorCharsIndexes.includes(i)) return COLOR_TEXT_INCORRECT;
-        if (!settings.practiceMode && (i === rPos || (i > pPos - 1 && i < rPos + 1)))
+        if (
+            !settings.practiceMode &&
+            (i === rPos || (i > pPos - 1 && i < rPos + 1))
+        )
             return COLOR_TEXT_RIVAL;
         if (ch === " " || i > pPos - 1) return COLOR_TEXT_DEFAULT;
 
@@ -188,13 +197,13 @@ const gameScene = (params) => {
         }
 
         const tokenRules = [
-            { test: t => A.tags.test(t), color: T.tags },
-            { test: t => A.numbers.test(t), color: T.numbers },
-            { test: t => A.classes.test(t), color: T.classes },
-            { test: t => A.functions.test(t), color: T.functions },
-            { test: t => A.keywords.test(t), color: T.keywords },
-            { test: t => A.strings.test(t), color: T.strings },
-            { test: t => /^[A-Za-z_$][\w$]*$/.test(t), color: T.variables },
+            { test: (t) => A.tags.test(t), color: T.tags },
+            { test: (t) => A.numbers.test(t), color: T.numbers },
+            { test: (t) => A.classes.test(t), color: T.classes },
+            { test: (t) => A.functions.test(t), color: T.functions },
+            { test: (t) => A.keywords.test(t), color: T.keywords },
+            { test: (t) => A.strings.test(t), color: T.strings },
+            { test: (t) => /^[A-Za-z_$][\w$]*$/.test(t), color: T.variables },
         ];
         for (const { test, color } of tokenRules) {
             if (test(token)) return k.Color.fromHex(color);
@@ -250,12 +259,14 @@ const gameScene = (params) => {
         }
     }
     function updateAWPM() {
-        const totalEventsLast60 = eventBuffer.reduce((sum, count) => sum + count, 0);
+        const totalEventsLast60 = eventBuffer.reduce(
+            (sum, count) => sum + count,
+            0,
+        );
         actual_awpm = totalEventsLast60 / 5;
     }
 
     function escapeForRender(str) {
-
         return str
             .replace(/\\/g, "\\\\")
             .replace(/\[/g, "\\[")
@@ -307,8 +318,10 @@ const gameScene = (params) => {
             const textObj = titleTexts[i];
             if (shuffledDialogs[currentBlockIndex + i]) {
                 textObj.text = shuffledDialogs[currentBlockIndex + i].title;
-                textObj.color = (currentBlockIndex + i) <= currentBlockIndex ? k.rgb(127, 134, 131) : k.WHITE;
-
+                textObj.color =
+                    currentBlockIndex + i <= currentBlockIndex
+                        ? k.rgb(127, 134, 131)
+                        : k.WHITE;
             } else {
                 textObj.text = "";
             }
@@ -415,8 +428,8 @@ const gameScene = (params) => {
     };
 
     const texts = dialogsData
-        .filter(item => (item.language || "default") === settings.language)
-        .map(item => ({
+        .filter((item) => (item.language || "default") === settings.language)
+        .map((item) => ({
             title: item.title,
             language: item.language || "default",
         }));
@@ -431,8 +444,8 @@ const gameScene = (params) => {
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.02,
-                    k.height() * (ICON_START_Y + SPACING * index)
-                )
+                    k.height() * (ICON_START_Y + SPACING * index),
+                ),
             ),
             k.opacity(1),
             k.z(55),
@@ -444,8 +457,8 @@ const gameScene = (params) => {
             resizablePos(() =>
                 k.vec2(
                     k.width() * 0.05,
-                    k.height() * (TEXT_START_Y + SPACING * index)
-                )
+                    k.height() * (TEXT_START_Y + SPACING * index),
+                ),
             ),
             k.color(k.WHITE),
             k.opacity(1),
@@ -458,8 +471,7 @@ const gameScene = (params) => {
         button_muteON.opacity = 0;
         button_muteOFF.opacity = 1;
         updateMusicVolume();
-    }
-    else {
+    } else {
         button_muteON.opacity = 1;
         button_muteOFF.opacity = 0;
         updateMusicVolume();
@@ -530,10 +542,11 @@ const gameScene = (params) => {
         k.opacity(0),
     ]);
 
-
     const textboxTextPos = () => {
-        return k.vec2(textPadding).sub(0, lineHeight * (JUMP_AFTER * jumpCount));
-    }
+        return k
+            .vec2(textPadding)
+            .sub(0, lineHeight * (JUMP_AFTER * jumpCount));
+    };
 
     const textboxText = textboxBackParent.add([
         k.text("", {
@@ -557,12 +570,11 @@ const gameScene = (params) => {
         const player = rival ? rivalState : playerState;
         const displayLine = player.curLineCount - jumpCount * JUMP_AFTER;
         const x = player.curCharInLine * fontWidth;
-        const y = displayLine * actualLineHeight
-            + cursorVerticalOffset
-            + CURSOR_EXTRA_OFFSET;
-        return textboxBackParent.pos
-            .add(textboxText.pos)
-            .add(x, y);
+        const y =
+            displayLine * actualLineHeight +
+            cursorVerticalOffset +
+            CURSOR_EXTRA_OFFSET;
+        return textboxBackParent.pos.add(textboxText.pos).add(x, y);
     };
 
     const cursorPointer = k.add([
@@ -637,7 +649,6 @@ const gameScene = (params) => {
         const steps = 4;
 
         if (completedBlocks > 0) {
-
             const t = Math.min(completedBlocks, steps) / steps;
             rivalSpeed = startSpeed * Math.pow(endSpeed / startSpeed, t);
         } else {
@@ -658,7 +669,7 @@ const gameScene = (params) => {
 
         const currentDialog = getCurrentDialog();
         const lang = currentDialog.language ?? "default";
-        theme = themes.find(t => t.name === lang) || themes[0];
+        theme = themes.find((t) => t.name === lang) || themes[0];
         const currentBlocks = currentDialog.blocks;
         curBlockData.lineCount = currentBlocks.length;
         originalText = currentBlocks.join("");
@@ -692,7 +703,7 @@ const gameScene = (params) => {
                     return char;
                 }
             })
-            .join("")
+            .join("");
         renderedText = escapeForRender(renderedText);
         textboxText.text = renderedText;
     }
@@ -723,8 +734,7 @@ const gameScene = (params) => {
         player.curLineCount++;
         if (JUMP_AFTER == 1) {
             jumpCount++;
-        }
-        else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
+        } else if (playerState.curLineCount >= JUMP_AFTER * (jumpCount + 1)) {
             jumpCount++;
         }
         if (!isRival) {
@@ -759,9 +769,18 @@ const gameScene = (params) => {
     function analitycs_calculate() {
         time_text.text = startTime.toFixed(1);
         if (startTime > 0 && totalCorrectChars > 5) {
-            actual_wpm = (totalCorrectChars && startTime > 1) ? (totalCorrectChars / 5) / (startTime / 60) : 0;
-            actual_lpm = (totalCorrectlines && startTime > 1) ? (totalCorrectlines) / (startTime / 60) : 0;
-            actual_acc = totalTypedCharacters > 0 ? (totalCorrectChars / totalTypedCharacters) * 100 : 100;
+            actual_wpm =
+                totalCorrectChars && startTime > 1
+                    ? totalCorrectChars / 5 / (startTime / 60)
+                    : 0;
+            actual_lpm =
+                totalCorrectlines && startTime > 1
+                    ? totalCorrectlines / (startTime / 60)
+                    : 0;
+            actual_acc =
+                totalTypedCharacters > 0
+                    ? (totalCorrectChars / totalTypedCharacters) * 100
+                    : 100;
 
             if (isNaN(actual_acc)) {
                 actual_acc = 100;
@@ -769,7 +788,6 @@ const gameScene = (params) => {
 
             wmp_text.text = Math.round(actual_wpm || 0).toString();
         }
-
     }
 
     const BUFFER_SIZE = 60;
@@ -795,7 +813,8 @@ const gameScene = (params) => {
     });
 
     k.onKeyPress((keyPressed) => {
-        const prevChar = playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : '';
+        const prevChar =
+            playerState.cursorPos > 0 ? fixedText[playerState.cursorPos] : "";
         if (prevChar === "\n") return;
 
         const correctChar = fixedText[playerState.cursorPos];
@@ -826,7 +845,8 @@ const gameScene = (params) => {
             addCorrectEvent();
             nextChar();
         } else {
-            if (errorCharsIndexes.length > maxMistakes) return preventError(k, settings);
+            if (errorCharsIndexes.length > maxMistakes)
+                return preventError(k, settings);
 
             errorCharsIndexes.push(playerState.cursorPos);
             errorCharsReplaces[playerState.cursorPos] = errorKey;
@@ -836,7 +856,10 @@ const gameScene = (params) => {
             if (!settings.mute) k.play("wrong_typing");
             totalIcorrectCorrectChars++;
         }
-        if (!playerStartedTyping && (totalCorrectChars > 0 || totalIcorrectCorrectChars > 0)) {
+        if (
+            !playerStartedTyping &&
+            (totalCorrectChars > 0 || totalIcorrectCorrectChars > 0)
+        ) {
             playerStartedTyping = true;
         }
     });

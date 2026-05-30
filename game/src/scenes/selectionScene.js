@@ -1,7 +1,7 @@
 import {
     escapeBackslashes,
     preventError,
-    setCapsLockActive
+    setCapsLockActive,
 } from "../data/utilities.js";
 import { getMute, saveMute } from "../systems/preferences.js";
 import { resizablePos } from "../components/resizablePos.js";
@@ -11,11 +11,12 @@ export const settings = {
     practiceMode: false,
     isCapsOn: false,
     rivalSpeed: 0,
-    language: "js"
+    language: "js",
 };
 function isMobile() {
-    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i
-        .test(navigator.userAgent);
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent,
+    );
 }
 k.scene("selection", () => {
     k.loadSprite("icon_05", "/sprites/icon_05.png");
@@ -33,7 +34,7 @@ k.scene("selection", () => {
     const textY = k.height() * 0.85;
     const underscoreY = k.height() * 0.86;
     const boxY = k.height() * 0.66;
-    const boxX = k.width() * 0.30 - 10;
+    const boxX = k.width() * 0.3 - 10;
     const boxCenterX = boxX + boxWidth / 2;
     const arrowYOffset = 0;
     const buttonLeftX = k.width() * 0.35 - 40;
@@ -68,7 +69,7 @@ k.scene("selection", () => {
     }
     isMobile();
     k.add([
-        k.pos(boxCenterX, k.height() * 0.50),
+        k.pos(boxCenterX, k.height() * 0.5),
         k.anchor("center"),
         k.text("Get faster and better at technical interviewing", { size: 22 }),
         k.color(k.WHITE),
@@ -88,12 +89,57 @@ k.scene("selection", () => {
         k.z(18),
     ]);
 
-    const outsideBox = k.add([k.rect(810, 260, { radius: 0 }), k.pos(k.width() * 0.30 - 15, boxY), k.color(k.rgb(52, 53, 54)), k.z(20), k.opacity(0.3)]);
-    const outerBox = k.add([k.rect(790, 230, { radius: 1 }), k.pos(k.width() * 0.30 - 5, boxY + 20), k.color(0, 0, 0), k.z(20), k.opacity(1)]);
-    const selecttext = k.add([k.anchor("left"), k.text("", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY)), k.opacity(1), k.z(21)]);
-    const selecttext2 = k.add([k.anchor("left"), k.text("", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap)), k.opacity(1), k.z(21)]);
-    const selecttext3 = k.add([k.anchor("left"), k.text("", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap * 2)), k.opacity(1), k.z(21)]);
-    const selecttext4 = k.add([k.anchor("left"), k.text("", { size: fontsize }), resizablePos(() => k.vec2(buttonLeftX + 250, buttonTopY + buttonGap)), k.opacity(1), k.z(21)]);
+    const outsideBox = k.add([
+        k.rect(810, 260, { radius: 0 }),
+        k.pos(k.width() * 0.3 - 15, boxY),
+        k.color(k.rgb(52, 53, 54)),
+        k.z(20),
+        k.opacity(0.3),
+    ]);
+    const outerBox = k.add([
+        k.rect(790, 230, { radius: 1 }),
+        k.pos(k.width() * 0.3 - 5, boxY + 20),
+        k.color(0, 0, 0),
+        k.z(20),
+        k.opacity(1),
+    ]);
+    const selecttext = k.add([
+        k.anchor("left"),
+        k.text("", { size: fontsize }),
+        resizablePos(() => k.vec2(buttonLeftX, buttonTopY)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const selecttext2 = k.add([
+        k.anchor("left"),
+        k.text("", { size: fontsize }),
+        resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const selecttext3 = k.add([
+        k.anchor("left"),
+        k.text("", { size: fontsize }),
+        resizablePos(() => k.vec2(buttonLeftX, buttonTopY + buttonGap * 2)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const selecttext4 = k.add([
+        k.anchor("left"),
+        k.text("", { size: fontsize }),
+        resizablePos(() => k.vec2(buttonLeftX + 250, buttonTopY + buttonGap)),
+        k.opacity(1),
+        k.z(21),
+    ]);
+    const selecttext5 = k.add([
+        k.anchor("left"),
+        k.text("", { size: fontsize }),
+        resizablePos(() =>
+            k.vec2(buttonLeftX + 250, buttonTopY + buttonGap * 2),
+        ),
+        k.opacity(1),
+        k.z(21),
+    ]);
 
     const button_muteON = k.add([
         k.sprite("muteON"),
@@ -129,27 +175,36 @@ k.scene("selection", () => {
                 commands = ["yes", "no"];
                 break;
             case 2:
-                commands = ["javascript", "python", "golang"];
+                commands = ["javascript", "typescript", "python", "golang"];
                 break;
             case 3:
                 commands = ["interview", "practice"];
                 break;
         }
-        selecttext.text = stage === 0 ? "start"
-            : stage === 1 ? "Play with Audio?"
-                : stage === 2 ? "Language"
+        selecttext.text =
+            stage === 0
+                ? "start"
+                : stage === 1
+                  ? "Play with Audio?"
+                  : stage === 2
+                    ? "Language"
                     : "Game Mode";
         selecttext2.text = commands[0];
         selecttext3.text = commands[1];
-        if (stage === 2) selecttext4.text = commands[2];
-        else selecttext4.text = "";
+        if (stage === 2) {
+            selecttext4.text = commands[2];
+            selecttext5.text = commands[3];
+        } else {
+            selecttext4.text = "";
+            selecttext5.text = "";
+        }
 
         updateTextColors();
     }
     function calcNewTarget(input) {
         if (input !== "") {
-            const match = commands.find(cmd =>
-                cmd.startsWith(input.toLowerCase())
+            const match = commands.find((cmd) =>
+                cmd.startsWith(input.toLowerCase()),
             );
             if (match) return match;
         }
@@ -157,7 +212,7 @@ k.scene("selection", () => {
         const defaults = {
             1: "yes",
             2: "javascript",
-            3: "interview"
+            3: "interview",
         };
 
         return defaults[stage] || "start";
@@ -167,24 +222,29 @@ k.scene("selection", () => {
         const newY = targetObj.pos.y + arrowYOffset;
         const newX = targetObj.pos.x + targetObj.text.length * 16;
         commandArrow.pos = k.vec2(newX, newY);
-        commandArrow.animate("pos", [k.vec2(newX, newY), k.vec2(newX + 10, newY)], {
-            duration: 0.5,
-            loop: true,
-            direction: "ping-pong",
-        });
+        commandArrow.animate(
+            "pos",
+            [k.vec2(newX, newY), k.vec2(newX + 10, newY)],
+            {
+                duration: 0.5,
+                loop: true,
+                direction: "ping-pong",
+            },
+        );
     }
 
     let targetText = "start";
     let maxLength = targetText.length;
     const letterSpacing = 14;
-    const fixedStartX = k.width() / 2.88 - ((maxLength - 1) * letterSpacing) / 2;
+    const fixedStartX =
+        k.width() / 2.88 - ((maxLength - 1) * letterSpacing) / 2;
     let letterObjects = [];
     let underscoreObjects = [];
     updateTextColors();
 
     function createLetterObjects() {
-        letterObjects.forEach(obj => k.destroy(obj));
-        underscoreObjects.forEach(obj => k.destroy(obj));
+        letterObjects.forEach((obj) => k.destroy(obj));
+        underscoreObjects.forEach((obj) => k.destroy(obj));
         letterObjects = [];
         underscoreObjects = [];
 
@@ -217,6 +277,8 @@ k.scene("selection", () => {
         selecttext.color = k.rgb(255, 255, 255);
         selecttext2.color = k.rgb(255, 255, 255);
         selecttext3.color = k.rgb(255, 255, 255);
+        selecttext4.color = k.rgb(255, 255, 255);
+        selecttext5.color = k.rgb(255, 255, 255);
 
         const cmdLower = targetText.toLowerCase();
         let commandList;
@@ -226,26 +288,27 @@ k.scene("selection", () => {
                 commandList = [
                     { obj: selecttext, label: "start" },
                     { obj: selecttext2, label: "about" },
-                    { obj: selecttext3, label: "github" }
+                    { obj: selecttext3, label: "github" },
                 ];
                 break;
             case 1:
                 commandList = [
                     { obj: selecttext2, label: "yes" },
-                    { obj: selecttext3, label: "no" }
+                    { obj: selecttext3, label: "no" },
                 ];
                 break;
             case 2:
                 commandList = [
                     { obj: selecttext2, label: "javascript" },
-                    { obj: selecttext3, label: "python" },
-                    { obj: selecttext4, label: "golang" }
+                    { obj: selecttext3, label: "typescript" },
+                    { obj: selecttext4, label: "python" },
+                    { obj: selecttext5, label: "golang" },
                 ];
                 break;
             case 3:
                 commandList = [
                     { obj: selecttext2, label: "interview" },
-                    { obj: selecttext3, label: "practice" }
+                    { obj: selecttext3, label: "practice" },
                 ];
                 break;
             default:
@@ -253,10 +316,12 @@ k.scene("selection", () => {
         }
 
         let selected = null;
+        let selectedLabel = null;
         commandList.forEach(({ obj, label }) => {
             if (cmdLower === label) {
                 obj.color = k.rgb(3, 255, 87);
                 selected = obj;
+                selectedLabel = label;
             }
         });
 
@@ -322,8 +387,10 @@ k.scene("selection", () => {
 
         const maxError = 3;
         const isTooLongTotal = input.length > targetText.length;
-        const isGrowingWithErrors = input.length > previousInput.length && localErrorCount >= maxError;
-        const hasAdvancedPastError = localErrorCount >= 2 && input.length > lastErrorIndex + 1;
+        const isGrowingWithErrors =
+            input.length > previousInput.length && localErrorCount >= maxError;
+        const hasAdvancedPastError =
+            localErrorCount >= 2 && input.length > lastErrorIndex + 1;
 
         if (isTooLongTotal || isGrowingWithErrors) {
             preventError(k, settings);
@@ -351,14 +418,17 @@ k.scene("selection", () => {
             const char = input[i];
             const displayChar = !char
                 ? correct
-                : (char === " " && correct !== " " ? "_" : char);
+                : char === " " && correct !== " "
+                  ? "_"
+                  : char;
 
             letterObj.text = escapeBackslashes(displayChar);
             letterObj.color = !char
                 ? k.rgb(128, 128, 128)
-                : (char.toLowerCase() !== correct.toLowerCase() || (char === " " && correct !== " "))
-                    ? k.rgb(255, 0, 0)
-                    : k.rgb(3, 255, 87);
+                : char.toLowerCase() !== correct.toLowerCase() ||
+                    (char === " " && correct !== " ")
+                  ? k.rgb(255, 0, 0)
+                  : k.rgb(3, 255, 87);
         });
 
         underscoreObjects.forEach((uObj, i) => {
@@ -372,10 +442,12 @@ k.scene("selection", () => {
 
         switch (input.toLowerCase()) {
             case "javascript":
+            case "typescript":
             case "python":
             case "golang":
                 if (stage === 2) {
                     settings.language = input.toLowerCase();
+
                     advanceStage();
                     updateStageCommands();
                     const candidate = calcNewTarget("");
@@ -489,7 +561,10 @@ k.scene("selection", () => {
 
     function setupKeyboardInput() {
         handleKeydown = (e) => {
-            if (e.getModifierState && typeof e.getModifierState === "function") {
+            if (
+                e.getModifierState &&
+                typeof e.getModifierState === "function"
+            ) {
                 settings.isCapsOn = e.getModifierState("CapsLock");
             }
             if (e.key.length === 1) {
@@ -515,7 +590,7 @@ k.scene("selection", () => {
         window.addEventListener("keydown", handleKeydown);
     }
 
-    k.onKeyPress('backspace', () => {
+    k.onKeyPress("backspace", () => {
         if (!rawInput) return;
         rawInput = rawInput.slice(0, -1);
         name.text = escapeBackslashes(rawInput);

@@ -18,6 +18,19 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The game appends a full-size canvas to body; shrink it to leave room for the footer. */
+body > canvas {
+  flex: 1;
+  min-height: 0;
+  height: auto !important;
+}
+
+#__next {
+  order: 1;
 }
 
 @layer utilities {
